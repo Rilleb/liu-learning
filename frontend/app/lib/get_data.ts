@@ -6,7 +6,7 @@ const userMap = new Map<number, User>([
     {
       userId: 1,
       name: "Alice",
-      courses: [101, 205],
+      courses: [101, 205, 301, 1],
       friends: [2, 3],
     },
   ],
@@ -35,21 +35,25 @@ const exampleCourses: Course[] = [
     courseId: 101,
     title: "Introduction to Computer Science",
     quizes: [1, 2, 3, 4],
+    completedQuizes: [1, 2],
   },
   {
     courseId: 205,
     title: "Advanced Data Structures",
     quizes: [5, 6, 7],
+    completedQuizes: [5, 6, 7],
   },
   {
     courseId: 301,
     title: "Machine Learning Fundamentals",
     quizes: [8, 9, 10, 11, 12],
+    completedQuizes: [8, 9, 10],
   },
   {
     courseId: 1,
     title: "Basic Mathematics for Computing",
     quizes: [13, 14],
+    completedQuizes: [],
   },
 ];
 
@@ -57,7 +61,7 @@ export function get_user(userId: number) {
   return userMap.get(userId);
 }
 
-export function get_courses(userId: number) {
+export function get_courses(userId: number): Course[] {
   const user = get_user(userId);
   const courseIds = user?.courses;
   if (courseIds) {
@@ -65,6 +69,6 @@ export function get_courses(userId: number) {
       courseIds.includes(course.courseId),
     );
   } else {
-    return {};
+    return [];
   }
 }
