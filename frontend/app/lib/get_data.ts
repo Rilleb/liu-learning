@@ -1,4 +1,4 @@
-import { User, Course } from "../data_types/data_types";
+import { User, Course, Quiz } from "../data_types/data_types";
 
 const userMap = new Map<number, User>([
   [
@@ -57,6 +57,23 @@ const exampleCourses: Course[] = [
   },
 ];
 
+export const quizes: Quiz[] = [
+  { quizId: 1, name: "Introduction to Programming" },
+  { quizId: 2, name: "Variables and Data Types" },
+  { quizId: 3, name: "Control Structures" },
+  { quizId: 4, name: "Functions and Scope" },
+  { quizId: 5, name: "Object-Oriented Programming" },
+  { quizId: 6, name: "Arrays and Collections" },
+  { quizId: 7, name: "Error Handling" },
+  { quizId: 8, name: "Asynchronous Programming" },
+  { quizId: 9, name: "Databases and SQL Basics" },
+  { quizId: 10, name: "Web Development Basics" },
+  { quizId: 11, name: "Version Control with Git" },
+  { quizId: 12, name: "Testing and Debugging" },
+  { quizId: 13, name: "Software Design Patterns" },
+  { quizId: 14, name: "Final Project Quiz" },
+];
+
 export function get_user(userId: number) {
   return userMap.get(userId);
 }
@@ -71,4 +88,8 @@ export function get_courses(userId: number): Course[] {
   } else {
     return [];
   }
+}
+
+export function get_latest_quizes(numberOf: number): Quiz[] {
+  return quizes.slice(0, numberOf);
 }
