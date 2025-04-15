@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function Header() {
   return (
-    <div className="w-full bg-red-300 float-left h-12">
+    <div className="w-full bg-red-300 h-12">
       <Link href="/user_profile" className="float-right">
         <Image
           src="/globe.svg"
