@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -5,12 +6,8 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
-  const pathname = usePathname(); // Get the current path
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const [isOpen, setIsOpen] = useState(true);
+  const pathname = usePathname();
 
   const navLinks = [
     { href: "/", label: "Home" },
@@ -20,39 +17,35 @@ export default function Navbar() {
   ];
 
   return (
-    <>
-      {/* Toggle button */}
+    <div className={`transition-all duration-300 ${isOpen ? "w-64" : "w-16"} bg-red-400 h-screen relative`}>
+      {/* Toggle Button */}
       <button
-        onClick={toggleMenu}
-        className="fixed top-4 left-4 z-50"
-        aria-label="Toggle menu"
+        onClick={() => setIsOpen(!isOpen)}
+        className="absolute top-4 mx-2 w-6 h-6 flex items-center justify-center z-50"
+        aria-label="Toggle Sidebar"
       >
         <div className="w-6 flex flex-col gap-1">
           <span className="h-0.5 w-full bg-black"></span>
           <span className="h-0.5 w-full bg-black"></span>
           <span className="h-0.5 w-full bg-black"></span>
-        </div>
-      </button>
+        </div>      </button>
 
-      {/* Navbar */}
-      <div
-        className={`fixed top-0 left-0 h-screen w-48 bg-red-400 transform transition-transform duration-300 z-40 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} justify-items-center`}
-      >
-        <ul className="flex flex-col mt-16 p-4 text-3xl font-stretch-150%">
-          {navLinks.map(({ href, label }) => ( // Iterate over each entry in navlinks
-            <li key={href}>
-              <Link
-                href={href}
-                className={`block px-4 py-4 rounded ${pathname === href ? "bg-gray-200 font-bold" : "hover:bg-gray-100"}`}
-              >
-                {label}
-              </Link>
-            </li>
-          ))}
+      {/* Nav Links */}
+      <ul className="mt-16 p-4 space-y-4 text-lg">
+        {navLinks.map(({ href, label }) => (
+          <li key={href}>
+            {isOpen && <Link
+              href={href}
+              className={`block px-2 py-1 rounded transition ${pathname === href ? "bg-gray-200 font-bold" : "hover:bg-gray-100"
+                }`}
+            >
 
-        </ul>
-      </div>
-    </>
+              <span className="ml-2">{label}</span>
+            </Link>}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
