@@ -14,13 +14,13 @@ const CourseComponent = ({ userId }: Props) => {
   const courses = get_courses(userId);
 
   return (
-    <div>
+    <div className="font-medium ">
       <ul>
         {courses && courses?.map((course, _) => {
           const completion = course.completedQuizes.length / course.quizes.length
-          return <li key={course.courseId}>
+          return <li key={course.courseId} className={"border-2 border-gray-200 rounded-md m-4"}>
             <Link href={`/course/${course.courseId}`}>
-              <p>Name: {course.title}</p>  {/*This should probably be a Link somewhere around here*/}
+              <h1>{course.title}</h1>  {/*This should probably be a Link somewhere around here*/}
               <ProgressBar progress={completion} />
             </Link>
           </li>;
@@ -53,13 +53,13 @@ export default function Home() {
 
   return (
     /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-    <div className="container m-auto grid grid-cols-2">
+    <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 flex">
       {/*Quizes*/}
-      <div>
+      <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
         <QuizComponent userId={userId} />
       </div>
       {/*Friends*/}
-      <div className="tile-marker">
+      <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-gray-300 p-4">
         <h2>Friends</h2>
         {user_data?.friends.map((id) => {
           const tmp = get_user(id);
@@ -67,7 +67,7 @@ export default function Home() {
         })}
       </div>
       {/*Courses*/}
-      <div className="tile-marker">
+      <div className="tile-marker col-span-2 border-2 md-col-span-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
         <CourseComponent userId={userId} />
       </div>
     </div>
