@@ -1,6 +1,7 @@
 import { get_courses, get_latest_quizes, get_user } from './lib/get_data'
 import ProgressBar from './components/progress_bar'
 import Link from 'next/link'
+import FriendsBar from './components/friend_bar'
 
 type Props = {
     userId: number
@@ -76,11 +77,7 @@ export default function Home() {
             </div>
             {/*Friends*/}
             <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
-                <h2>Friends</h2>
-                {user_data?.friends.map((id) => {
-                    const tmp = get_user(id)
-                    return <p key={id}>{tmp?.name}</p>
-                })}
+                <FriendsBar activeFriends={["James", "Thea", "Gustav", "Rickard"]} offlineFriends={["Christina", "Oscar"]} />
             </div>
             {/*Courses*/}
             <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
