@@ -3,7 +3,7 @@ import ProgressBar from './components/progress_bar'
 import Link from 'next/link'
 
 type Props = {
-    userId: number
+  userId: number
 }
 
 
@@ -37,7 +37,7 @@ const CourseComponent = ({ userId }: Props) => {
   );
 };
 const QuizComponent = ({ userId }: Props) => {
-  const quizes = get_latest_quizes(6);
+  const quizes = get_latest_quizes(12);
   return (
     <div>
       {/*Think it would be cool to make so if you hover on a quiz, the card flip and gives a description*/}
@@ -56,14 +56,14 @@ const QuizComponent = ({ userId }: Props) => {
 }
 
 export default function Home() {
-    const userId = 1
-    const user_data = get_user(userId)
+  const userId = 1
+  const user_data = get_user(userId)
 
   return (
     /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-    <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5">
+    <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
       {/*Quizes*/}
-      <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
+      <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
         <QuizComponent userId={userId} />
       </div>
       {/*Friends*/}
