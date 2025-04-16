@@ -1,9 +1,9 @@
-import { get_courses, get_latest_quizes, get_user } from "./lib/get_data";
-import ProgressBar from "./components/progress_bar";
-import Link from "next/link";
+import { get_courses, get_latest_quizes, get_user } from './lib/get_data'
+import ProgressBar from './components/progress_bar'
+import Link from 'next/link'
 
 type Props = {
-  userId: number
+    userId: number
 }
 
 
@@ -56,8 +56,8 @@ const QuizComponent = ({ userId }: Props) => {
 }
 
 export default function Home() {
-  const userId = 1;
-  const user_data = get_user(userId);
+    const userId = 1
+    const user_data = get_user(userId)
 
   return (
     /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/

@@ -1,4 +1,3 @@
-
 interface ProgressBarProps {
   total: number;
   completed: number;
