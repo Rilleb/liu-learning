@@ -31,31 +31,50 @@ const userMap = new Map<number, User>([
 ])
 
 const exampleCourses: Course[] = [
-    {
-        courseId: 101,
-        title: 'Introduction to Computer Science',
-        quizes: [1, 2, 3, 4],
-        completedQuizes: [1, 2],
-    },
-    {
-        courseId: 205,
-        title: 'Advanced Data Structures',
-        quizes: [5, 6, 7],
-        completedQuizes: [5, 6, 7],
-    },
-    {
-        courseId: 301,
-        title: 'Machine Learning Fundamentals',
-        quizes: [8, 9, 10, 11, 12],
-        completedQuizes: [8, 9, 10],
-    },
-    {
-        courseId: 1,
-        title: 'Basic Mathematics for Computing',
-        quizes: [13, 14],
-        completedQuizes: [],
-    },
-]
+  {
+    courseId: 101,
+    title: "Introduction to Computer Science",
+    quizes: [1, 2, 3, 4],
+    completedQuizes: [1, 2],
+  },
+  {
+    courseId: 205,
+    title: "Advanced Data Structures",
+    quizes: [5, 6, 7],
+    completedQuizes: [5, 6, 7],
+  },
+  {
+    courseId: 301,
+    title: "Machine Learning Fundamentals",
+    quizes: [8, 9, 10, 11, 12],
+    completedQuizes: [8, 9, 10],
+  },
+  {
+    courseId: 1,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14],
+    completedQuizes: [],
+  },
+  {
+    courseId: 2,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2],
+  },
+  {
+    courseId: 3,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2, 3],
+  },
+{
+    courseId: 4,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2, 3, 4],
+  },
+
+];
 
 export const quizes: Quiz[] = [
     { quizId: 1, name: 'Introduction to Programming' },
