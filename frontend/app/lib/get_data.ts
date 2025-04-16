@@ -6,7 +6,7 @@ const userMap = new Map<number, User>([
     {
       userId: 1,
       name: "Alice",
-      courses: [101, 205, 301, 1],
+      courses: [101, 205, 301, 1, 2, 3, 4],
       friends: [2, 3],
     },
   ],
@@ -55,6 +55,25 @@ const exampleCourses: Course[] = [
     quizes: [13, 14],
     completedQuizes: [],
   },
+  {
+    courseId: 2,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2],
+  },
+  {
+    courseId: 3,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2, 3],
+  },
+{
+    courseId: 4,
+    title: "Basic Mathematics for Computing",
+    quizes: [13, 14, 1, 2, 3],
+    completedQuizes: [1, 2, 3, 4],
+  },
+
 ];
 
 export const quizes: Quiz[] = [
