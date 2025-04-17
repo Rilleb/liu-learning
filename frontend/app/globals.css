@@ -4,8 +4,13 @@
 @tailwind components;
 
 :root {
-    --background: #ffffff;
-    --foreground: #171717;
+    --background: #CAE9FF;
+    --foreground: #1B4965;
+    --foreground2: #37566a;
+
+    --color1: #5FA8D3;
+    --color2: #62B6CB;
+    --color3: #BEE9E8;
 }
 
 @theme inline {
@@ -31,9 +36,9 @@ body {
 }
 
 h1 {
-    @apply text-4xl font-bold text-gray-800;
+    @apply text-4xl font-bold text-[var(--foreground)];
 }
 
 h3 {
-    @apply text-xl font-bold text-gray-400;
+    @apply text-xl font-bold text-[var(--foreground2)];
 }
