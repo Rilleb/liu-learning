@@ -18,7 +18,7 @@ const CourseComponent = ({ userId }: Props) => {
                     courses.map((course) => (
                         <li
                             key={course.courseId}
-                            className="border-2 border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow"
+                            className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                         >
                             <Link href={`/course/${course.courseId}`}>
                                 <div className="space-y-2">
@@ -47,11 +47,11 @@ const QuizComponent = ({ userId }: Props) => {
             <h1>Upcoming Quizes</h1>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quizes &&
-                    quizes.map((quiz) => {
+                    quizes.map((quiz ) => {
                         return (
                             <li
                                 key={quiz.quizId}
-                                className="border-2 border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow"
+                                className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                             >
                                 <Link href={'/quiz_that_needs_to_change'}>
                                     <p>Quiz: {quiz.name} </p>
@@ -72,15 +72,15 @@ export default function Home() {
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             {/*Quizes*/}
-            <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
+            <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
                 <QuizComponent userId={userId} />
             </div>
             {/*Friends*/}
-            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
+            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
                 <FriendsBar activeFriends={["James", "Thea", "Gustav", "Rickard"]} offlineFriends={["Christina", "Oscar"]} />
             </div>
             {/*Courses*/}
-            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
+            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
                 <CourseComponent userId={userId} />
             </div>
         </div>

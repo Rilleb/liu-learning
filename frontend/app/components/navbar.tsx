@@ -17,7 +17,7 @@ export default function Navbar() {
 
     return (
         <div
-            className={`transition-all duration-300 ${isOpen ? 'w-64' : 'w-16'} bg-red-400 h-screen relative`}
+            className={`transition-all duration-300 ${isOpen ? 'w-64' : 'w-16'} bg-[var(--color1)] h-screen relative`}
         >
             {/* Toggle Button */}
             <button
@@ -26,9 +26,9 @@ export default function Navbar() {
                 aria-label="Toggle Sidebar"
             >
                 <div className="w-6 flex flex-col gap-1">
-                    <span className="h-0.5 w-full bg-black"></span>
-                    <span className="h-0.5 w-full bg-black"></span>
-                    <span className="h-0.5 w-full bg-black"></span>
+                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
+                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
+                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
                 </div>{' '}
             </button>
 
@@ -41,8 +41,8 @@ export default function Navbar() {
                                 href={href}
                                 className={`block px-2 py-1 rounded transition ${
                                     pathname === href
-                                        ? 'bg-gray-200 font-bold'
-                                        : 'hover:bg-gray-100'
+                                        ? 'bg-[var(--background)] font-bold'
+                                        : 'hover:bg-[var(--color3)]'
                                 }`}
                             >
                                 <span className="ml-2">{label}</span>
