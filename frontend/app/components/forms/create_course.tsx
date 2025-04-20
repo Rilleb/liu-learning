@@ -2,7 +2,7 @@
 
 import Form from 'next/form';
 import { useState } from 'react';
-import { printData } from './actions/print_data';
+import { printData } from '@/app/create/actions/print_data';
 
 export default function CreateCourseForm() {
     const [chapters, setChapters] = useState<string[]>(['']);
@@ -82,4 +82,5 @@ export default function CreateCourseForm() {
         </Form>
     );
 }
+
 
