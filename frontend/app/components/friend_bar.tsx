@@ -10,9 +10,9 @@ export default function FriendsBar({ activeFriends, offlineFriends }: FriendsBar
         <div>
             <h3>Active</h3>
             <ul>
-                {activeFriends && activeFriends.map((friend) => {
+                {activeFriends && activeFriends.map((friend, index) => {
                     return (
-                        <div className="flex items-center">
+                        <div key={index} className="flex items-center">
                             <Image src={"globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
                             {friend}
                             <span className="h-2 w-2 rounded-full bg-green-500 inline-block m-1" />
@@ -22,9 +22,9 @@ export default function FriendsBar({ activeFriends, offlineFriends }: FriendsBar
             </ul>
             <h3>Offline</h3>
             <ul>
-                {offlineFriends && offlineFriends.map((friend) => {
+                {offlineFriends && offlineFriends.map((friend, index) => {
                     return (
-                        <div className="flex items-center">
+                        <div key={index} className="flex items-center">
                             <Image src={"globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
                             {friend}
                             <span className="h-2 w-2 rounded-full bg-red-500 inline-block m-1" />
