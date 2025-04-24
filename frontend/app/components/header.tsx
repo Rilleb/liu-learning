@@ -42,7 +42,7 @@ function SearchBar() {
 
 export default function Header() {
     return (
-        <div className="w-full bg-white shadow-md h-16 flex items-center justify-between px-6">
+        <div className="w-full shadow-md bg-[var(--foreground)] h-12 flex items-center justify-between px-6">
             {/* Left section (can be empty or logo) */}
             <div className="w-1/3"></div>
 
@@ -63,6 +63,7 @@ export default function Header() {
                     />
                 </Link>
             </div>
+
         </div>
     )
 }
