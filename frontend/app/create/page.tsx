@@ -1,85 +1,26 @@
-'use client';
+import CreateCourseForm from '../components/forms/create_course'
+import Link from 'next/link'
 
-import Form from 'next/form';
-import { useState } from 'react';
-import { printData } from './actions/print_data';
-
-export default function CreateCourseForm() {
-    const [chapters, setChapters] = useState<string[]>(['']);
-
-    const handleAddChapter = () => {
-        setChapters([...chapters, '']); // Add new input
-    };
-
-    const handleRemoveChapter = (index: number) => {
-        const newChapters = chapters.filter((_, i) => i !== index);
-        setChapters(newChapters);
-    };
-
-    const handleChapterChange = (index: number, value: string) => {
-        const newChapters = [...chapters];
-        newChapters[index] = value;
-        setChapters(newChapters);
-    };
+export default function Page() {
 
     return (
-        <Form action={printData} className="space-y-4 max-w-md">
-            <div>
-                <label className="block text-sm font-medium">Course Title</label>
-                <input
-                    name="title"
-                    type="text"
-                    required
-                    className="w-full border px-2 py-1 rounded"
-                />
+        <div className="overflow-auto">
+            {/*Quizes*/}
+            <div className="overflow-auto">
+                <select />
             </div>
-
-            <div>
-                <label className="block text-sm font-medium">Description</label>
-                <textarea
-                    name="description"
-                    required
-                    className="w-full border px-2 py-1 rounded"
-                />
+            {/*Friends*/}
+            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
+                <h2>Friends</h2>
+                {user_data?.friends.map((id) => {
+                    const tmp = get_user(id)
+                    return <p key={id}>{tmp?.name}</p>
+                })}
             </div>
-
-            <div>
-                <label className="block text-sm font-medium">Chapters</label>
-                {chapters.map((chapter, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                        <input
-                            name={`chapters[${index}]`}
-                            type="text"
-                            value={chapter}
-                            onChange={(e) => handleChapterChange(index, e.target.value)}
-                            className="w-full border px-2 py-1 rounded"
-                            placeholder={`Chapter #${index + 1}`}
-                        />
-                        <button
-                            type="button"
-                            onClick={() => handleRemoveChapter(index)}
-                            className="text-red-500 text-sm"
-                        >
-                            ✕
-                        </button>
-                    </div>
-                ))}
-                <button
-                    type="button"
-                    onClick={handleAddChapter}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    + Add Chapter
-                </button>
+            {/*Courses*/}
+            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
+                <CourseComponent userId={userId} />
             </div>
-
-            <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-                Create Course
-            </button>
-        </Form>
-    );
+        </div>
+    )
 }
-
