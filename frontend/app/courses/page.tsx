@@ -1,6 +1,9 @@
 import { get_courses, get_user } from '../lib/get_data'
 import ProgressBar from '../components/progress_bar'
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { options } from '../api/auth/[...nextauth]/options'
+import { redirect } from 'next/navigation'
 
 type Props = {
     userId: number
@@ -39,11 +42,16 @@ const CourseComponent = ({ userId }: Props) => {
 }
 
 
-export default function Home() {
+export default async function Home() {
     const userId = 1
-    const user_data = get_user(userId)
+    const user_data = get_user(userId);
+    const session = await getServerSession(options);
 
+    if (!session) {
+        redirect("/api/auth/signin");
+    }
     return (
+
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             {/*Courses*/}
