@@ -1,26 +1,29 @@
-import CreateCourseForm from '../components/forms/create_course'
-import Link from 'next/link'
+"use client";
+
+import { useState } from 'react';
+import CreateCourseForm from '../components/forms/create_course';
+import CreateQuizForm from '../components/forms/create_quiz';
 
 export default function Page() {
+    const [formType, setFormType] = useState('course');
 
     return (
         <div className="overflow-auto">
-            {/*Quizes*/}
+            {/* Dropdown */}
+            <select
+                value={formType}
+                onChange={(e) => setFormType(e.target.value)}
+                className="border p-2 rounded mb-4"
+            >
+                <option value="course"> Course </option>
+                <option value="quiz"> Quiz </option>
+            </select>
+
+            {/*Forms*/}
             <div className="overflow-auto">
-                <select />
-            </div>
-            {/*Friends*/}
-            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-gray-300 p-4 overflow-auto">
-                <h2>Friends</h2>
-                {user_data?.friends.map((id) => {
-                    const tmp = get_user(id)
-                    return <p key={id}>{tmp?.name}</p>
-                })}
-            </div>
-            {/*Courses*/}
-            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-gray-300 p-4">
-                <CourseComponent userId={userId} />
+                <h2>Create new {formType}</h2>
+                {formType === 'course' ? <CreateCourseForm /> : <CreateQuizForm />}
             </div>
         </div>
-    )
+    );
 }
