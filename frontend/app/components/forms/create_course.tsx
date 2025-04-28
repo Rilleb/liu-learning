@@ -35,6 +35,16 @@ export default function CreateCourseForm() {
             </div>
 
             <div>
+                <label className="block text-sm font-medium">Course Code</label>
+                <input
+                    name="courseCode"
+                    type="text"
+                    required
+                    className="w-full border px-2 py-1 rounded"
+                />
+            </div>
+
+            <div>
                 <label className="block text-sm font-medium">Description</label>
                 <textarea
                     name="description"
