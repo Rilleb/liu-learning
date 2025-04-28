@@ -4,52 +4,106 @@ import Form from 'next/form';
 import { printData } from '@/app/create/actions/print_data';
 import { useState } from 'react';
 
+const MultipleChoiceAnswer = () => {
+    return (
+        <div className='grid-cols-2'>
+            <input
+                name="correctAnswer"
+                type="text"
+                placeholder="Alternative 1 (correct)"
+            />
+            <input
+                name="alternative1"
+                type="text"
+                placeholder="Alternative 1"
+            />
+            <input
+                name="alternative2"
+                type="text"
+                placeholder="Alternative 2"
+            />
+            <input
+                name="alternative3"
+                type="text"
+                placeholder="Alternative 3"
+            />
+        </div>
+    )
+}
 
 const QuizQuestions = () => {
+    const [answerType, setAnswerType] = useState<string[]>(['']);
+
+    const handleAnswerTypeChange = (index: number, type: string) => {
+        const newAnswerTypes = [...answerType];
+        newAnswerTypes[index] = type;
+        setAnswerType(newAnswerTypes);
+    };
+
     const [questions, setQuestions] = useState<string[]>(['']);
 
-    const [answerType, setAnswerType] = useState('answer');
-
     const handleAddQuestions = () => {
-        setQuestions([...questions, '']); // Add new input
+        setQuestions([...questions, '']);
+        setAnswerType([...answerType, '']);
     };
 
     const handleRemoveQuestions = (index: number) => {
         const newQuestions = questions.filter((_, i) => i !== index);
+        const newAnswerTypes = answerType.filter((_, i) => i !== index);
         setQuestions(newQuestions);
+        setAnswerType(newAnswerTypes);
     };
 
     const handleQuestionChange = (index: number, value: string) => {
         const newQuestions = [...questions];
-        newQuestions[index] = value; name = "questionType"
+        newQuestions[index] = value;
         setQuestions(newQuestions);
     };
 
     return (
-        <div>
+        <div className='items-center'>
             <label className="block text-sm font-medium">Questions</label>
             {questions.map((questions, index) => (
-                <div key={index} className="flex items-center gap-2">
-                    <input
-                        name={`question[${index}]`}
-                        type="text"
-                        value={questions}
-                        onChange={(e) => handleQuestionChange(index, e.target.value)}
-                        className="w-full border px-2 py-1 rounded"
-                        placeholder={`Chapter #${index + 1}`}
-                    />
-                    <button
-                        type="button"
-                        onClick={() => handleRemoveQuestions(index)}
-                        className="text-red-500 text-sm"
-                    >
-                        ✕
-                    </button>
+                <div key={index} >
+                    <div className="flex items-center gap-2">
+                        <input
+                            name={`question[${index}]`}
+                            type="text"
+                            value={questions}
+                            onChange={(e) => handleQuestionChange(index, e.target.value)}
+                            className="w-full border px-2 py-1 rounded"
+                            placeholder={`Question #${index + 1}`}
+                        />
+                        <button
+                            type="button"
+                            onClick={() => handleRemoveQuestions(index)}
+                            className="text-red-500 text-sm"
+                        >
+                            ✕
+                        </button>
+                    </div>
                     <label> Free Text </label>
-                    <input type="radio" name="questionType" value="free-text" onChange={(e) => setAnswerType(e.target.value)} />
+                    <input
+                        type="radio"
+                        name={`questionType-${index}`}
+                        value="free-text"
+                        onChange={(e) => handleAnswerTypeChange(index, e.target.value)} />
                     <label> Multiple Choice </label>
-                    <input type="radio" name="questionType" value="multiple-choice" onChange={(e) => setAnswerType(e.target.value)} />
-                    {answerType === 'free-text' ? <div> free </div> : <div> multiple </div>}
+                    <input
+                        type="radio"
+                        name={`questionType-${index}`}
+                        value="multiple-choice"
+                        onChange={(e) => handleQuestionChange(index, e.target.value)} />
+
+                    {answerType[index] === 'multiple-choice' ? (
+                        <MultipleChoiceAnswer />
+                    ) : (
+                        <>
+                            <div className='grid-cols-1'>
+                                <textarea name="free-text-answer" />
+                            </div>
+                        </>
+                    )}
                 </div>
             ))}
             <button
