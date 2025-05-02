@@ -12,6 +12,7 @@ Our goal is to create an engaging, gamified learning platform where users can tr
 ## Extra features (if time)
 - Add a 1v1 or (1v1v1... limited to 10 users) gamemode, where users compete against each other in a fast-paced. Quickest to anser x amount of questions correctly wins.
 - Use AI models to classify/generate questions for different subjects, e.g from pdfs.
+- Add resources tab for each courses that points to useful course resources.
 
 # Technical Specification
 
