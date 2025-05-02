@@ -4,52 +4,60 @@ import Form from 'next/form';
 import { printData } from '@/app/create/actions/print_data';
 import { useState } from 'react';
 
-const MultipleChoiceAnswer = () => {
+type MultipleChoiceAnswerProps = {
+    index: number;
+};
+
+const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index }) => {
     return (
-        <div className='grid-cols-2'>
+        <div className="grid grid-cols-1 gap-2 my-2">
             <input
-                name="correctAnswer"
+                name={`question[${index}].correctAnswer`}
                 type="text"
-                placeholder="Alternative 1 (correct)"
+                placeholder="Correct Answer"
+                className="border px-2 py-1 rounded"
             />
             <input
-                name="alternative1"
+                name={`question[${index}].alternative1`}
                 type="text"
                 placeholder="Alternative 1"
+                className="border px-2 py-1 rounded"
             />
             <input
-                name="alternative2"
+                name={`question[${index}].alternative2`}
                 type="text"
                 placeholder="Alternative 2"
+                className="border px-2 py-1 rounded"
             />
             <input
-                name="alternative3"
+                name={`question[${index}].alternative3`}
                 type="text"
                 placeholder="Alternative 3"
+                className="border px-2 py-1 rounded"
             />
         </div>
-    )
-}
+    );
+};
 
 const QuizQuestions = () => {
-    const [answerType, setAnswerType] = useState<string[]>(['']);
+    const [answerTypes, setAnswerType] = useState<string[]>(['']);
 
     const handleAnswerTypeChange = (index: number, type: string) => {
-        const newAnswerTypes = [...answerType];
+        const newAnswerTypes = [...answerTypes];
         newAnswerTypes[index] = type;
         setAnswerType(newAnswerTypes);
     };
 
     const [questions, setQuestions] = useState<string[]>(['']);
 
-    const handleAddQuestions = () => {
+    const handleAddQuestion = () => {
         setQuestions([...questions, '']);
-        setAnswerType([...answerType, '']);
+        setAnswerType([...answerTypes, '']);
     };
 
-    const handleRemoveQuestions = (index: number) => {
+    const handleRemoveQuestion = (index: number) => {
         const newQuestions = questions.filter((_, i) => i !== index);
-        const newAnswerTypes = answerType.filter((_, i) => i !== index);
+        const newAnswerTypes = answerTypes.filter((_, i) => i !== index);
         setQuestions(newQuestions);
         setAnswerType(newAnswerTypes);
     };
@@ -61,54 +69,63 @@ const QuizQuestions = () => {
     };
 
     return (
-        <div className='items-center'>
+        <div className="space-y-6 mt-4">
             <label className="block text-sm font-medium">Questions</label>
-            {questions.map((questions, index) => (
-                <div key={index} >
+            {questions.map((question, index) => (
+                <div key={index} className="border p-4 rounded space-y-2">
                     <div className="flex items-center gap-2">
                         <input
-                            name={`question[${index}]`}
+                            name={`question[${index}].text`}
                             type="text"
-                            value={questions}
+                            value={question}
                             onChange={(e) => handleQuestionChange(index, e.target.value)}
                             className="w-full border px-2 py-1 rounded"
                             placeholder={`Question #${index + 1}`}
                         />
                         <button
                             type="button"
-                            onClick={() => handleRemoveQuestions(index)}
+                            onClick={() => handleRemoveQuestion(index)}
                             className="text-red-500 text-sm"
                         >
                             ✕
                         </button>
                     </div>
-                    <label> Free Text </label>
-                    <input
-                        type="radio"
-                        name={`questionType-${index}`}
-                        value="free-text"
-                        onChange={(e) => handleAnswerTypeChange(index, e.target.value)} />
-                    <label> Multiple Choice </label>
-                    <input
-                        type="radio"
-                        name={`questionType-${index}`}
-                        value="multiple-choice"
-                        onChange={(e) => handleQuestionChange(index, e.target.value)} />
 
-                    {answerType[index] === 'multiple-choice' ? (
-                        <MultipleChoiceAnswer />
+                    <div className="flex items-center gap-4">
+                        <label>
+                            <input
+                                type="radio"
+                                name={`questionType-${index}`}
+                                value="free-text"
+                                checked={answerTypes[index] !== 'multiple-choice'}
+                                onChange={(e) => handleAnswerTypeChange(index, e.target.value)}
+                            /> Free Text
+                        </label>
+                        <label>
+                            <input
+                                type="radio"
+                                name={`questionType-${index}`}
+                                value="multiple-choice"
+                                checked={answerTypes[index] === 'multiple-choice'}
+                                onChange={(e) => handleAnswerTypeChange(index, e.target.value)}
+                            /> Multiple Choice
+                        </label>
+                    </div>
+
+                    {answerTypes[index] === 'multiple-choice' ? (
+                        <MultipleChoiceAnswer index={index} />
                     ) : (
-                        <>
-                            <div className='grid-cols-1'>
-                                <textarea name="free-text-answer" />
-                            </div>
-                        </>
+                        <textarea
+                            name={`question[${index}].freeTextAnswer`}
+                            className="w-full border px-2 py-1 rounded"
+                            placeholder="Enter expected free text answer"
+                        />
                     )}
                 </div>
             ))}
             <button
                 type="button"
-                onClick={handleAddQuestions}
+                onClick={handleAddQuestion}
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
             >
                 + Add Question
@@ -129,19 +146,26 @@ export default function CreateQuestionsForm() {
                     required
                     className="w-full border px-2 py-1 rounded"
                 />
-                <label className="block text-sm font-medium">Course Code</label>
+                <label className="block text-sm font-medium">Course </label>
                 <select
                     name="courseCode"
                     required
-                    className=""
+                    className="w-full border px-2 py-1 rounded"
                 >
                     {/* TODO list actual course codes */}
+                    <option> Select a course</option>
                     <option> Code1 </option>
                     <option> Code2 </option>
                     <option> Code3 </option>
                 </select>
                 <QuizQuestions />
             </div>
+            <button
+                type="submit"
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            >
+                Create Quiz
+            </button>
         </Form>
     );
 }
