@@ -1,3 +1,5 @@
+import { User } from 'next-auth'
+
 /*Basic example on how a course might look*/
 export interface Course {
     courseId: number
@@ -7,7 +9,7 @@ export interface Course {
 }
 
 /*Basic example of how a user might look*/
-export interface User {
+export interface Users {
     userId: number
     name: string
     courses: number[]
@@ -17,4 +19,9 @@ export interface User {
 export interface Quiz {
     name: string
     quizId: number
+}
+
+export interface AuthenticatedUser extends User {
+    accessToken?: string
+    refreshToken?: string
 }

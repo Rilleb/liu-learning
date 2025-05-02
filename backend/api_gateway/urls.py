@@ -1,7 +1,12 @@
 from django.urls import path
-from .views import CourseView
+from .views import CourseView, CredentialsLoginView, GithubSyncView, GoogleSyncView, UserCreateView 
 
 
 urlpatterns = [
-    path('api/', CourseView.as_view(), name='course'),
+    path('courses/', CourseView.as_view(), name='courses'),
+    path("auth/google-login/", GoogleSyncView.as_view(), name="google-sync"),
+    path("auth/github-login/", GithubSyncView.as_view(), name="github-sync"),
+    path("auth/credentials-login/", CredentialsLoginView.as_view(), name="credentials-sync"),
+    path("auth/credentials-create", UserCreateView.as_view(), name="create-user"),
 ]
+
