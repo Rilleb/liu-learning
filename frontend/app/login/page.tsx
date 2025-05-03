@@ -3,11 +3,13 @@
 
 import { getProviders, signIn } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
 export default function SignInPage() {
-    const [providers, setProviders] = useState<any>(null)
+    const [providers, setProviders] = useState<Record<string, any> | null>(null)
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [error, setError] = useState('')
 
     useEffect(() => {
         getProviders().then(setProviders)
@@ -15,12 +17,20 @@ export default function SignInPage() {
 
     const handleCredentialsLogin = async (e: React.FormEvent) => {
         e.preventDefault()
-        await signIn('credentials', {
-            redirect: true,
+        setError('')
+
+        const result = await signIn('credentials', {
+            redirect: false,
             email,
             password,
-            callbackUrl: '/', // or wherever you want
+            callbackUrl: '/',
         })
+
+        if (result?.ok) {
+            window.location.href = result.url || '/'
+        } else {
+            setError('Invalid email or password.')
+        }
     }
 
     return (
@@ -46,6 +56,7 @@ export default function SignInPage() {
                 <button type="submit" className="bg-blue-600 text-white p-2 rounded">
                     Sign In
                 </button>
+                {error && <p className="text-red-500">{error}</p>}
             </form>
 
             <div className="mt-6">
@@ -67,9 +78,9 @@ export default function SignInPage() {
 
             <p className="mt-4">
                 Don't have an account?{' '}
-                <a href="/register" className="text-blue-500 underline">
+                <Link href="/register" className="text-blue-500 underline">
                     Register here
-                </a>
+                </Link>
             </p>
         </div>
     )
