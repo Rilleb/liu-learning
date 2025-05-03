@@ -5,6 +5,9 @@ import type { AuthOptions } from 'next-auth'
 import type { AuthenticatedUser } from '@/app/data_types/data_types'
 
 export const options: AuthOptions = {
+    pages: {
+        signIn: '/login', // route to your custom page
+    },
     providers: [
         CredentialsProvider({
             name: 'credentials',
