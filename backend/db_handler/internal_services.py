@@ -14,7 +14,7 @@ def create_course(name, code, created_by, date_created=None):
 def create_chapter(name, course, created_by, date_created=None):
     if date_created is None:
         date_created = datetime.date.today()
-    chapter = Chapter.objects.create(name=name, course_id=course, created_by=created_by, date_created=date_created)
+    chapter = Chapter.objects.create(name=name, course=course, created_by=created_by, date_created=date_created)
     return chapter
 
 def create_quiz(name, course, chapter, created_by, description='', date_created=None):
@@ -22,8 +22,8 @@ def create_quiz(name, course, chapter, created_by, description='', date_created=
         date_created = datetime.date.today()
     quiz = Quiz.objects.create(
         name=name,
-        course_id=course,
-        chapter_id=chapter,
+        course=course,
+        chapter=chapter,
         created_by=created_by,
         description=description,
         date_created=date_created
@@ -32,7 +32,7 @@ def create_quiz(name, course, chapter, created_by, description='', date_created=
 
 def create_question(quiz, description, index, is_multiple=False, free_text_answer='', alt_1='', alt_2='', alt_3='', correct_answer=''):
     question = Question.objects.create(
-        quiz_id=quiz,
+        quiz=quiz,
         description=description,
         index=index,
         is_multiple=is_multiple,
@@ -51,7 +51,7 @@ def add_friend(user1, user2):
     user2.save()
 
 def mark_course_as_read(user, course):
-    read_course = ReadCourse.objects.create(user_id=user, course_id=course)
+    read_course = ReadCourse.objects.create(user=user, course=course)
     return read_course
 
 def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False):
@@ -60,8 +60,8 @@ def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False
     if ended_at is None:
         ended_at = datetime.date.today()
     attempt = QuizAttempt.objects.create(
-        user_id=user,
-        quiz_id=quiz,
+        user=user,
+        quiz=quiz,
         attempt_started_at=started_at,
         attempt_ended_at=ended_at,
         passed=passed
@@ -74,8 +74,8 @@ def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=Non
     if ended_at is None:
         ended_at = datetime.date.today()
     answer = QuizAnswer.objects.create(
-        attempt_id=attempt,
-        question_id=question,
+        attempt=attempt,
+        question=question,
         is_correct=is_correct,
         multiple_chooice_answer=multiple_choice_answer,
         free_text_answer=free_text_answer,

@@ -75,8 +75,11 @@ export const options: AuthOptions = {
                 }
 
                 const data = await res.json()
+                console.log(data)
+                const { access_token } = data
+                console.log('Token :', access_token)
                 if (data.access_token) {
-                    user.accessToken = data.access_token // Attach the accessToken to the user object
+                    user.accessToken = access_token // Attach the accessToken to the user object
                 }
 
                 return user

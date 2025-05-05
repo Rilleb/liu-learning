@@ -21,61 +21,61 @@ class CourseSerializer(serializers.ModelSerializer):
 # Serializer for the Chapter model
 class ChapterSerializer(serializers.ModelSerializer):
     created_by = UserSerializer()  # Nested serializer for the User model
-    course_id = CourseSerializer()  # Nested serializer for the Course model
+    course = CourseSerializer()  # Nested serializer for the Course model
 
     class Meta:
         model = Chapter
-        fields = ['id', 'name', 'created_by', 'course_id', 'date_created']
+        fields = ['id', 'name', 'created_by', 'course', 'date_created']
 
 
 # Serializer for the Quiz model
 class QuizSerializer(serializers.ModelSerializer):
     created_by = UserSerializer()  # Nested serializer for the User model
-    course_id = CourseSerializer()  # Nested serializer for the Course model
-    chapter_id = ChapterSerializer()  # Nested serializer for the Chapter model
+    course = CourseSerializer()  # Nested serializer for the Course model
+    chapter = ChapterSerializer()  # Nested serializer for the Chapter model
 
     class Meta:
         model = Quiz
-        fields = ['id', 'course_id', 'name', 'chapter_id', 'created_by', 'date_created', 'description']
+        fields = ['id', 'course', 'name', 'chapter', 'created_by', 'date_created', 'description']
 
 
 # Serializer for the Question model
 class QuestionSerializer(serializers.ModelSerializer):
-    quiz_id = QuizSerializer()  # Nested serializer for the Quiz model
+    quiz = QuizSerializer()  # Nested serializer for the Quiz model
 
     class Meta:
         model = Question
-        fields = ['id', 'quiz_id', 'description', 'index', 'is_multiple', 'free_text_answer', 'alt_1', 'alt_2', 'alt_3', 'correct_answer']
+        fields = ['id', 'quiz', 'description', 'index', 'is_multiple', 'free_text_answer', 'alt_1', 'alt_2', 'alt_3', 'correct_answer']
 
 
 # Serializer for the ReadCourse model
 class ReadCourseSerializer(serializers.ModelSerializer):
-    user_id = UserSerializer()  # Nested serializer for the User model
-    course_id = CourseSerializer()  # Nested serializer for the Course model
+    user = UserSerializer()  # Nested serializer for the User model
+    course = CourseSerializer()  # Nested serializer for the Course model
 
     class Meta:
         model = ReadCourse
-        fields = ['id', 'user_id', 'course_id']
+        fields = ['id', 'user', 'course']
 
 
 # Serializer for the QuizAttempt model
 class QuizAttemptSerializer(serializers.ModelSerializer):
-    quiz_id = QuizSerializer()  # Nested serializer for the Quiz model
-    user_id = UserSerializer()  # Nested serializer for the User model
+    quiz = QuizSerializer()  # Nested serializer for the Quiz model
+    user = UserSerializer()  # Nested serializer for the User model
 
     class Meta:
         model = QuizAttempt
-        fields = ['id', 'quiz_id', 'user_id', 'attempt_started_at', 'attempt_ended_at', 'passed']
+        fields = ['id', 'quiz', 'user', 'attempt_started_at', 'attempt_ended_at', 'passed']
 
 
 # Serializer for the QuizAnswer model
 class QuizAnswerSerializer(serializers.ModelSerializer):
-    attempt_id = QuizAttemptSerializer()  # Nested serializer for the QuizAttempt model
-    question_id = QuestionSerializer()  # Nested serializer for the Question model
+    attempt = QuizAttemptSerializer()  # Nested serializer for the QuizAttempt model
+    question = QuestionSerializer()  # Nested serializer for the Question model
 
     class Meta:
         model = QuizAnswer
-        fields = ['id', 'attempt_id', 'is_correct', 'attempt_started_at', 'attempt_ended_at', 'question_id', 'multiple_chooice_answer', 'free_text_answer']
+        fields = ['id', 'attempt', 'is_correct', 'attempt_started_at', 'attempt_ended_at', 'question', 'multiple_chooice_answer', 'free_text_answer']
 
 
 # Serializer for the Friendship model

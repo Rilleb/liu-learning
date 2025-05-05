@@ -1,14 +1,13 @@
 import { User } from 'next-auth'
 
-/*Basic example on how a course might look*/
 export interface Course {
-    courseId: number
-    title: string
-    quizes: number[]
-    completedQuizes: number[]
+    id: number
+    name: string
+    code: string
+    created_by: User
+    date_created: string // ISO date string, e.g., "2025-05-05T10:00:00Z"
 }
 
-/*Basic example of how a user might look*/
 export interface Users {
     userId: number
     name: string
@@ -17,11 +16,14 @@ export interface Users {
 }
 
 export interface Quiz {
+    id: number
+    course_id: number
     name: string
-    quizId: number
+    chapter_id: number
+    created_by: number
+    date_created: string
+    description: string
 }
 
-export interface AuthenticatedUser extends User {
-    accessToken?: string
-    refreshToken?: string
-}
+export type QuizList = Quiz[]
+export type CourseList = Course[]

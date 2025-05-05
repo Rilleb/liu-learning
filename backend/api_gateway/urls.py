@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CourseView, CredentialsLoginView, GithubSyncView, GoogleSyncView, UserCreateView 
+from .views import CourseView, CredentialsLoginView, GithubSyncView, GoogleSyncView, QuizView, UserCreateView 
 
 
 urlpatterns = [
@@ -8,5 +8,6 @@ urlpatterns = [
     path("auth/github-login/", GithubSyncView.as_view(), name="github-sync"),
     path("auth/credentials-login/", CredentialsLoginView.as_view(), name="credentials-sync"),
     path("auth/credentials-create", UserCreateView.as_view(), name="create-user"),
+    path("quiz/", QuizView.as_view(), name='quiz')
 ]
 
