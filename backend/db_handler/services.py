@@ -58,7 +58,7 @@ def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False
         print(f"Error creating quiz attempt: {e}")
         return None
 
-def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=None, free_text_answer='', started_at=None, ended_at=None):
+def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=False, free_text_answer='', started_at=None, ended_at=None):
     try:
         return internal_services.create_quiz_answer(attempt, question, is_correct, multiple_choice_answer, free_text_answer, started_at, ended_at)
     except Exception as e:
@@ -73,15 +73,14 @@ def get_courses(user):
         print("Courses", courses)
         return courses
     except Exception as e:
-        print(f"Error getting quizes: {e}")
+        print(f"Error creating quiz answer: {e}")
         return None
 
 def get_quizes(user):
     try:
-        quizes = models.Quiz.objects.filter(course__in=models.ReadCourse.objects.filter(user=user).values('course'))
+        quizes = models.Quiz.objects.filter(course__in=ReadCourse.objects.filter(user=user).values('course_id'))
         print("Quizes", quizes)
         return quizes
     except Exception as e:
         print(f"Could not get quizes: {e}")
-        return None
 

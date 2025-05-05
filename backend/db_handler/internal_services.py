@@ -45,10 +45,8 @@ def create_question(quiz, description, index, is_multiple=False, free_text_answe
     return question
 
 def add_friend(user1, user2):
-    user1.friends.add(user2)
-    user2.friends.add(user1)
-    user1.save()
-    user2.save()
+    friends = Friendship.objects.create(user1=user1, user2=user2) 
+    return friends
 
 def mark_course_as_read(user, course):
     read_course = ReadCourse.objects.create(user=user, course=course)
@@ -68,7 +66,7 @@ def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False
     )
     return attempt
 
-def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=None, free_text_answer='', started_at=None, ended_at=None):
+def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=False, free_text_answer='', started_at=None, ended_at=None):
     if started_at is None:
         started_at = datetime.date.today()
     if ended_at is None:

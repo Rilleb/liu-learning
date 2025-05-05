@@ -8,7 +8,7 @@ from db_handler.services import (
 
 password = make_password("1234")
 
-gustav = create_user("gustav", "gustav@test.com", password)
+gustav = create_user("gstcc", "gustav@test.com", password)
 thea = create_user("thea", "thea@test.com", password)
 rille = create_user("rille", "rille@test.com", password)
 

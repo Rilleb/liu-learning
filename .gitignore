@@ -4,4 +4,3 @@ pyrightconfig.json
 venv/
 secrets.py
 db.sqlite3
-*migrations*
