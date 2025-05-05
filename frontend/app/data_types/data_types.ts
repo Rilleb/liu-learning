@@ -17,4 +17,5 @@ export interface User {
 export interface Quiz {
     name: string
     quizId: number
+    courseId: number
 }

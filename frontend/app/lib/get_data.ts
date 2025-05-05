@@ -30,6 +30,30 @@ const userMap = new Map<number, User>([
     ],
 ])
 
+export const quizes: Quiz[] = [
+    { quizId: 1, name: 'Introduction to Programming', courseId: 101 },
+    { quizId: 2, name: 'Variables and Data Types', courseId: 101 },
+    { quizId: 3, name: 'Control Structures', courseId: 101 },
+    { quizId: 4, name: 'Functions and Scope', courseId: 101 },
+    { quizId: 5, name: 'Object-Oriented Programming', courseId: 205 },
+    { quizId: 6, name: 'Arrays and Collections', courseId: 205 },
+    { quizId: 7, name: 'Error Handling', courseId: 205 },
+    { quizId: 8, name: 'Asynchronous Programming', courseId: 301 },
+    { quizId: 9, name: 'Databases and SQL Basics', courseId: 301 },
+    { quizId: 10, name: 'Web Development Basics', courseId: 301 },
+    { quizId: 11, name: 'Version Control with Git', courseId: 301 },
+    { quizId: 12, name: 'Testing and Debugging', courseId: 301 },
+    { quizId: 13, name: 'Software Design Patterns', courseId: 1 },
+    { quizId: 14, name: 'Final Project Quiz', courseId: 1 },
+    // Reused quizzes for other courses
+    { quizId: 13, name: 'Software Design Patterns', courseId: 2 },
+    { quizId: 14, name: 'Final Project Quiz', courseId: 2 },
+    { quizId: 1, name: 'Introduction to Programming', courseId: 2 },
+    { quizId: 2, name: 'Variables and Data Types', courseId: 2 },
+    { quizId: 3, name: 'Control Structures', courseId: 2 },
+    // And so on for other course reuses...
+];
+
 const exampleCourses: Course[] = [
     {
         courseId: 101,
@@ -75,23 +99,6 @@ const exampleCourses: Course[] = [
     },
 ]
 
-export const quizes: Quiz[] = [
-    { quizId: 1, name: 'Introduction to Programming' },
-    { quizId: 2, name: 'Variables and Data Types' },
-    { quizId: 3, name: 'Control Structures' },
-    { quizId: 4, name: 'Functions and Scope' },
-    { quizId: 5, name: 'Object-Oriented Programming' },
-    { quizId: 6, name: 'Arrays and Collections' },
-    { quizId: 7, name: 'Error Handling' },
-    { quizId: 8, name: 'Asynchronous Programming' },
-    { quizId: 9, name: 'Databases and SQL Basics' },
-    { quizId: 10, name: 'Web Development Basics' },
-    { quizId: 11, name: 'Version Control with Git' },
-    { quizId: 12, name: 'Testing and Debugging' },
-    { quizId: 13, name: 'Software Design Patterns' },
-    { quizId: 14, name: 'Final Project Quiz' },
-]
-
 export function get_user(userId: number) {
     return userMap.get(userId)
 }
@@ -110,4 +117,14 @@ export function get_courses(userId: number): Course[] {
 
 export function get_latest_quizes(numberOf: number): Quiz[] {
     return quizes.slice(0, numberOf)
+}
+
+export function get_course_name(courseId: number): String {
+    const course = exampleCourses.find(c => c.courseId === courseId);
+    return course?.title ||" ";
+}
+
+export function getQuizzesForCourse(courseId: number): Quiz[] {
+    console.log(courseId)
+    return quizes.filter(quiz => quiz.courseId === courseId);
 }

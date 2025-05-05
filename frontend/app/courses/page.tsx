@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getServerSession } from 'next-auth'
 import { options } from '../api/auth/[...nextauth]/options'
 import { redirect } from 'next/navigation'
+import FriendsBar from '../components/friend_bar'
 
 type Props = {
     userId: number
@@ -21,7 +22,7 @@ const CourseComponent = ({ userId }: Props) => {
                             key={course.courseId}
                             className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                         >
-                            <Link href={`/course/${course.courseId}`}>
+                            <Link href={`/courses/${course.courseId}`}>
                                 <div className="space-y-2">
                                     <h3 className="hover:underline">
                                         {course.title}
@@ -61,11 +62,7 @@ export default async function Home() {
             </div>
             {/*Friends*/}
             <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <h2 className='text-[var(--foreground)]'>Friends</h2>
-                {user_data?.friends.map((id) => {
-                    const tmp = get_user(id)
-                    return <p key={id}>{tmp?.name}</p>
-                })}
+                <FriendsBar activeFriends={["James", "Thea", "Gustav", "Rickard"]} offlineFriends={["Christina", "Oscar"]} />
             </div>
         </div>
     )

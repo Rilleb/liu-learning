@@ -20,7 +20,7 @@ const CourseComponent = ({ userId }: Props) => {
                             key={course.courseId}
                             className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                         >
-                            <Link href={`/course/${course.courseId}`}>
+                            <Link href={`/courses/${course.courseId}`}>
                                 <div className="space-y-2">
                                     <h3 className="hover:underline">
                                         {course.title}
