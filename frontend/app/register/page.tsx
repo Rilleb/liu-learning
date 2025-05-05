@@ -14,17 +14,17 @@ export default function RegisterPage() {
         e.preventDefault()
         setError('')
 
-        const res = await fetch(`${process.env.BACKEND_URL}/api/auth/credentials-login/`,
+        const res = await fetch("http://localhost:8000/api/auth/credentials-create",
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password, name: username }),
+                body: JSON.stringify({ "email": email, "password": password, "username": username }),
             })
 
         if (res.ok) {
-            router.push('/auth/signin')
+            router.push('/')
         } else {
             const data = await res.json()
             setError(data.detail || 'Registration failed.')
