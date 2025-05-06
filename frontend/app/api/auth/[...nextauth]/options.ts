@@ -30,9 +30,12 @@ export const options: AuthOptions = {
 
                 // If no error and we have user data, return it
                 if (res.ok && user) {
-                    return user
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        accessToken: user.access_token,
+                    }
                 }
-                // Return null if user data could not be retrieved
                 return null
             },
         }),
@@ -75,9 +78,7 @@ export const options: AuthOptions = {
                 }
 
                 const data = await res.json()
-                console.log(data)
                 const { access_token } = data
-                console.log('Token :', access_token)
                 if (data.access_token) {
                     user.accessToken = access_token // Attach the accessToken to the user object
                 }

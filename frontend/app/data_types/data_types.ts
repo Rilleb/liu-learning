@@ -1,18 +1,19 @@
-import { User } from 'next-auth'
-
 export interface Course {
     id: number
     name: string
     code: string
     created_by: User
-    date_created: string // ISO date string, e.g., "2025-05-05T10:00:00Z"
+    date_created: string // ISO date string, e.g., 2025-05-05T10:00:00Z
 }
 
-export interface Users {
-    userId: number
-    name: string
-    courses: number[]
-    friends: number[]
+interface User {
+    id: number
+    username: string
+    first_name: string
+    last_name: string
+    email: string
+    date_joined: string
+    is_active: string
 }
 
 export interface Quiz {
@@ -27,3 +28,5 @@ export interface Quiz {
 
 export type QuizList = Quiz[]
 export type CourseList = Course[]
+export type FriendsList = FriendsList[]
+export type UserList = User[]

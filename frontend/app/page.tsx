@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { options } from "./api/auth/[...nextauth]/options"
 import ProgressBar from './components/progress_bar'
 import Link from 'next/link'
-import { CourseList, QuizList } from "./data_types/data_types"
+import { CourseList, FriendsList, QuizList, UserList } from "./data_types/data_types"
 import FriendsBar from './components/friend_bar'
 import { get_latest_quizes } from "./lib/get_data"
 
@@ -10,7 +10,7 @@ type Props = {
     userId: number
 }
 
-const QuizComponent = async ({ userId }: Props) => {
+const QuizComponent = async () => {
     const session = await getServerSession(options)
     if (!session) {
         return (
@@ -37,6 +37,7 @@ const QuizComponent = async ({ userId }: Props) => {
         )
     }
     const quizes: QuizList = await res.json()
+    console.log("Quizes: ", quizes)
 
     return (
         <div>
@@ -114,19 +115,30 @@ export async function CourseComponent() {
     )
 }
 
-export default function Home() {
-    const userId = 1
+export default async function Home() {
+    const session = await getServerSession(options)
+    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            'Authorization': `Token ${session.accessToken}`,
+        }
+    })
+    if (!res.ok) {
+
+    }
+    const friends: UserList = await res.json()
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             {/*Quizes*/}
             <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <QuizComponent userId={userId} />
+                <QuizComponent />
             </div>
             {/*Friends*/}
             <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsBar activeFriends={["James", "Thea", "Gustav", "Rickard"]} offlineFriends={["Christina", "Oscar"]} />
+                <FriendsBar friends={friends} />
             </div>
             {/*Courses*/}
             <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
