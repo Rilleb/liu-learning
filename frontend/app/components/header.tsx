@@ -53,7 +53,7 @@ export default function Header() {
 
             {/* Right-aligned profile icon */}
             <div className="w-1/3 flex justify-end">
-                <Link href="/user_profile">
+                <Link href="/settings">
                     <Image
                         src="/globe.svg"
                         width={30}
