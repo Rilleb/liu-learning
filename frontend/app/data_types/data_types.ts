@@ -1,21 +1,32 @@
-/*Basic example on how a course might look*/
 export interface Course {
-    courseId: number
-    title: string
-    quizes: number[]
-    completedQuizes: number[]
+    id: number
+    name: string
+    code: string
+    created_by: User
+    date_created: string // ISO date string, e.g., 2025-05-05T10:00:00Z
 }
 
-/*Basic example of how a user might look*/
-export interface User {
-    userId: number
-    name: string
-    courses: number[]
-    friends: number[]
+interface User {
+    id: number
+    username: string
+    first_name: string
+    last_name: string
+    email: string
+    date_joined: string
+    is_active: string
 }
 
 export interface Quiz {
+    id: number
+    course_id: number
     name: string
-    quizId: number
-    courseId: number
+    chapter_id: number
+    created_by: number
+    date_created: string
+    description: string
 }
+
+export type QuizList = Quiz[]
+export type CourseList = Course[]
+export type FriendsList = FriendsList[]
+export type UserList = User[]

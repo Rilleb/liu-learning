@@ -1,4 +1,8 @@
+from django.contrib.auth import get_user, get_user_model
+from django.db.models import Q
 from . import internal_services
+from . import models
+
 
 def create_user(username, email, password):
     try:
@@ -7,12 +11,14 @@ def create_user(username, email, password):
         print(f"Error creating user: {e}")
         return None
 
+
 def create_course(name, code, created_by, date_created=None):
     try:
         return internal_services.create_course(name, code, created_by, date_created)
     except Exception as e:
         print(f"Error creating course: {e}")
         return None
+
 
 def create_chapter(name, course, created_by, date_created=None):
     try:
@@ -21,19 +27,44 @@ def create_chapter(name, course, created_by, date_created=None):
         print(f"Error creating chapter: {e}")
         return None
 
-def create_quiz(name, course, chapter, created_by, description='', date_created=None):
+
+def create_quiz(name, course, chapter, created_by, description="", date_created=None):
     try:
-        return internal_services.create_quiz(name, course, chapter, created_by, description, date_created)
+        return internal_services.create_quiz(
+            name, course, chapter, created_by, description, date_created
+        )
     except Exception as e:
         print(f"Error creating quiz: {e}")
         return None
 
-def create_question(quiz, description, index, is_multiple=False, free_text_answer='', alt_1='', alt_2='', alt_3='', correct_answer=''):
+
+def create_question(
+    quiz,
+    description,
+    index,
+    is_multiple=False,
+    free_text_answer="",
+    alt_1="",
+    alt_2="",
+    alt_3="",
+    correct_answer="",
+):
     try:
-        return internal_services.create_question(quiz, description, index, is_multiple, free_text_answer, alt_1, alt_2, alt_3, correct_answer)
+        return internal_services.create_question(
+            quiz,
+            description,
+            index,
+            is_multiple,
+            free_text_answer,
+            alt_1,
+            alt_2,
+            alt_3,
+            correct_answer,
+        )
     except Exception as e:
         print(f"Error creating question: {e}")
         return None
+
 
 def add_friend(user1, user2):
     try:
@@ -42,6 +73,7 @@ def add_friend(user1, user2):
         print(f"Error adding friend: {e}")
         return None
 
+
 def mark_course_as_read(user, course):
     try:
         return internal_services.mark_course_as_read(user, course)
@@ -49,16 +81,71 @@ def mark_course_as_read(user, course):
         print(f"Error marking course as read: {e}")
         return None
 
+
 def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False):
     try:
-        return internal_services.create_quiz_attempt(user, quiz, started_at, ended_at, passed)
+        return internal_services.create_quiz_attempt(
+            user, quiz, started_at, ended_at, passed
+        )
     except Exception as e:
         print(f"Error creating quiz attempt: {e}")
         return None
 
-def create_quiz_answer(attempt, question, is_correct, multiple_choice_answer=None, free_text_answer='', started_at=None, ended_at=None):
+
+def create_quiz_answer(
+    attempt,
+    question,
+    is_correct,
+    multiple_choice_answer=False,
+    free_text_answer="",
+    started_at=None,
+    ended_at=None,
+):
     try:
-        return internal_services.create_quiz_answer(attempt, question, is_correct, multiple_choice_answer, free_text_answer, started_at, ended_at)
+        return internal_services.create_quiz_answer(
+            attempt,
+            question,
+            is_correct,
+            multiple_choice_answer,
+            free_text_answer,
+            started_at,
+            ended_at,
+        )
     except Exception as e:
         print(f"Error creating quiz answer: {e}")
+        return None
+
+
+User = get_user_model()
+
+
+def get_courses(user):
+    try:
+        courses = models.Course.objects.filter(readcourse__user=user)
+        print("Courses", courses)
+        return courses
+    except Exception as e:
+        print(f"Error creating quiz answer: {e}")
+        return None
+
+
+def get_quizes(user):
+    try:
+        quizes = models.Quiz.objects.filter(
+            course__in=models.ReadCourse.objects.filter(user=user).values("course_id")
+        )
+        return quizes
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+
+
+def get_friends(user):
+    try:
+        friendships = models.Friendship.objects.filter(Q(user1=user) | Q(user2=user))
+        friends = [f.user2 if f.user1 == user else f.user1 for f in friendships]
+        print(friends)
+        return friends
+    except Exception as e:
+        print(f"Could not get friends, error: {e}")
         return None

@@ -46,11 +46,7 @@ const CourseComponent = ({ userId }: Props) => {
 export default async function Home() {
     const userId = 1
     const user_data = get_user(userId);
-    const session = await getServerSession(options);
 
-    if (!session) {
-        redirect("/api/auth/signin");
-    }
     return (
 
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
