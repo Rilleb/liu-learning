@@ -1,14 +1,17 @@
 'use client';
 
-import Form from 'next/form';
 import { useState } from 'react';
 import { printData } from '@/app/create/actions/print_data';
 
 export default function CreateCourseForm() {
     const [chapters, setChapters] = useState<string[]>(['']);
+    const [title, setTitle] = useState('');
+    const [code, setCode] = useState('');
+    const [description, setDescription] = useState('');
+    const [status, setStatus] = useState('')
 
     const handleAddChapter = () => {
-        setChapters([...chapters, '']); // Add new input
+        setChapters([...chapters, '']);
     };
 
     const handleRemoveChapter = (index: number) => {
@@ -22,8 +25,28 @@ export default function CreateCourseForm() {
         setChapters(newChapters);
     };
 
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const res = await fetch("http://localhost:8000/api/courses",
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ "title": title, "code": title, "description": description, "chapters": chapters }),
+            })
+
+        if (res.ok) {
+            setStatus("Succesfully created course")
+        } else {
+            const data = await res.json()
+            setStatus(data.message || 'Failed to create course')
+        }
+    }
+
     return (
-        <Form action={printData} className="space-y-4 max-w-md">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
             <div>
                 <label className="block text-sm font-medium">Course Title</label>
                 <input
@@ -31,6 +54,7 @@ export default function CreateCourseForm() {
                     type="text"
                     required
                     className="w-full border px-2 py-1 rounded"
+                    onChange={(e) => setTitle(e.target.value)}
                 />
             </div>
 
@@ -41,6 +65,7 @@ export default function CreateCourseForm() {
                     type="text"
                     required
                     className="w-full border px-2 py-1 rounded"
+                    onChange={(e) => setCode(e.target.value)}
                 />
             </div>
 
@@ -50,6 +75,7 @@ export default function CreateCourseForm() {
                     name="description"
                     required
                     className="w-full border px-2 py-1 rounded"
+                    onChange={(e) => setDescription(e.target.value)}
                 />
             </div>
 
@@ -89,7 +115,8 @@ export default function CreateCourseForm() {
             >
                 Create Course
             </button>
-        </Form>
+            {status && <p>{status}</p>}
+        </form>
     );
 }
 
