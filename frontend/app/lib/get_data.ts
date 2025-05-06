@@ -128,3 +128,8 @@ export function getQuizzesForCourse(courseId: number): Quiz[] {
     console.log(courseId)
     return quizes.filter(quiz => quiz.courseId === courseId);
 }
+
+export function get_quiz_name(quizId: number): String {
+    const quiz = quizes.find(q => q.quizId === quizId);
+    return quiz?.name ||" ";
+}
