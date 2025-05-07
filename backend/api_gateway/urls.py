@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (
+    AttemptStatisticsView,
     CourseView,
     CredentialsLoginView,
+    FindUser,
     Friendsview,
     GithubSyncView,
     GoogleSyncView,
@@ -22,4 +24,10 @@ urlpatterns = [
     path("auth/credentials-create", UserCreateView.as_view(), name="create-user"),
     path("quiz/", QuizView.as_view(), name="quiz"),
     path("friends/", Friendsview.as_view(), name="friends"),
+    path(
+        "statistics/quiz/attempts",
+        AttemptStatisticsView.as_view(),
+        name="stats-attempts",
+    ),
+    path("statistics/compate/friend", FindUser.as_view(), name="find_friend"),
 ]
