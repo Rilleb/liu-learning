@@ -10,6 +10,9 @@ import json
 from django.contrib.auth.hashers import make_password
 
 
+User = get_user_model()
+
+
 # Create your views here.
 class CourseView(APIView):
     def get(self, request):
@@ -30,9 +33,6 @@ class CourseView(APIView):
         return Response(
             {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
         )
-
-
-User = get_user_model()
 
 
 class GoogleSyncView(APIView):

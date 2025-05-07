@@ -12,7 +12,7 @@ class User(AbstractUser):
 class Course(models.Model):
     name = models.CharField(max_length=50)
     code = models.CharField(max_length=10, unique=True)
-    description = models.CharField(max_length=200)
+    description = models.TextField(default=None)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date_created = models.DateField()
 

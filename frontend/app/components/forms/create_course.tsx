@@ -28,20 +28,20 @@ export default function CreateCourseForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const res = await fetch("http://localhost:8000/api/courses",
+        const res = await fetch("http://localhost:8000/api/courses/",
             {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ "title": title, "code": title, "description": description, "chapters": chapters }),
+                body: JSON.stringify({ "title": title, "code": code, "description": description, "chapters": chapters }),
             })
 
         if (res.ok) {
             setStatus("Succesfully created course")
         } else {
-            const data = await res.json()
-            setStatus(data.message || 'Failed to create course')
+            // const data = await res.json()data.message 
+            setStatus('Failed to create course')
         }
     }
 
