@@ -5,21 +5,24 @@ import SearchBar from "../searchBar";
 import { useDebounceCallback } from "usehooks-ts";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
+import { UserList, User } from "@/app/data_types/data_types";
 
 export function FriendStats() {
     const [loading, setLoading] = useState(false)
-    const [results, setResults] = useState<string[]>([])
+    const [results, setResults] = useState<UserList>([])
     const [showDropdown, setShowDropdown] = useState(false)
     const { data: session, status } = useSession();
-
     const [query, setQuery] = useState("")
 
-    if (status === "loading") return <p>Loading...</p>;
-    if (!session) return <p>You are not logged in</p>;
+    const token = session?.accessToken ?? "";
 
-    const token = session.accessToken;
+    const onClick = ((user: User) => {
+        setQuery(user.username)
+        setShowDropdown(false)
+    })
 
     const handleSearch = useDebounceCallback(async (q: string) => {
+        console.log("Handle search: ", q)
         if (!q) {
             setResults([]);
             setShowDropdown(false);
@@ -43,7 +46,7 @@ export function FriendStats() {
                 setResults([]);
                 setShowDropdown(false);
             } else {
-                const users: string[] = await res.json();
+                const users: UserList = await res.json();
                 setResults(users);
                 setShowDropdown(true);
             }
@@ -54,17 +57,21 @@ export function FriendStats() {
         }
     }, 300);
 
+    // ✅ All hooks have now been called before conditionals
+    if (status === "loading") return <p>Loading...</p>;
+    if (!session) return <p>You are not logged in</p>;
+
     return (
         <div className="flex flex-col items-center w-full">
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={handleSearch} value={query} />
 
             {loading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
 
             {showDropdown && results.length > 0 && (
                 <ul className="w-full max-w-md mt-2 bg-white border rounded shadow">
                     {results.map((user, index) => (
-                        <li key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-                            {user}
+                        <li key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => onClick(user)}>
+                            {user.username}
                         </li>
                     ))}
                 </ul>

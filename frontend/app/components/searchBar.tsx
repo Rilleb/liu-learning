@@ -1,14 +1,19 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 interface Props {
     onSearch: (query: string) => void
+    value: string
 }
 
 
-const SearchBar: React.FC<Props> = ({ onSearch }) => {
-    const [query, setQuery] = useState("")
+const SearchBar: React.FC<Props> = ({ onSearch, value }) => {
+    const [query, setQuery] = useState(value)
+
+    useEffect(() => {
+        setQuery(value)
+    }, [value])
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value

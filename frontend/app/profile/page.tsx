@@ -6,6 +6,7 @@ export interface AttemptsData {
     total_attempts: number
     ratio: number
     successfull_attempts: number
+    daily_time_spent: number
 }
 
 export default function Profile() {

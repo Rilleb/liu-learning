@@ -64,9 +64,7 @@ class Friendsview(APIView):
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
         if auth_header and auth_header.startswith("Token "):
             token = auth_header.split("Token ")[1]
-            print(token)
             user = get_user_from_token(token=token)
-            print(user)
             if not user:
                 return Response({"Message": {"Token was not included or has expired"}})
             friends = services.get_friends(user=user)
@@ -91,7 +89,6 @@ class AttemptStatisticsView(APIView):
                     }
                 )
             attempts = services.get_quiz_statistics(user=user)
-            print("Attempts:", attempts)
             return Response(attempts)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)

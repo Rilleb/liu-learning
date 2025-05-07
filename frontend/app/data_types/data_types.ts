@@ -6,7 +6,7 @@ export interface Course {
     date_created: string // ISO date string, e.g., 2025-05-05T10:00:00Z
 }
 
-interface User {
+export interface User {
     id: number
     username: string
     first_name: string

@@ -163,11 +163,15 @@ def get_quiz_statistics(user):
         )
         daily_counts = defaultdict(int)
         daily_sucess = defaultdict(int)
+        daily_time_spent = defaultdict(float)
         for attempt in attempts:
-            print(attempt.passed)
             if attempt.passed:
                 daily_sucess[attempt.date_only] += 1
             daily_counts[attempt.date_only] += 1
+            duration = (
+                attempt.attempt_ended_at - attempt.attempt_started_at
+            ).total_seconds()
+            daily_time_spent[attempt.date_only] += duration
 
         cumulative = []
         total = 0
@@ -182,6 +186,7 @@ def get_quiz_statistics(user):
                     "successfull_attempts": successfull,
                     "ratio": successfull
                     / total,  # Ratio of successfull vs number tried
+                    "total_time_spent": daily_time_spent[d],
                 }
             )
 
@@ -193,10 +198,15 @@ def get_quiz_statistics(user):
 
 def find_friend(user, query):
     try:
-        friends = models.User.objects.filter(
-            (Q(friendship__user1=user) | Q(friendship__user2=user)),
-            username__contains=query,
-        )[:5]
+        friendships = models.Friendship.objects.filter(Q(user1=user) | Q(user2=user))
+
+        friend_ids = [
+            f.user2.id if f.user1 == user else f.user1.id for f in friendships
+        ]
+
+        friends = User.objects.filter(id__in=friend_ids, username__icontains=query)[:5]
+
+        print(friends)
         return friends
     except Exception as e:
         print(f"Could not find any friends with that pattern, Pattern: {e}")
