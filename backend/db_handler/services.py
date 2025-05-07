@@ -1,4 +1,7 @@
+from django.contrib.auth import get_user, get_user_model
+from django.db.models import Q
 from . import internal_services
+from . import models
 
 
 def create_user(username, email, password):
@@ -95,7 +98,7 @@ def create_quiz_answer(
     attempt,
     question,
     is_correct,
-    multiple_choice_answer=None,
+    multiple_choice_answer=False,
     free_text_answer="",
     started_at=None,
     ended_at=None,
@@ -112,4 +115,39 @@ def create_quiz_answer(
         )
     except Exception as e:
         print(f"Error creating quiz answer: {e}")
+        return None
+
+
+User = get_user_model()
+
+
+def get_courses(user):
+    try:
+        courses = models.Course.objects.filter(readcourse__user=user)
+        print("Courses", courses)
+        return courses
+    except Exception as e:
+        print(f"Error creating quiz answer: {e}")
+        return None
+
+
+def get_quizes(user):
+    try:
+        quizes = models.Quiz.objects.filter(
+            course__in=models.ReadCourse.objects.filter(user=user).values("course_id")
+        )
+        return quizes
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+
+
+def get_friends(user):
+    try:
+        friendships = models.Friendship.objects.filter(Q(user1=user) | Q(user2=user))
+        friends = [f.user2 if f.user1 == user else f.user1 for f in friendships]
+        print(friends)
+        return friends
+    except Exception as e:
+        print(f"Could not get friends, error: {e}")
         return None
