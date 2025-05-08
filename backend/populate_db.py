@@ -1,4 +1,5 @@
-from datetime import date, timedelta
+from datetime import datetime, date, timedelta, time
+from django.utils import timezone
 import random
 from django.contrib.auth.models import make_password
 from db_handler.services import (
@@ -115,22 +116,39 @@ add_friend(gustav, thea)
 add_friend(thea, rille)
 add_friend(rille, gustav)
 
+
+def random_time_on_day(day):
+    hour = random.randint(8, 22)  # Between 8 AM and 10 PM
+    minute = random.randint(0, 59)
+    second = random.randint(0, 59)
+    return datetime.combine(day, time(hour, minute, second))
+
+
 # Creating quiz attempts for users
 for i in range(40):
     passed = random.choice([True, False])
+
+    day = date.today() - timedelta(days=i)
+    started_at = timezone.make_aware(random_time_on_day(day))
+    ended_at = started_at + timedelta(seconds=random.randint(60, 600))
+
     quiz_attempt_1_gustav = create_quiz_attempt(
         gustav,
         quiz_1_course_1,
-        started_at=date.today() - timedelta(days=i),
-        ended_at=date.today() - timedelta(days=i),
+        started_at=started_at,
+        ended_at=ended_at,
         passed=passed,
-    )  # Create some randomness, so chart is not so straight
+    )
+
+    # Thea’s attempt always today, random time
+    thea_start = timezone.make_aware(random_time_on_day(date.today()))
+    thea_end = thea_start + timedelta(seconds=random.randint(60, 600))
 
     quiz_attempt_2_thea = create_quiz_attempt(
         thea,
         quiz_2_course_1,
-        started_at=date.today(),
-        ended_at=date.today(),
+        started_at=thea_start,
+        ended_at=thea_end,
         passed=False,
     )
 
