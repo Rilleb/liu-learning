@@ -114,8 +114,8 @@ class FindUser(APIView):
             serilizer = UserSerializer(friends, many=True)
             return Response(serilizer.data)
         else:
-            Return(
-                f"{'Missing auth header' if not auth_header else "No args were passed in"}"
+            return Response(
+                f"{'Missing auth header' if not auth_header else 'No args were passed in'}"
             )
 
 
