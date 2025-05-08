@@ -1,14 +1,5 @@
 from django.urls import path
-from .views import (
-    CourseView,
-    CredentialsLoginView,
-    Friendsview,
-    GithubSyncView,
-    GoogleSyncView,
-    QuizView,
-    UserCreateView,
-)
-
+from .views import *
 
 urlpatterns = [
     path("courses/", CourseView.as_view(), name="courses"),
@@ -22,4 +13,7 @@ urlpatterns = [
     path("auth/credentials-create", UserCreateView.as_view(), name="create-user"),
     path("quiz/", QuizView.as_view(), name="quiz"),
     path("friends/", Friendsview.as_view(), name="friends"),
+    path("quiz/description/", QuizDescription.as_view(), name="description"),
+    path("quiz/name/", QuizName.as_view(), name="quizName"),
+    path("quiz/questionCount/", QuestionCount.as_view(), name="questionCount"),
 ]

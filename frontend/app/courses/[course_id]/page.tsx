@@ -1,42 +1,84 @@
-"use client"
-
 import { getQuizzesForCourse , get_course_name} from '../../lib/get_data'
 import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
-import { useParams } from 'next/navigation'
+import { getServerSession } from "next-auth"
+import { options } from "../../api/auth/[...nextauth]/options"
+import { UserList, QuizList } from "../../data_types/data_types"
 
-const QuizComponent = ({ id }: { id: number }) => {
-    const quizzes = getQuizzesForCourse(id)
-    console.log("ID: ", id);
+async function FriendsComponent() {
+    const session = await getServerSession(options);
+    if (!session) {
+        return <div>Not authenticated</div>;
+    }
 
+    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            'Authorization': `Token ${session.accessToken}`,
+        }
+    });
+
+    if (!res.ok) {
+        return <div>Error loading friends</div>;
+    }
+
+    const friends: UserList = await res.json();
+    return <FriendsBar friends={friends} />;
+}
+
+const QuizComponent = async ({ id }: { id: number }) => {
+    const session = await getServerSession(options)
+    if (!session) {
+        return (
+            <div>
+                <p>Error fetching Quiz</p>
+            </div>
+        )
+    }
+    const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            //@ts-ignore
+            'Authorization': `Token ${session.accessToken}`,
+        }
+    })
+
+    if (!res.ok) {
+        return (
+            <div>
+                <p>Error fetching quizes</p>
+                <p>Make sure you are logged in</p>
+            </div>
+        )
+    }
+    const quizes: QuizList = await res.json()
+    console.log("Quizes: ", quizes)
     return (
-        <div className="font-medium">
-            <ul className="grid grid-cols-1 md:grid-cols-1 gap-2 ">
-                {quizzes &&
-                    quizzes.map((quiz) => (
-                        <li
-                            key={quiz.quizId}
-                            className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
-                        >
-                            <Link href={`/courses/${id}/${quiz.quizId}`}>
-                                <div className="space-y-2">
-                                    <h3 className="hover:underline">
-                                        {quiz.name}
-                                    </h3>
-                                </div>
-                            </Link>
-                        </li>
-                    ))}
+        <div>
+            <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {quizes &&
+                    quizes.map((quiz) => {
+                        return (
+                            <li
+                                key={quiz.id}
+                                className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
+                            >
+                                <Link href={`/courses/${id}/${quiz.id}`}>
+                                    <p>Quiz: {quiz.name} </p>
+                                </Link>
+                            </li>
+                        )
+                    })}
             </ul>
         </div>
     )
 }
 
 
-export default function Home() {
-    const params = useParams()
+export default function Home({ params }: { params: { course_id: number } }) {
     const courseId = Number(params.course_id)
-    console.log("All params:", params)
 
     const courseName = String(get_course_name(courseId))
     return (
@@ -52,7 +94,7 @@ export default function Home() {
             </div>
             {/*Friends*/}
             <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsBar activeFriends={["James", "Thea", "Gustav", "Rickard"]} offlineFriends={["Christina", "Oscar"]} />
+                <FriendsComponent/>
             </div>
         </div>
     )

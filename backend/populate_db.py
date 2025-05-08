@@ -1,4 +1,5 @@
-from datetime import date
+from datetime import date, timedelta
+import random
 from django.contrib.auth.models import make_password
 from db_handler.services import (
     create_user,
@@ -115,15 +116,34 @@ add_friend(thea, rille)
 add_friend(rille, gustav)
 
 # Creating quiz attempts for users
-quiz_attempt_1_gustav = create_quiz_attempt(
-    gustav, quiz_1_course_1, started_at=date.today(), ended_at=date.today(), passed=True
-)
-quiz_attempt_2_thea = create_quiz_attempt(
-    thea, quiz_2_course_1, started_at=date.today(), ended_at=date.today(), passed=False
-)
+for i in range(40):
+    passed = random.choice([True, False])
+    quiz_attempt_1_gustav = create_quiz_attempt(
+        gustav,
+        quiz_1_course_1,
+        started_at=date.today() - timedelta(days=i),
+        ended_at=date.today() - timedelta(days=i),
+        passed=passed,
+    )  # Create some randomness, so chart is not so straight
 
-# Creating quiz answers for quiz attempts
-create_quiz_answer(quiz_attempt_1_gustav, question_1_quiz_1_course_1, is_correct=True)
-create_quiz_answer(quiz_attempt_1_gustav, question_2_quiz_1_course_1, is_correct=True)
-create_quiz_answer(quiz_attempt_2_thea, question_1_quiz_2_course_1, is_correct=False)
-create_quiz_answer(quiz_attempt_2_thea, question_2_quiz_2_course_1, is_correct=False)
+    quiz_attempt_2_thea = create_quiz_attempt(
+        thea,
+        quiz_2_course_1,
+        started_at=date.today(),
+        ended_at=date.today(),
+        passed=False,
+    )
+
+    # Creating quiz answers for quiz attempts
+    create_quiz_answer(
+        quiz_attempt_1_gustav, question_1_quiz_1_course_1, is_correct=passed
+    )
+    create_quiz_answer(
+        quiz_attempt_1_gustav, question_2_quiz_1_course_1, is_correct=passed
+    )
+    create_quiz_answer(
+        quiz_attempt_2_thea, question_1_quiz_2_course_1, is_correct=False
+    )
+    create_quiz_answer(
+        quiz_attempt_2_thea, question_2_quiz_2_course_1, is_correct=False
+    )
