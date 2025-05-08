@@ -154,6 +154,33 @@ def get_friends(user):
         return None
 
 
+def get_quiz_description(quiz_id):
+    try:
+        description = models.Quiz.objects.filter(id = quiz_id).first().description
+        return description
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+  
+  
+def get_quiz_name(quiz_id):
+    try:
+        name = models.Quiz.objects.filter(id = quiz_id).first().name
+        return name
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+
+      
+def get_question_count(quiz_id):
+    try:
+        count = models.Question.objects.filter(quiz_id = quiz_id).count()
+        return count
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+      
+      
 def get_quiz_statistics(user):
     try:
         attempts = (
