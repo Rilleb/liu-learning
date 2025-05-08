@@ -2,23 +2,32 @@
 
 import { AttemptsData } from "@/app/profile/page";
 import SearchBar from "../searchBar";
+import LineChartDate from "../charts/line";
 import { useDebounceCallback } from "usehooks-ts";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { UserList, User } from "@/app/data_types/data_types";
+import Stats from "./stats";
 
-export function FriendStats() {
+interface Props {
+    userData: AttemptsData[]
+}
+
+export function FriendStats({ userData }: Props) {
     const [loading, setLoading] = useState(false)
     const [results, setResults] = useState<UserList>([])
     const [showDropdown, setShowDropdown] = useState(false)
     const { data: session, status } = useSession();
     const [query, setQuery] = useState("")
+    const [userSelected, setUserSelected] = useState(false)
+    const [userStats, setUserStats] = useState<User>()
 
     const token = session?.accessToken ?? "";
 
     const onClick = ((user: User) => {
         setQuery(user.username)
         setShowDropdown(false)
+        setUserSelected(true)
     })
 
     const handleSearch = useDebounceCallback(async (q: string) => {
@@ -57,9 +66,7 @@ export function FriendStats() {
         }
     }, 300);
 
-    // ✅ All hooks have now been called before conditionals
     if (status === "loading") return <p>Loading...</p>;
-    if (!session) return <p>You are not logged in</p>;
 
     return (
         <div className="flex flex-col items-center w-full">
@@ -76,6 +83,22 @@ export function FriendStats() {
                     ))}
                 </ul>
             )}
+
+            <div className="w-full h-full p-2">
+                <div className="w-full h-1/4">
+                    <p>Number of Quiz Attempts</p>
+                    <LineChartDate data={userData} metric="total_attempts" />
+                </div>
+                <div className="w-full h-1/4">
+                    <p>Ratio</p>
+                    <LineChartDate data={userData} metric="ratio" />
+                </div>
+                <div className="w-full h-1/4">
+                    <p>Total time spent</p>
+                    <LineChartDate data={userData} metric="total_time_spent" />
+                </div>
+            </div>
+
         </div>
     )
 }

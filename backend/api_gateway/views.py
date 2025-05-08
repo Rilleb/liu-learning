@@ -79,7 +79,9 @@ class AttemptStatisticsView(APIView):
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
         if auth_header and auth_header.startswith("Token "):
             token = auth_header.split("Token ")[1]
-            user = get_user_from_token(token=token)
+            user = request.query_params.get("friend", None)
+            if not user:
+                user = get_user_from_token(token=token)
             if not user:
                 return Response(
                     {
