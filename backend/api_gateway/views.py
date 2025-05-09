@@ -79,9 +79,7 @@ class AttemptStatisticsView(APIView):
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
         if auth_header and auth_header.startswith("Token "):
             token = auth_header.split("Token ")[1]
-            user = request.query_params.get("friend", None)
-            if not user:
-                user = get_user_from_token(token=token)
+            user = get_user_from_token(token=token)
             if not user:
                 return Response(
                     {
@@ -91,6 +89,31 @@ class AttemptStatisticsView(APIView):
                     }
                 )
             attempts = services.get_quiz_statistics(user=user)
+            return Response(attempts)
+        else:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+
+class FriendStatisticsView(APIView):
+    def get(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        friend = request.query_params.get("friend")
+        if auth_header and auth_header.startswith("Token ") and friend:
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token)
+            if not user:
+                return Response(
+                    {
+                        "Message": {
+                            "Token has expired, our has no user associated with it"
+                        }
+                    }
+                )
+
+            if not services.is_friend_with(user, friend):
+                return Response({"Message": "Can only get statistics from friends"})
+            attempts = services.get_combined_quiz_statistics(user=user, friend=friend)
+            print(attempts)
             return Response(attempts)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)

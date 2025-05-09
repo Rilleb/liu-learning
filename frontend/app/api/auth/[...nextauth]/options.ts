@@ -36,6 +36,7 @@ export const options: AuthOptions = {
                     return {
                         id: user.id,
                         email: user.email,
+                        username: user.username,
                         accessToken: user.access_token,
                     }
                 }

@@ -1,34 +1,62 @@
 "use client"
 
-import { AttemptsData } from "@/app/profile/page";
 import SearchBar from "../searchBar";
 import LineChartDate from "../charts/line";
 import { useDebounceCallback } from "usehooks-ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
-import { UserList, User } from "@/app/data_types/data_types";
-import Stats from "./stats";
+import { UserList, User, CombinedQuizStatistics, DateBasedStat, CourseBasedStat } from "@/app/data_types/data_types";
+import RadarCourseChart from "../charts/radar";
 
 interface Props {
-    userData: AttemptsData[]
+    userData: CombinedQuizStatistics
 }
 
 export function FriendStats({ userData }: Props) {
+    const { date_based, course_based } = userData
     const [loading, setLoading] = useState(false)
     const [results, setResults] = useState<UserList>([])
     const [showDropdown, setShowDropdown] = useState(false)
     const { data: session, status } = useSession();
     const [query, setQuery] = useState("")
     const [userSelected, setUserSelected] = useState(false)
-    const [userStats, setUserStats] = useState<User>()
+    const [dateBasedData, setDateBasedData] = useState<DateBasedStat[]>(date_based)
+    const [courseBasedData, setCourseBasedData] = useState<CourseBasedStat[]>(course_based)
 
     const token = session?.accessToken ?? "";
+    const username = session?.user?.name
 
-    const onClick = ((user: User) => {
+    const onClick = (async (user: User) => {
         setQuery(user.username)
         setShowDropdown(false)
         setUserSelected(true)
+        setLoading(true)
+        try {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/statistics/compare/stats?friend=${user.id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Token ${token}`
+                }
+            })
+
+            if (!res.ok) {
+                console.log("Something went wrong")
+            }
+
+            const combinedData: CombinedQuizStatistics = await res.json()
+            setUserSelected(true)
+            setDateBasedData(combinedData.date_based)
+            setCourseBasedData(combinedData.course_based)
+
+        } catch (err) {
+            console.log(err)
+            console.log("Could not get data")
+        }
+        setLoading(false)
+
     })
+
 
     const handleSearch = useDebounceCallback(async (q: string) => {
         console.log("Handle search: ", q)
@@ -85,18 +113,23 @@ export function FriendStats({ userData }: Props) {
             )}
 
             <div className="w-full h-full p-2">
-                <div className="w-full h-1/4">
+                <div className="w-full h-[200px]">
                     <p>Number of Quiz Attempts</p>
-                    <LineChartDate data={userData} metric="total_attempts" />
+                    <LineChartDate data={dateBasedData} metric="total_attempts" is_multiple={userSelected} />
                 </div>
-                <div className="w-full h-1/4">
+                <div className="w-full h-[200px]">
                     <p>Ratio</p>
-                    <LineChartDate data={userData} metric="ratio" />
+                    <LineChartDate data={dateBasedData} metric="ratio" is_multiple={userSelected} />
                 </div>
-                <div className="w-full h-1/4">
+                <div className="w-full h-[200px]">
                     <p>Total time spent</p>
-                    <LineChartDate data={userData} metric="total_time_spent" />
+                    <LineChartDate data={dateBasedData} metric="time_spent" is_multiple={userSelected} />
                 </div>
+                <div className="w-full h-[200px]">
+                    <p>Attempts by course</p>
+                    <RadarCourseChart data={courseBasedData} user="PLACEHOLDER" is_multiple={userSelected} />
+                </div>
+
             </div>
 
         </div>

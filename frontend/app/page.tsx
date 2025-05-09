@@ -37,7 +37,6 @@ const QuizComponent = async () => {
         )
     }
     const quizes: QuizList = await res.json()
-    console.log("Quizes: ", quizes)
 
     return (
         <div>
@@ -121,13 +120,14 @@ export default async function Home() {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
+            'Authorization': `Token ${session?.accessToken}`,
         }
     })
     if (!res.ok) {
 
     }
     const friends: UserList = await res.json()
+    console.log(friends)
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/

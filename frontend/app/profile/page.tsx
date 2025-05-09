@@ -1,14 +1,8 @@
 import { FriendStats } from "../components/stats/friend_comparison"
 import { getServerSession } from "next-auth"
 import { options } from "../api/auth/[...nextauth]/options"
+import { CombinedQuizStatistics } from "../data_types/data_types"
 
-export interface AttemptsData {
-    date: Date
-    total_attempts: number
-    ratio: number
-    successfull_attempts: number
-    total_time_spent: number
-}
 
 export default async function Profile() {
     const session = await getServerSession(options)
@@ -27,7 +21,8 @@ export default async function Profile() {
         }
     })
 
-    const data: AttemptsData[] = await res.json() //Data should be returned in order 
+    const data: CombinedQuizStatistics = await res.json() //Data should be returned in order 
+    console.log(data)
 
     return (
         <div className="h-screen w-full">
