@@ -1,7 +1,5 @@
 'use client';
 
-import Form from 'next/form';
-import { printData } from '@/app/create/actions/print_data';
 import { useState } from 'react';
 
 type MultipleChoiceAnswerProps = {
@@ -137,7 +135,8 @@ const QuizQuestions = () => {
 export default function CreateQuestionsForm() {
 
     return (
-        <Form action={printData} className="space-y-4 max-w-md">
+        /* ADD onSubmit later */
+        <form className="space-y-4 max-w-md">
             <div>
                 <label className="block text-sm font-medium">Quiz Title</label>
                 <input
@@ -166,7 +165,7 @@ export default function CreateQuestionsForm() {
             >
                 Create Quiz
             </button>
-        </Form>
+        </form>
     );
 }
 

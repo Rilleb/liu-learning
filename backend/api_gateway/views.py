@@ -46,6 +46,7 @@ class CourseView(APIView):
         name = data.get("title")
         code = data.get("code")
         description = data.get("description")
+        chapters = data.get("chapters")
 
         created_by_user = get_user_from_token(token)
         if not created_by_user:
@@ -54,7 +55,7 @@ class CourseView(APIView):
                 status.HTTP_401_UNAUTHORIZED,
             )
 
-        course = create_course(name, code, description, created_by_user)
+        course = create_course(name, code, description, created_by_user, chapters)
         if course:
             return Response({"message": "Course created"}, status=status.HTTP_200_OK)
         return Response(

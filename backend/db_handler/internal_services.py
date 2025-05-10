@@ -24,7 +24,7 @@ def create_chapter(name, course, created_by, date_created=None):
     if date_created is None:
         date_created = datetime.date.today()
     chapter = Chapter.objects.create(
-        name=name, course_id=course, created_by=created_by, date_created=date_created
+        name=name, course=course, created_by=created_by, date_created=date_created
     )
     return chapter
 

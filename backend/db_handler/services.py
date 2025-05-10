@@ -12,11 +12,16 @@ def create_user(username, email, password):
         return None
 
 
-def create_course(name, code, description, created_by, date_created=None):
+def create_course(name, code, description, created_by, chapters, date_created=None):
     try:
-        return internal_services.create_course(
+        course = internal_services.create_course(
             name, code, description, created_by, date_created
         )
+
+        for chapter in chapters:
+            create_chapter(chapter, course, created_by)
+
+            return course
     except Exception as e:
         print(f"Error creating course: {e}")
         return None
