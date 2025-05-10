@@ -1,7 +1,7 @@
-'use client';
+'use client'
 
 import { useState } from 'react';
-import { printData } from '@/app/create/actions/print_data';
+import { createCourse } from './actions/course_action';
 
 export default function CreateCourseForm() {
     const [chapters, setChapters] = useState<string[]>(['']);
@@ -28,16 +28,9 @@ export default function CreateCourseForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
-        const res = await fetch("http://localhost:8000/api/courses/",
-            {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ "title": title, "code": code, "description": description, "chapters": chapters }),
-            })
+        const res = await createCourse({ title, code, description, chapters });
 
-        if (res.ok) {
+        if (res.success) {
             setStatus("Succesfully created course")
         } else {
             // const data = await res.json()data.message 

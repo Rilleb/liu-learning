@@ -25,17 +25,36 @@ def get_user_from_token(token):
         return None
 
 
+def get_auth_token(request):
+    auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+    if auth_header and auth_header.startswith("Token "):
+        token = auth_header.split("Token ")[1]
+        return token
+    else:
+        return None
+
+
 # Create your views here.
 class CourseView(APIView):
 
     def post(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
         data = request.data
         name = data.get("title")
         code = data.get("code")
         description = data.get("description")
-        created_by = "temp"
 
-        course = create_course(name, code, description, created_by)
+        created_by_user = get_user_from_token(token)
+        if not created_by_user:
+            return Response(
+                {"Message": {"Token was not included or has expired"}},
+                status.HTTP_401_UNAUTHORIZED,
+            )
+
+        course = create_course(name, code, description, created_by_user)
         if course:
             return Response({"message": "Course created"}, status=status.HTTP_200_OK)
         return Response(
@@ -43,20 +62,20 @@ class CourseView(APIView):
         )
 
     def get(self, request):
-        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
-        if auth_header and auth_header.startswith("Token "):
-            token = auth_header.split("Token ")[1]
-            user = get_user_from_token(token=token)
-            if not user:
-                return Response(
-                    {"Message": {"Token was not included or has expired"}},
-                    status.HTTP_401_UNAUTHORIZED,
-                )
-            courses = services.get_courses(user=user)
-            serilizer = CourseSerializer(courses, many=True)
-            return Response(serilizer.data)
-        else:
+        token = get_auth_token(request)
+        if not token:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_user_from_token(token=token)
+        if not user:
+            return Response(
+                {"Message": {"Token was not included or has expired"}},
+                status.HTTP_401_UNAUTHORIZED,
+            )
+
+        courses = services.get_courses(user=user)
+        serilizer = CourseSerializer(courses, many=True)
+        return Response(serilizer.data)
 
 
 class QuizView(APIView):
