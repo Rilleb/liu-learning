@@ -138,8 +138,8 @@ class FindUser(APIView):
             serilizer = UserSerializer(friends, many=True)
             return Response(serilizer.data)
         else:
-            Return(
-                f"{'Missing auth header' if not auth_header else "No args were passed in"}"
+            return Response(
+                f"{'Missing auth header' if not auth_header else 'No args were passed in'}"
             )
 
 
@@ -244,3 +244,24 @@ class CredentialsLoginView(APIView):
             )
         else:
             return Response({"error": "Invalid credentials"}, status=400)
+
+
+class QuizDescription(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        description = services.get_quiz_description(quizId == quizId)
+        return Response(description)
+
+
+class QuizName(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        name = services.get_quiz_name(quizId == quizId)
+        return Response(name)
+    
+
+class QuestionCount(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        count = services.get_question_count(quizId == quizId)
+        return Response(count)
