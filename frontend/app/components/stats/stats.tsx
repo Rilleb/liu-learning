@@ -1,5 +1,5 @@
 import { options } from "@/app/api/auth/[...nextauth]/options"
-import { getServerSession } from "next-auth"
+import { getServerSession, User } from "next-auth"
 import { AttemptsData } from "@/app/profile/page"
 import LineChartDate from "../charts/line"
 

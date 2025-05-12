@@ -8,6 +8,7 @@ import { get_latest_quizes } from "./lib/get_data"
 
 type Props = {
     userId: number
+
 }
 
 const QuizComponent = async () => {
@@ -37,7 +38,7 @@ const QuizComponent = async () => {
         )
     }
     const quizes: QuizList = await res.json()
-    console.log("Quizes: ", quizes)
+
     return (
         <div>
             {/*Think it would be cool to make so if you hover on a quiz, the card flip and gives a description*/}
@@ -120,13 +121,14 @@ export default async function Home() {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
+            'Authorization': `Token ${session?.accessToken}`,
         }
     })
     if (!res.ok) {
 
     }
     const friends: UserList = await res.json()
+    console.log(friends)
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/

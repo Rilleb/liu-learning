@@ -29,13 +29,13 @@ export const options: AuthOptions = {
                     }
                 )
                 const user = await res.json()
-                console.log(user)
 
                 // If no error and we have user data, return it
                 if (res.ok && user) {
                     return {
                         id: user.id,
                         email: user.email,
+                        username: user.username,
                         accessToken: user.access_token,
                     }
                 }

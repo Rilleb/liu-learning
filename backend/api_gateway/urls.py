@@ -22,4 +22,9 @@ urlpatterns = [
         name="stats-attempts",
     ),
     path("statistics/compate/friend", FindUser.as_view(), name="find_friend"),
+    path(
+        "statistics/compare/stats",
+        FriendStatisticsView.as_view(),
+        name="compare-with-friend",
+    ),
 ]
