@@ -20,15 +20,16 @@ interface Props {
 
 
 const LineChartDate: React.FC<Props> = ({ data, metric, is_multiple }) => {
+    console.log(data)
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data}>
                     <XAxis dataKey={"date"} />
                     <YAxis />
-                    <Tooltip />
-                    <Line type="monotone" dataKey={`user_${metric}`} stroke="#8884d8" dot={false} />
-                    {is_multiple && (<Line type="monotone" dataKey={`friend_${metric}`} stroke="#333333" dot={false} />)}
+                    <Tooltip formatter={(value) => value.toFixed(2)} />
+                    <Line type="monotone" dataKey={`user_${metric}`} stroke="#8884d8" dot={false} connectNulls={true} />
+                    {is_multiple && (<Line type="monotone" dataKey={`friend_${metric}`} stroke="#333333" dot={false} connectNulls={true} />)}
                 </LineChart>
             </ResponsiveContainer>
         </div>

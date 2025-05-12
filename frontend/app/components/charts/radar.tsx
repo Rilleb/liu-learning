@@ -25,8 +25,8 @@ const RadarCourseChart: React.FC<Props> = ({ data, user, is_multiple }) => {
                 <RadarChart data={data}>
                     <PolarGrid />
                     <PolarAngleAxis dataKey="course" />
-                    <Radar name={user} dataKey="user_attempts" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
-                    {is_multiple && (<Radar name={user} dataKey="friend_attempts" stroke="#555555" fill="#55555" fillOpacity={0.6} />)}
+                    <Radar name={user} dataKey="user_attempts" stroke="#89CFF0" fill="#89CFF0" fillOpacity={0.4} />
+                    {is_multiple && (<Radar name={user} dataKey="friend_attempts" stroke="#008000" fill="#008000" fillOpacity={0.4} />)}
                     <Legend />
                 </RadarChart>
             </ResponsiveContainer>

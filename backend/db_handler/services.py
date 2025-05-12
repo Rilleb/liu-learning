@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user, get_user_model
 from collections import defaultdict
+
 from django.db.models import Q
 from django.db.models import DateField
 from django.db.models.functions import Cast
@@ -198,11 +199,11 @@ def get_quiz_statistics(user):
                     "user_successfull_attempts": successfull,
                     "user_ratio": successfull
                     / total,  # Ratio of successfull vs number tried
-                    "user_total_time_spent": daily_time_spent[d],
+                    "user_time_spent": daily_time_spent[d],
                 }
             )
         attempts_by_course = [
-            {"course": k, "attempts": v} for k, v in attempts_by_course.items()
+            {"course": k, "user_attempts": v} for k, v in attempts_by_course.items()
         ]
         return {"date_based": cumulative, "course_based": attempts_by_course}
     except Exception as e:
@@ -211,90 +212,90 @@ def get_quiz_statistics(user):
 
 
 def get_combined_quiz_statistics(user, friend):
-    def collect_attempts(u):
-        attempts = (
-            models.QuizAttempt.objects.filter(user=u)
-            .annotate(date_only=Cast("attempt_ended_at", output_field=DateField()))
-            .order_by("date_only")
-        )
-        date_stats = defaultdict(
-            lambda: {
-                "total_attempts": 0,
-                "successfull_attempts": 0,
-                "total_time_spent": 0.0,
+    user_stats = get_quiz_statistics(user)
+    friend_stats = get_quiz_statistics(friend)
+
+    if not user_stats or not friend_stats:
+        return None
+
+    # Merge date_based
+    date_dict = {}
+
+    # Add user data to the date_dict
+    for entry in user_stats["date_based"]:
+        date = entry["date"]
+        date_dict[date] = {
+            "date": date,
+            "user_total_attempts": entry.get("user_total_attempts", None),
+            "user_successfull_attempts": entry.get("user_successfull_attempts", None),
+            "user_ratio": entry.get("user_ratio", None),
+            "user_time_spent": entry.get("user_time_spent", None),
+            "friend_total_attempts": None,
+            "friend_successfull_attempts": None,
+            "friend_ratio": None,
+            "friend_time_spent": None,
+        }
+
+    # Add friend data to the date_dict
+    for entry in friend_stats["date_based"]:
+        date = entry["date"]
+        if date not in date_dict:
+            date_dict[date] = {
+                "date": date,
+                "user_total_attempts": None,
+                "user_successfull_attempts": None,
+                "user_ratio": None,
+                "user_time_spent": None,
             }
+
+        # Merge the friend's data
+        date_dict[date]["friend_total_attempts"] = entry.get(
+            "user_total_attempts", None
         )
-        quiz_counts = defaultdict(int)
+        date_dict[date]["friend_successfull_attempts"] = entry.get(
+            "user_successfull_attempts", None
+        )
+        date_dict[date]["friend_ratio"] = entry.get("user_ratio", None)
+        date_dict[date]["friend_time_spent"] = entry.get("user_time_spent", None)
 
-        for attempt in attempts:
-            date = attempt.date_only
-            date_stats[date]["total_attempts"] += 1
-            if attempt.passed:
-                date_stats[date]["successfull_attempts"] += 1
-            duration = (
-                attempt.attempt_ended_at - attempt.attempt_started_at
-            ).total_seconds()
-            date_stats[date]["total_time_spent"] += duration
-            quiz_counts[attempt.quiz_id] += 1
+    # Sort the dates
+    combined_date_based = sorted(date_dict.values(), key=lambda x: x["date"])
 
-        return date_stats, quiz_counts
+    # Merge course_based
+    course_dict = {}
 
-    # Collect stats for both users
-    user_dates, user_quiz_counts = collect_attempts(user)
-    friend_dates, friend_quiz_counts = collect_attempts(friend)
+    # Add user course data to the course_dict
+    for entry in user_stats["course_based"]:
+        course = entry["course"]
+        course_dict[course] = {
+            "course": course,
+            "user_attempts": (
+                entry.get("user_attempts", 0)
+                if entry.get("user_attempts", 0) > 0
+                else 0
+            ),
+            "friend_attempts": 0,
+        }
 
-    # Merge date-based stats
-    all_dates = set(user_dates.keys()) | set(friend_dates.keys())
-    combined_date_stats = []
-    for d in sorted(all_dates):
-        u = user_dates.get(d, {})
-        f = friend_dates.get(d, {})
-        u_total = u.get("total_attempts", 0)
-        f_total = f.get("total_attempts", 0)
-        u_success = u.get("successfull_attempts", 0)
-        f_success = f.get("successfull_attempts", 0)
-        u_time = u.get("total_time_spent", 0.0)
-        f_time = f.get("total_time_spent", 0.0)
-
-        combined_date_stats.append(
-            {
-                "date": d,
-                "user_total_attempts": u_total,
-                "friend_total_attempts": f_total,
-                "user_successful_attempts": u_success,
-                "friend_successful_attempts": f_success,
-                "user_ratio": u_success / u_total if u_total else 0,
-                "friend_ratio": f_success / f_total if f_total else 0,
-                "user_time_spent": u_time,
-                "friend_time_spent": f_time,
+    # Add friend course data to the course_dict
+    for entry in friend_stats["course_based"]:
+        course = entry["course"]
+        if course not in course_dict:
+            course_dict[course] = {
+                "course": course,
+                "user_attempts": 0,
             }
+
+        course_dict[course]["friend_attempts"] = (
+            entry.get("user_attempts", 0) if entry.get("user_attempts", 0) > 0 else 0
         )
 
-    # Map quizzes to course names
-    all_quiz_ids = set(user_quiz_counts.keys()) | set(friend_quiz_counts.keys())
-    quiz_to_course = {
-        q.id: q.course.name
-        for q in models.Quiz.objects.filter(id__in=all_quiz_ids).select_related(
-            "course"
-        )
-    }
-
-    # Merge course-based stats
-    course_stats = defaultdict(lambda: {"user_attempts": 0, "friend_attempts": 0})
-    for quiz_id, count in user_quiz_counts.items():
-        course = quiz_to_course.get(quiz_id)
-        if course:
-            course_stats[course]["user_attempts"] += count
-    for quiz_id, count in friend_quiz_counts.items():
-        course = quiz_to_course.get(quiz_id)
-        if course:
-            course_stats[course]["friend_attempts"] += count
-
-    combined_course_stats = [{"course": c, **v} for c, v in course_stats.items()]
+    # Convert to list
+    combined_course_based = list(course_dict.values())
 
     return {
-        "date_based": combined_date_stats,
-        "course_based": combined_course_stats,
+        "date_based": combined_date_based,
+        "course_based": combined_course_based,
     }
 
 
@@ -308,7 +309,6 @@ def find_friend(user, query):
 
         friends = User.objects.filter(id__in=friend_ids, username__icontains=query)[:5]
 
-        print(friends)
         return friends
     except Exception as e:
         print(f"Could not find any friends with that pattern, Pattern: {e}")

@@ -25,7 +25,7 @@ export default async function Profile() {
     console.log(data)
 
     return (
-        <div className="h-screen w-full">
+        <div className="h-full w-full">
             <FriendStats userData={data} />
         </div>
     )

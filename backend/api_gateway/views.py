@@ -113,7 +113,6 @@ class FriendStatisticsView(APIView):
             if not services.is_friend_with(user, friend):
                 return Response({"Message": "Can only get statistics from friends"})
             attempts = services.get_combined_quiz_statistics(user=user, friend=friend)
-            print(attempts)
             return Response(attempts)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)

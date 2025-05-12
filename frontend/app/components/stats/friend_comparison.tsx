@@ -24,6 +24,7 @@ export function FriendStats({ userData }: Props) {
     const [courseBasedData, setCourseBasedData] = useState<CourseBasedStat[]>(course_based)
 
     const token = session?.accessToken ?? "";
+    console.log(session)
     const username = session?.user?.name
 
     const onClick = (async (user: User) => {
@@ -97,41 +98,66 @@ export function FriendStats({ userData }: Props) {
     if (status === "loading") return <p>Loading...</p>;
 
     return (
-        <div className="flex flex-col items-center w-full">
-            <SearchBar onSearch={handleSearch} value={query} />
+
+
+        <div className="flex flex-col w-full p-4 box-border h-full">
+
 
             {loading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
+            <div className="relative flex items-center gap-4 w-full max-w-md mb-4">
+                <SearchBar onSearch={handleSearch} value={query} />
 
-            {showDropdown && results.length > 0 && (
-                <ul className="w-full max-w-md mt-2 bg-white border rounded shadow">
-                    {results.map((user, index) => (
-                        <li key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => onClick(user)}>
-                            {user.username}
-                        </li>
-                    ))}
-                </ul>
-            )}
+                {showDropdown && results.length > 0 && (
+                    <ul className="absolute z-50 w-full max-w-md mt-2 bg-white border rounded shadow">
+                        {results.map((user, index) => (
+                            <li key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => onClick(user)}>
+                                {user.username}
+                            </li>
+                        ))}
+                    </ul>
+                )}
 
-            <div className="w-full h-full p-2">
-                <div className="w-full h-[200px]">
-                    <p>Number of Quiz Attempts</p>
-                    <LineChartDate data={dateBasedData} metric="total_attempts" is_multiple={userSelected} />
+                <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                        type="checkbox"
+                        checked={userSelected}
+                        onChange={() => setUserSelected(!userSelected)}
+                        className="form-checkbox h-5 w-5 text-blue-600"
+                    />
+                    <span className="text-sm text-gray-700">Compare with friend</span>
+                </label>
+            </div>
+
+            <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-6xl self-center">
+                <div className="bg-white rounded-xl shadow p-4 flex flex-col">
+                    <p className="font-semibold mb-2">Number of Quiz Attempts</p>
+                    <div className="flex-grow">
+                        <LineChartDate data={dateBasedData} metric="total_attempts" is_multiple={userSelected} />
+                    </div>
                 </div>
-                <div className="w-full h-[200px]">
-                    <p>Ratio</p>
-                    <LineChartDate data={dateBasedData} metric="ratio" is_multiple={userSelected} />
+
+                <div className="bg-white rounded-xl shadow p-4 flex flex-col">
+                    <p className="font-semibold mb-2">Ratio of correct answers compared to total</p>
+                    <div className="flex-grow">
+                        <LineChartDate data={dateBasedData} metric="ratio" is_multiple={userSelected} />
+                    </div>
                 </div>
-                <div className="w-full h-[200px]">
-                    <p>Total time spent</p>
-                    <LineChartDate data={dateBasedData} metric="time_spent" is_multiple={userSelected} />
+
+                <div className="bg-white rounded-xl shadow p-4 flex flex-col">
+                    <p className="font-semibold mb-2">Time spent per day</p>
+                    <div className="flex-grow">
+                        <LineChartDate data={dateBasedData} metric="time_spent" is_multiple={userSelected} />
+                    </div>
                 </div>
-                <div className="w-full h-[200px]">
-                    <p>Attempts by course</p>
-                    <RadarCourseChart data={courseBasedData} user="PLACEHOLDER" is_multiple={userSelected} />
+
+                <div className="bg-white rounded-xl shadow p-4 flex flex-col">
+                    <p className="font-semibold mb-2">Attempts by Course</p>
+                    <div className="flex-grow">
+                        <RadarCourseChart data={courseBasedData} user="PLACEHOLDER" is_multiple={userSelected} />
+                    </div>
                 </div>
 
             </div>
-
         </div>
     )
 }

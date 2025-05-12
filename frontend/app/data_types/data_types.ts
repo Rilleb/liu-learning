@@ -28,11 +28,11 @@ export interface Quiz {
 
 export interface DateBasedStat {
     date: Date
-    user_total_attempts: number
+    user_total_attempts?: number
     friend_total_attempts?: number
-    user_successful_attempts: number
+    user_successful_attempts?: number
     friend_successful_attempts?: number
-    user_ratio: number
+    user_ratio?: number
     friend_ratio?: number
     user_time_spent: number
     friend_time_spent?: number

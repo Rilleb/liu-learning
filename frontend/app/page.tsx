@@ -8,6 +8,7 @@ import { get_latest_quizes } from "./lib/get_data"
 
 type Props = {
     userId: number
+
 }
 
 const QuizComponent = async () => {
