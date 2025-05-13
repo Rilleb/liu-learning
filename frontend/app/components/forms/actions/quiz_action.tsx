@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { options } from '@/app/api/auth/[...nextauth]/options';
 
 
-export async function createCourse({ title, code, description, chapters }: {
+export async function createQuiz({ title, code, description, chapters }: {
     title: string;
     code: string;
     description: string;
@@ -16,7 +16,7 @@ export async function createCourse({ title, code, description, chapters }: {
         return { success: false, message: 'Not authenticated' };
     }
 
-    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/quizes/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

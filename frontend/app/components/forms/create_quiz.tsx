@@ -4,10 +4,19 @@ import { useState } from 'react';
 
 type MultipleChoiceAnswerProps = {
     index: number;
+    answers: string[];
+    setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
 };
 
-const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index }) => {
+const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index, answers, setAnswers }) => {
+    const handleMultipleChoiceAnswerChange = (index: number, value: string) => {
+        const newAnswers = [...answers];
+        newAnswers[index] = value;
+        setAnswers(newAnswers);
+    };
+
     return (
+        /* Use string[string[]] for answers ??? */
         <div className="grid grid-cols-1 gap-2 my-2">
             <input
                 name={`question[${index}].correctAnswer`}
@@ -37,8 +46,23 @@ const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index }) =>
     );
 };
 
-const QuizQuestions = () => {
-    const [answerTypes, setAnswerType] = useState<string[]>(['']);
+type QuizQuestionsProps = {
+    questions: string[];
+    setQuestions: React.Dispatch<React.SetStateAction<string[]>>;
+    answerTypes: string[];
+    setAnswerType: React.Dispatch<React.SetStateAction<string[]>>;
+    answers: string[];
+    setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
+}
+
+const QuizQuestions: React.FC<QuizQuestionsProps> = ({
+    questions,
+    setQuestions,
+    answerTypes,
+    setAnswerType,
+    answers,
+    setAnswers
+}) => {
 
     const handleAnswerTypeChange = (index: number, type: string) => {
         const newAnswerTypes = [...answerTypes];
@@ -46,7 +70,6 @@ const QuizQuestions = () => {
         setAnswerType(newAnswerTypes);
     };
 
-    const [questions, setQuestions] = useState<string[]>(['']);
 
     const handleAddQuestion = () => {
         setQuestions([...questions, '']);
@@ -66,6 +89,12 @@ const QuizQuestions = () => {
         setQuestions(newQuestions);
     };
 
+    const handleFreeTextAnswerChange = (index: number, value: string) => {
+        const newAnswers = [...answers];
+        newAnswers[index] = value;
+        setAnswers(newAnswers);
+    };
+
     return (
         <div className="space-y-6 mt-4">
             <label className="block text-sm font-medium">Questions</label>
@@ -73,7 +102,7 @@ const QuizQuestions = () => {
                 <div key={index} className="border p-4 rounded space-y-2">
                     <div className="flex items-center gap-2">
                         <input
-                            name={`question[${index}].text`}
+                            name={`question[${index}].title`}
                             type="text"
                             value={question}
                             onChange={(e) => handleQuestionChange(index, e.target.value)}
@@ -111,12 +140,13 @@ const QuizQuestions = () => {
                     </div>
 
                     {answerTypes[index] === 'multiple-choice' ? (
-                        <MultipleChoiceAnswer index={index} />
+                        <MultipleChoiceAnswer index={index} answers={answers} setAnswers={setAnswers} />
                     ) : (
                         <textarea
                             name={`question[${index}].freeTextAnswer`}
                             className="w-full border px-2 py-1 rounded"
                             placeholder="Enter expected free text answer"
+                            onChange={(e) => handleFreeTextAnswerChange(index, e.target.value)}
                         />
                     )}
                 </div>
@@ -132,7 +162,25 @@ const QuizQuestions = () => {
     )
 }
 
-export default function CreateQuestionsForm() {
+export default function CreateQuizForm() {
+    const [title, setTitle] = useState('');
+    const [code, setCode] = useState('');
+    const [answerTypes, setAnswerType] = useState<string[]>(['']);
+    const [questions, setQuestions] = useState<string[]>(['']);
+    const [answers, setAnswers] = useState<string[]>(['']);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const res = await createCourse({ title, code, description, chapters });
+
+        if (res.success) {
+            setStatus("Succesfully created course")
+        } else {
+            // const data = await res.json()data.message 
+            setStatus('Failed to create course')
+        }
+    };
 
     return (
         /* ADD onSubmit later */
@@ -144,12 +192,14 @@ export default function CreateQuestionsForm() {
                     type="text"
                     required
                     className="w-full border px-2 py-1 rounded"
+                    onChange={(e) => setTitle(e.target.value)}
                 />
                 <label className="block text-sm font-medium">Course </label>
                 <select
                     name="courseCode"
                     required
                     className="w-full border px-2 py-1 rounded"
+                    onChange={(e) => setCode(e.target.value)}
                 >
                     {/* TODO list actual course codes */}
                     <option> Select a course</option>
