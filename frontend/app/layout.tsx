@@ -5,6 +5,7 @@ import Header from '@/app/components/header'
 import Navbar from '@/app/components/navbar'
 import { SessionProvider } from "next-auth/react"
 import SessionProviderWrapper from './components/SessionProviderWrapper'
+import WebSocketConnector from './components/webSocketConnector'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
@@ -32,6 +33,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <SessionProviderWrapper>
+                    <WebSocketConnector />
                     <Header />
                     <div className="flex h-screen w-full overflow-hidden">
                         <Navbar />

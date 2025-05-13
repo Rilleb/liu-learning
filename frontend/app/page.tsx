@@ -128,7 +128,6 @@ export default async function Home() {
 
     }
     const friends: UserList = await res.json()
-    console.log(friends)
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/

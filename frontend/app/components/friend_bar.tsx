@@ -7,7 +7,6 @@ interface Props {
 }
 
 export default function FriendsBar({ friends }: Props) {
-    console.log(friends)
     const activeFriends = friends.filter((f) => f.is_active)
     const offlineFriends = friends.filter((f) => !f.is_active)
     return (

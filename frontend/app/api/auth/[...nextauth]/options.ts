@@ -33,7 +33,7 @@ export const options: AuthOptions = {
                 // If no error and we have user data, return it
                 if (res.ok && user) {
                     return {
-                        id: user.id,
+                        id: user.user_id,
                         email: user.email,
                         username: user.username,
                         accessToken: user.access_token,
@@ -96,11 +96,15 @@ export const options: AuthOptions = {
             // Check if user exists (i.e., first time the JWT callback is called)
             if (user) {
                 token.accessToken = user.accessToken // Store accessToken in the token
+
+                token.id = user.id
             }
             return token
         },
         async session({ session, token }) {
             session.accessToken = token.accessToken
+
+            session.user.id = token.id
             return session
         },
     },

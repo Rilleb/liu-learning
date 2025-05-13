@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from db_handler.serializers import (
     CourseSerializer,
     QuizSerializer,
@@ -5,12 +6,13 @@ from db_handler.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model, authenticate, user_logged_in
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 import json
 from django.contrib.auth.hashers import make_password
 from db_handler import services
+from django_redis import get_redis_connection
 
 
 def get_user_from_token(token):
@@ -173,6 +175,10 @@ class GoogleSyncView(APIView):
             user.first_name = name  # update name if needed
             user.save()
 
+        user.last_login = now()
+        user.save(update_fields=["last_login"])
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
+
         token, _ = Token.objects.get_or_create(user=user)
 
         return Response({"access_token": token.key})
@@ -201,6 +207,10 @@ class GithubSyncView(APIView):
         if not created:
             user.first_name = name  # update name if needed
             user.save()
+
+        user.last_login = now()
+        user.save(update_fields=["last_login"])
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
 
         token, _ = Token.objects.get_or_create(user=user)
 
@@ -238,6 +248,10 @@ class CredentialsLoginView(APIView):
 
         user = authenticate(username=user.username, password=password)
         if user:
+            user.last_login = now()
+            user.save(update_fields=["last_login"])
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
+
             token, _ = Token.objects.get_or_create(user=user)
             return Response(
                 {"access_token": token.key, "user_id": user.id, "email": user.email}
@@ -258,7 +272,7 @@ class QuizName(APIView):
         quizId = request.query_params.get("quiz_id", None)
         name = services.get_quiz_name(quizId == quizId)
         return Response(name)
-    
+
 
 class QuestionCount(APIView):
     def get(self, request):
