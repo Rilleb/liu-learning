@@ -1,10 +1,13 @@
 "use client"
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { useDispatch } from "react-redux";
+import { setFriendOnline } from "@/app/store/friendSlice";
 
 export default function WebSocketConnector() {
   const { data: session, status } = useSession();
 
+  const dispatch = useDispatch();
   useEffect(() => {
     if (status === "authenticated" && session?.user?.id) {
       const socket = new WebSocket(`ws://localhost:8000/ws/users/${session.user.id}/`);
@@ -22,7 +25,7 @@ export default function WebSocketConnector() {
         const data = JSON.parse(event.data);
         console.log("WebSocket message:", data);
         if (data.type == "friend_logged_in") {
-
+          dispatch(setFriendOnline(data.user_id));
 
         }
       };

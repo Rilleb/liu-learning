@@ -4,7 +4,6 @@ import ProgressBar from './components/progress_bar'
 import Link from 'next/link'
 import { CourseList, FriendsList, QuizList, UserList } from "./data_types/data_types"
 import FriendsBar from './components/friend_bar'
-import { get_latest_quizes } from "./lib/get_data"
 
 type Props = {
     userId: number
@@ -117,6 +116,7 @@ export async function CourseComponent() {
 
 export default async function Home() {
     const session = await getServerSession(options)
+
     const res = await fetch(`${process.env.BACKEND_URL}/api/friends/`, {
         method: 'GET',
         headers: {

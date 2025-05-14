@@ -2,14 +2,23 @@
 import Image from "next/image";
 import { FriendsList, UserList } from "@/app/data_types/data_types";
 import { useDispatch, useSelector } from 'react-redux';
+import { setFriends } from "../store/friendSlice";
+import { useAppStore, RootState } from "../store";
+import { useEffect, useRef } from "react";
 
 interface Props {
     friends: FriendsList
 }
 
 export default function FriendsBar({ friends }: Props) {
-    const dispatch = useDispatch()
-    const { online, offline }: FriendsList = useSelector((state: any) => state.friends)
+    const store = useAppStore()
+    useEffect(() => {
+        store.dispatch(setFriends(friends));
+    }, [store, friends]);
+    const online: UserList = useSelector((state: RootState) => state.friends.online);
+    const offline: UserList = useSelector((state: RootState) => state.friends.offline);
+
+
     return (
         <div>
             <h3>Active</h3>
