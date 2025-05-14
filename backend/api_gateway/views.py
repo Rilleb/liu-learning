@@ -73,7 +73,9 @@ class Friendsview(APIView):
             online_serilizer = UserSerializer(online, many=True)
             offline_serilizer = UserSerializer(offline, many=True)
 
-            return Response({"online": online_serilizer.data, "offline": offline_serilizer.data})
+            return Response(
+                {"online": online_serilizer.data, "offline": offline_serilizer.data}
+            )
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
 

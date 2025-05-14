@@ -24,6 +24,10 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                     request=None,
                     user=self.user,
                 )
+
+                await self.channel_layer.group_add(
+                    f"user_{self.user.id}", self.channel_name
+                )
                 await self.send_json({"status": "authenticated"})
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
@@ -35,10 +39,20 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             else:
                 await self.send_json({"error": "Not authenticated"})
 
+    async def user_logged_in(self, event):
+        await self.send_json(
+            {
+                "type": "friend_logged_in",
+                "user_id": event["user_id"],
+            }
+        )
+
     async def disconnect(self, close_code):
-        print(self.user)
         await sync_to_async(user_logged_out.send)(
             sender=self.__class__,
             request=None,
             user=self.user,
+        )
+        await self.channel_layer.group_discard(
+            f"user_{self.user.id}", self.channel_name
         )

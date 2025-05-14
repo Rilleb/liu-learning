@@ -1,13 +1,15 @@
 "use client"
 import Image from "next/image";
-import { FriendsList, UserList } from "../data_types/data_types";
+import { FriendsList, UserList } from "@/app/data_types/data_types";
+import { useDispatch, useSelector } from 'react-redux';
 
 interface Props {
     friends: FriendsList
 }
 
 export default function FriendsBar({ friends }: Props) {
-    const { online, offline } = friends
+    const dispatch = useDispatch()
+    const { online, offline }: FriendsList = useSelector((state: any) => state.friends)
     return (
         <div>
             <h3>Active</h3>

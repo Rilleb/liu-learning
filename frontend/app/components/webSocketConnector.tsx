@@ -21,6 +21,10 @@ export default function WebSocketConnector() {
       socket.onmessage = (event) => {
         const data = JSON.parse(event.data);
         console.log("WebSocket message:", data);
+        if (data.type == "friend_logged_in") {
+
+
+        }
       };
 
       socket.onclose = () => {

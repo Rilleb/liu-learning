@@ -163,7 +163,7 @@ def get_friends(user):
             else:
                 offline.append(f)
 
-        return offline, online 
+        return offline, online
     except Exception as e:
         print(f"Could not get friends, error: {e}")
         return None
