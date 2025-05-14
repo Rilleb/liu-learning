@@ -1,5 +1,6 @@
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
+from django.contrib.auth import user_logged_in, user_logged_out
 from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.authtoken.models import Token
@@ -7,7 +8,6 @@ from rest_framework.authtoken.models import Token
 
 class UserConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
-        print("connect")
         await self.accept()
         self.user = AnonymousUser()  # Until authenticated
 
@@ -19,6 +19,11 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                     key=token_key
                 )
                 self.user = token.user
+                await sync_to_async(user_logged_in.send)(
+                    sender=self.__class__,
+                    request=None,
+                    user=self.user,
+                )
                 await self.send_json({"status": "authenticated"})
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
@@ -30,5 +35,10 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             else:
                 await self.send_json({"error": "Not authenticated"})
 
-    async def logout(self):
-
+    async def disconnect(self, close_code):
+        print(self.user)
+        await sync_to_async(user_logged_out.send)(
+            sender=self.__class__,
+            request=None,
+            user=self.user,
+        )

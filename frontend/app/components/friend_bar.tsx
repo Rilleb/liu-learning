@@ -1,19 +1,18 @@
 "use client"
 import Image from "next/image";
-import { UserList } from "../data_types/data_types";
+import { FriendsList, UserList } from "../data_types/data_types";
 
 interface Props {
-    friends: UserList
+    friends: FriendsList
 }
 
 export default function FriendsBar({ friends }: Props) {
-    const activeFriends = friends.filter((f) => f.is_active)
-    const offlineFriends = friends.filter((f) => !f.is_active)
+    const { online, offline } = friends
     return (
         <div>
             <h3>Active</h3>
             <ul>
-                {activeFriends && activeFriends.map((friend, index) => {
+                {online && online.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
                             <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
@@ -25,7 +24,7 @@ export default function FriendsBar({ friends }: Props) {
             </ul>
             <h3>Offline</h3>
             <ul>
-                {offlineFriends && offlineFriends.map((friend, index) => {
+                {offline && offline.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
                             <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />

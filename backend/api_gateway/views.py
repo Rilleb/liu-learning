@@ -69,9 +69,11 @@ class Friendsview(APIView):
             user = get_user_from_token(token=token)
             if not user:
                 return Response({"Message": {"Token was not included or has expired"}})
-            friends = services.get_friends(user=user)
-            serilizer = UserSerializer(friends, many=True)
-            return Response(serilizer.data)
+            offline, online = services.get_friends(user=user)
+            online_serilizer = UserSerializer(online, many=True)
+            offline_serilizer = UserSerializer(offline, many=True)
+
+            return Response({"online": online_serilizer.data, "offline": offline_serilizer.data})
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
 

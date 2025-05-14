@@ -13,5 +13,6 @@ def handle_user_logged_in(sender, request, user, **kwargs):
 
 @receiver(user_logged_out)
 def handle_user_logged_out(sender, request, user, **kwargs):
+    print(f"User just logged out: {user}")
     conn = get_redis_connection("default")
     conn.srem("online_users", user.id)

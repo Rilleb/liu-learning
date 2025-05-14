@@ -48,8 +48,11 @@ export interface CombinedQuizStatistics {
     date_based: DateBasedStat[]
     course_based: CourseBasedStat[]
 }
-
 export type QuizList = Quiz[]
 export type CourseList = Course[]
-export type FriendsList = FriendsList[]
 export type UserList = User[]
+
+export interface FriendsList {
+    online: UserList
+    offline: UserList
+}

@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user, get_user_model
 from collections import defaultdict
-
+from django_redis import get_redis_connection
 from django.db.models import Q
 from django.db.models import DateField
 from django.db.models.functions import Cast
@@ -144,13 +144,26 @@ def get_quizes(user):
         return None
 
 
+def is_user_online(user_id):
+    conn = get_redis_connection("default")
+    return conn.sismember("online_users", user_id)
+
+
 def get_friends(user):
     try:
         friendships = models.Friendship.objects.filter(
             Q(user1=user) | Q(user2=user)
         ).distinct()
         friends = [f.user2 if f.user1 == user else f.user1 for f in friendships]
-        return friends
+        online = []
+        offline = []
+        for f in friends:
+            if is_user_online(f.id):
+                online.append(f)
+            else:
+                offline.append(f)
+
+        return offline, online 
     except Exception as e:
         print(f"Could not get friends, error: {e}")
         return None
@@ -158,31 +171,31 @@ def get_friends(user):
 
 def get_quiz_description(quiz_id):
     try:
-        description = models.Quiz.objects.filter(id = quiz_id).first().description
+        description = models.Quiz.objects.filter(id=quiz_id).first().description
         return description
     except Exception as e:
         print(f"Could not get quizes: {e}")
         return None
-  
-  
+
+
 def get_quiz_name(quiz_id):
     try:
-        name = models.Quiz.objects.filter(id = quiz_id).first().name
+        name = models.Quiz.objects.filter(id=quiz_id).first().name
         return name
     except Exception as e:
         print(f"Could not get quizes: {e}")
         return None
 
-      
+
 def get_question_count(quiz_id):
     try:
-        count = models.Question.objects.filter(quiz_id = quiz_id).count()
+        count = models.Question.objects.filter(quiz_id=quiz_id).count()
         return count
     except Exception as e:
         print(f"Could not get quizes: {e}")
         return None
-      
-      
+
+
 def get_quiz_statistics(user):
     try:
         attempts = (

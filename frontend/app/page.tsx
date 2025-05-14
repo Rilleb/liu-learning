@@ -20,7 +20,7 @@ const QuizComponent = async () => {
             </div>
         )
     }
-    const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
@@ -71,7 +71,7 @@ export async function CourseComponent() {
             </div>
         )
     }
-    const res = await fetch(`http://localhost:8000/api/courses`, {
+    const res = await fetch(`http://localhost:8000/api/courses/`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
@@ -117,7 +117,7 @@ export async function CourseComponent() {
 
 export default async function Home() {
     const session = await getServerSession(options)
-    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/friends/`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
@@ -127,7 +127,7 @@ export default async function Home() {
     if (!res.ok) {
 
     }
-    const friends: UserList = await res.json()
+    const friends: FriendsList = await res.json()
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
