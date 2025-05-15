@@ -6,6 +6,7 @@ import { setFriendOffline, setFriendOnline } from "@/app/store/friendSlice";
 
 export default function WebSocketConnector() {
   const { data: session, status } = useSession();
+  //ToDO use socketContext and create useState 
 
   const dispatch = useDispatch();
   useEffect(() => {

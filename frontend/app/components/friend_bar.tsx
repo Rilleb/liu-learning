@@ -4,13 +4,17 @@ import { FriendsList, UserList } from "@/app/data_types/data_types";
 import { useSelector } from 'react-redux';
 import { setFriends } from "../store/friendSlice";
 import { RootState, useAppDispatch, useAppSelector } from "../store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { User } from "@/app/data_types/data_types";
+import * as Popover from '@radix-ui/react-popover';
 
 
 export default function FriendsBar() {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
+    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const [showPopup, setShowPopup] = useState(false)
 
     const hasFriends = useAppSelector((state) => {
         if (state.friends.online && state.friends.offline) {
@@ -50,6 +54,11 @@ export default function FriendsBar() {
     const online: UserList = useSelector((state: RootState) => state.friends.online);
     const offline: UserList = useSelector((state: RootState) => state.friends.offline);
 
+    const inviteUser = (friend: User) => {
+
+
+    }
+
 
     return (
         <div>
@@ -57,28 +66,74 @@ export default function FriendsBar() {
             <ul>
                 {online && online.map((friend, index) => {
                     return (
-                        <div key={index} className="flex items-center">
-                            <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
-                            {friend.username}
-                            <span className="h-2 w-2 rounded-full bg-green-500 inline-block m-1" />
-                        </div>
+                        <Popover.Root key={`offline-friend-${index}`}>
+                            <Popover.Trigger asChild>
+                                <div className="flex items-center p-2 hover:border hover:border-gray-600 cursor-pointer hover:shadow-gray-400 hover:shadow-xl rounded-xl">
+                                    <Image src="/globe.svg" alt="Profile-Pic" width={15} height={15} className="m-1" />
+                                    {friend.username}
+                                    <span className="h-2 w-2 rounded-full bg-green-500 inline-block m-1" />
+                                </div>
+                            </Popover.Trigger>
+
+                            <Popover.Portal>
+                                <Popover.Content
+                                    className="bg-white border p-4 rounded shadow z-50 w-48"
+                                    side="right"
+                                    align="start"
+                                    sideOffset={8}
+                                >
+                                    <p className="font-bold">{friend.username}</p>
+                                    <p className="text-sm text-gray-500">Status: Online</p>
+                                    <button
+                                        onClick={() => inviteUser(friend)}
+                                        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm w-full"
+                                    >
+                                        Invite to Game
+                                    </button>
+                                    <Popover.Arrow className="fill-white" />
+                                </Popover.Content>
+                            </Popover.Portal>
+                        </Popover.Root>
                     )
                 })}
             </ul>
             <h3>Offline</h3>
             <ul>
-                {offline && offline.map((friend, index) => {
-                    return (
-                        <div key={index} className="flex items-center">
-                            <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
-                            {friend.username}
-                            <span className="h-2 w-2 rounded-full bg-red-500 inline-block m-1" />
-                        </div>
-                    )
-                })}
+
+                {offline && offline.map((friend, index) => (
+                    <Popover.Root key={`offline-friend-${index}`}>
+                        <Popover.Trigger asChild>
+                            <div className="flex items-center p-2 hover:border hover:border-gray-600 cursor-pointer hover:shadow-gray-400 hover:shadow-xl rounded-xl">
+                                <Image src="/globe.svg" alt="Profile-Pic" width={15} height={15} className="m-1" />
+                                {friend.username}
+                                <span className="h-2 w-2 rounded-full bg-red-500 inline-block m-1" />
+                            </div>
+                        </Popover.Trigger>
+
+                        <Popover.Portal>
+                            <Popover.Content
+                                className="bg-white border p-4 rounded shadow z-50 w-48"
+                                side="right"
+                                align="start"
+                                sideOffset={8}
+                            >
+                                <p className="font-bold">{friend.username}</p>
+                                <p className="text-sm text-gray-500">Status: Offline</p>
+                                <button
+                                    onClick={() => inviteUser(friend)}
+                                    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm w-full"
+                                >
+                                    Invite to Game
+                                </button>
+                                <Popover.Arrow className="fill-white" />
+                            </Popover.Content>
+                        </Popover.Portal>
+                    </Popover.Root>
+                ))}
+
             </ul>
 
-        </div>
+        </div >
     )
 };
 

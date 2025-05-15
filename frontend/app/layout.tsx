@@ -9,6 +9,7 @@ import WebSocketConnector from './components/webSocketConnector'
 import { Provider } from 'react-redux'
 import { makeStore, AppStore } from './store'
 import { useRef } from 'react'
+import 'react-tooltip/dist/react-tooltip.css'
 
 const geistSans = Geist({
     variable: '--font-geist-sans',
