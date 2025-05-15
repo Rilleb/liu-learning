@@ -14,7 +14,7 @@ export default function RegisterPage() {
         e.preventDefault()
         setError('')
 
-        const res = await fetch("http://localhost:8000/api/auth/credentials-create",
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth/credentials-create`,
             {
                 method: 'POST',
                 headers: {

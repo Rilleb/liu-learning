@@ -20,7 +20,6 @@ interface Props {
 
 
 const LineChartDate: React.FC<Props> = ({ data, metric, is_multiple }) => {
-    console.log(data)
     return (
         <div className="w-full h-full">
             <ResponsiveContainer width="100%" height="100%">

@@ -25,7 +25,6 @@ export function FriendStats({ userData }: Props) {
 
     const token = session?.accessToken ?? "";
     console.log(session)
-    const username = session?.user?.name
 
     const onClick = (async (user: User) => {
         setQuery(user.username)
@@ -51,8 +50,7 @@ export function FriendStats({ userData }: Props) {
             setCourseBasedData(combinedData.course_based)
 
         } catch (err) {
-            console.log(err)
-            console.log("Could not get data")
+            console.error(err)
         }
         setLoading(false)
 
@@ -60,7 +58,6 @@ export function FriendStats({ userData }: Props) {
 
 
     const handleSearch = useDebounceCallback(async (q: string) => {
-        console.log("Handle search: ", q)
         if (!q) {
             setResults([]);
             setShowDropdown(false);
@@ -89,7 +86,7 @@ export function FriendStats({ userData }: Props) {
                 setShowDropdown(true);
             }
         } catch (err) {
-            console.log("Error during search:", err);
+            console.error("Error during search:", err);
         } finally {
             setLoading(false);
         }

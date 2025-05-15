@@ -25,17 +25,21 @@ export default function FriendsBar() {
         if (!hasFriends) {
             //moved the fetching to here to leverage redux to avoid fetching multiple times when switching routes
             const fetchFriends = async () => {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/friends/`, {
-                    headers: {
-                        'Content-type': 'application/json',
-                        'Authorization': `Token ${session?.accessToken}`,
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/friends/`, {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': `Token ${session?.accessToken}`,
+                        }
+                    });
+                    if (response.ok) {
+                        const friendsData: FriendsList = await response.json();
+                        dispatch(setFriends(friendsData));
+                    } else {
+                        console.error("Error fetching friends");
                     }
-                });
-                if (response.ok) {
-                    const friendsData: FriendsList = await response.json();
-                    dispatch(setFriends(friendsData));
-                } else {
-                    console.error("Error fetching friends");
+                } catch (e) {
+                    console.error(`Error fetching friends, ${e}`)
                 }
             };
 
