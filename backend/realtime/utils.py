@@ -29,3 +29,17 @@ async def notify_user_friends_on_login(user):
             await channel_layer.group_send(
                 f"user_{id}", {"type": "user_logged_in", "user_id": user.id}
             )
+
+
+async def notify_user_friends_on_logout(user):
+    online_ids = get_online_users()
+    friends = sync_to_async(services.get_friends)(user)
+
+    channel_layer = get_channel_layer()
+    print("LAYERS:", channel_layers)
+    for id in online_ids:
+        if id != user.id:
+            print(id)
+            await channel_layer.group_send(
+                f"user_{id}", {"type": "user_logged_off", "user_id": user.id}
+            )

@@ -1,31 +1,31 @@
-import { getQuizzesForCourse , get_course_name} from '../../lib/get_data'
+import { getQuizzesForCourse, get_course_name } from '../../lib/get_data'
 import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
 import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
 import { UserList, QuizList } from "../../data_types/data_types"
 
-async function FriendsComponent() {
-    const session = await getServerSession(options);
-    if (!session) {
-        return <div>Not authenticated</div>;
-    }
-
-    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    });
-
-    if (!res.ok) {
-        return <div>Error loading friends</div>;
-    }
-
-    const friends: UserList = await res.json();
-    return <FriendsBar friends={friends} />;
-}
+// async function FriendsComponent() {
+//     const session = await getServerSession(options);
+//     if (!session) {
+//         return <div>Not authenticated</div>;
+//     }
+//
+//     const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-type': 'application/json',
+//             'Authorization': `Token ${session.accessToken}`,
+//         }
+//     });
+//
+//     if (!res.ok) {
+//         return <div>Error loading friends</div>;
+//     }
+//
+//     const friends: UserList = await res.json();
+//     return <FriendsBar friends={friends} />;
+// }
 
 const QuizComponent = async ({ id }: { id: number }) => {
     const session = await getServerSession(options)
@@ -94,7 +94,7 @@ export default function Home({ params }: { params: { course_id: number } }) {
             </div>
             {/*Friends*/}
             <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsComponent/>
+                <FriendsBar />
             </div>
         </div>
     )

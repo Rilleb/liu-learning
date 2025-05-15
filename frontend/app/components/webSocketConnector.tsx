@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
-import { setFriendOnline } from "@/app/store/friendSlice";
+import { setFriendOffline, setFriendOnline } from "@/app/store/friendSlice";
 
 export default function WebSocketConnector() {
   const { data: session, status } = useSession();
@@ -26,7 +26,8 @@ export default function WebSocketConnector() {
         console.log("WebSocket message:", data);
         if (data.type == "friend_logged_in") {
           dispatch(setFriendOnline(data.user_id));
-
+        } else if (data.type == "friend_logged_off") {
+          dispatch(setFriendOffline(data.user_id))
         }
       };
 

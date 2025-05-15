@@ -62,7 +62,6 @@ for user in users:
 for i, user in enumerate(users):
     for other_user in users[i + 1 :]:
         add_friend(user, other_user)
-        add_friend(other_user, user)
 
 
 def random_time_on_day(day):

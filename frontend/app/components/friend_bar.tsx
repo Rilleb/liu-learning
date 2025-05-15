@@ -1,20 +1,48 @@
 "use client"
 import Image from "next/image";
 import { FriendsList, UserList } from "@/app/data_types/data_types";
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { setFriends } from "../store/friendSlice";
-import { useAppStore, RootState } from "../store";
-import { useEffect, useRef } from "react";
+import { RootState, useAppDispatch, useAppSelector } from "../store";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-interface Props {
-    friends: FriendsList
-}
 
-export default function FriendsBar({ friends }: Props) {
-    const store = useAppStore()
+export default function FriendsBar() {
+    const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+
+    const hasFriends = useAppSelector((state) => {
+        if (state.friends.online && state.friends.offline) {
+            return state.friends.online.length > 0 || state.friends.offline.length > 0
+        } else {
+            return false
+        }
+    }
+    );
+
     useEffect(() => {
-        store.dispatch(setFriends(friends));
-    }, [store, friends]);
+        if (!hasFriends) {
+            //moved the fetching to here to leverage redux to avoid fetching multiple times when switching routes
+            const fetchFriends = async () => {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/friends/`, {
+                    headers: {
+                        'Content-type': 'application/json',
+                        'Authorization': `Token ${session?.accessToken}`,
+                    }
+                });
+                if (response.ok) {
+                    const friendsData: FriendsList = await response.json();
+                    dispatch(setFriends(friendsData));
+                } else {
+                    console.error("Error fetching friends");
+                }
+            };
+
+            fetchFriends();
+        }
+    }, [hasFriends, session, status, dispatch]);  // Re-run only when necessary
+
     const online: UserList = useSelector((state: RootState) => state.friends.online);
     const offline: UserList = useSelector((state: RootState) => state.friends.offline);
 

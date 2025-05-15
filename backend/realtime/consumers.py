@@ -47,6 +47,14 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
+    async def user_logged_off(self, event):
+        await self.send_json(
+            {
+                "type": "friend_logged_off",
+                "user_id": event["user_id"],
+            }
+        )
+
     async def disconnect(self, close_code):
         await sync_to_async(user_logged_out.send)(
             sender=self.__class__,
