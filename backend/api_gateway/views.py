@@ -75,7 +75,13 @@ class CourseView(APIView):
                 status.HTTP_401_UNAUTHORIZED,
             )
 
-        courses = services.get_courses(user=user)
+        fetch_all = request.query_params.get("all", "").lower() == "true"
+
+        if fetch_all:
+            courses = services.get_all_courses()
+        else:
+            courses = services.get_courses(user=user)
+
         serilizer = CourseSerializer(courses, many=True)
         return Response(serilizer.data)
 

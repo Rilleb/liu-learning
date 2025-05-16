@@ -1,5 +1,3 @@
-'use client';
-
 import { useState, useEffect } from 'react';
 import { createQuiz } from './actions/quiz_action';
 import { Course } from '@/app/data_types/data_types';
@@ -176,44 +174,21 @@ const QuizQuestions: React.FC<QuizQuestionsProps> = ({
     )
 }
 
-export default function CreateQuizForm() {
+type QuizFormProps = {
+    courses: Course[];
+};
+
+export default function CreateQuizForm({ courses }: QuizFormProps) {
     const [title, setTitle] = useState('');
     const [code, setCode] = useState('');
     const [answerTypes, setAnswerType] = useState<string[]>(['']);
     const [questions, setQuestions] = useState<string[]>(['']);
     const [answers, setAnswers] = useState<string[][]>([['']]);
-    const [status, setStatus] = useState('')
-    const [courses, setCourses] = useState<Course[]>([])
+    const [status, setStatus] = useState('');
+    const [course, setCourse] = useState<Course | null>(null);
+
 
     useEffect(() => {
-        const fetchCourses = async () => {
-
-            const session = await getServerSession(options)
-            if (!session) {
-                return (
-                    <div>
-                        <p>Could not fetch courses, no logged in user</p>
-                    </div>
-                )
-            }
-            const res = await fetch(`${process.env.BACKEND_URL}/api/courses/`, {
-                method: 'GET',
-                headers: {
-                    'Content-type': 'application/json',
-                    'Authorization': `Token ${session.accessToken}`,
-                },
-                cache: 'no-store', // optional: prevents Next.js from caching the fetch
-            })
-
-            if (!res.ok) {
-                return <div>Error fetching courses</div>
-            }
-            const data = await res.json();
-            setCourses(data);
-        };
-
-        fetchCourses();
-
         const handleSubmit = async (e: React.FormEvent) => {
             e.preventDefault()
 

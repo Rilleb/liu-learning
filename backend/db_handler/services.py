@@ -140,6 +140,16 @@ def get_courses(user):
         return None
 
 
+def get_all_courses():
+    try:
+        courses = models.Course.objects
+        print("Courses", courses)
+        return courses
+    except Exception as e:
+        print(f"Error creating quiz answer: {e}")
+        return None
+
+
 def get_quizes(user):
     try:
         quizes = models.Quiz.objects.filter(
