@@ -1,5 +1,8 @@
 from django.contrib.auth import get_user, get_user_model
+from collections import defaultdict
 from django.db.models import Q
+from django.db.models import DateField
+from django.db.models.functions import Cast
 from . import internal_services
 from . import models
 
@@ -155,4 +158,90 @@ def get_friends(user):
         return friends
     except Exception as e:
         print(f"Could not get friends, error: {e}")
+        return None
+
+
+def get_quiz_description(quiz_id):
+    try:
+        description = models.Quiz.objects.filter(id = quiz_id).first().description
+        return description
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+  
+  
+def get_quiz_name(quiz_id):
+    try:
+        name = models.Quiz.objects.filter(id = quiz_id).first().name
+        return name
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+
+      
+def get_question_count(quiz_id):
+    try:
+        count = models.Question.objects.filter(quiz_id = quiz_id).count()
+        return count
+    except Exception as e:
+        print(f"Could not get quizes: {e}")
+        return None
+      
+      
+def get_quiz_statistics(user):
+    try:
+        attempts = (
+            models.QuizAttempt.objects.filter(user=user)
+            .annotate(date_only=Cast("attempt_ended_at", output_field=DateField()))
+            .order_by("date_only")
+        )
+        daily_counts = defaultdict(int)
+        daily_sucess = defaultdict(int)
+        daily_time_spent = defaultdict(float)
+        for attempt in attempts:
+            if attempt.passed:
+                daily_sucess[attempt.date_only] += 1
+            daily_counts[attempt.date_only] += 1
+            duration = (
+                attempt.attempt_ended_at - attempt.attempt_started_at
+            ).total_seconds()
+            daily_time_spent[attempt.date_only] += duration
+
+        cumulative = []
+        total = 0
+        successfull = 0
+        for d in sorted(daily_counts.keys()):
+            total += daily_counts[d]
+            successfull += daily_sucess[d]
+            cumulative.append(
+                {
+                    "date": d,
+                    "total_attempts": total,
+                    "successfull_attempts": successfull,
+                    "ratio": successfull
+                    / total,  # Ratio of successfull vs number tried
+                    "total_time_spent": daily_time_spent[d],
+                }
+            )
+
+        return cumulative
+    except Exception as e:
+        print(f"Could not get statisics, Error: {e}")
+        return None
+
+
+def find_friend(user, query):
+    try:
+        friendships = models.Friendship.objects.filter(Q(user1=user) | Q(user2=user))
+
+        friend_ids = [
+            f.user2.id if f.user1 == user else f.user1.id for f in friendships
+        ]
+
+        friends = User.objects.filter(id__in=friend_ids, username__icontains=query)[:5]
+
+        print(friends)
+        return friends
+    except Exception as e:
+        print(f"Could not find any friends with that pattern, Pattern: {e}")
         return None

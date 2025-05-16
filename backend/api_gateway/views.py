@@ -3,7 +3,6 @@ from db_handler.services import create_course, create_chapter
 from db_handler.serializers import CourseSerializer
 from db_handler.serializers import (
     CourseSerializer,
-    FriendshipSerializer,
     QuizSerializer,
     UserSerializer,
 )
@@ -103,9 +102,7 @@ class Friendsview(APIView):
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")
         if auth_header and auth_header.startswith("Token "):
             token = auth_header.split("Token ")[1]
-            print(token)
             user = get_user_from_token(token=token)
-            print(user)
             if not user:
                 return Response({"Message": {"Token was not included or has expired"}})
             friends = services.get_friends(user=user)
@@ -113,6 +110,51 @@ class Friendsview(APIView):
             return Response(serilizer.data)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+
+class AttemptStatisticsView(APIView):
+    def get(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth_header and auth_header.startswith("Token "):
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token=token)
+            if not user:
+                return Response(
+                    {
+                        "Message": {
+                            "Token has expired, our has no user associated with it"
+                        }
+                    }
+                )
+            attempts = services.get_quiz_statistics(user=user)
+            return Response(attempts)
+        else:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+
+class FindUser(APIView):
+    def get(self, request, *args, **kwargs):
+
+        query = request.query_params.get("friend", None)
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth_header and auth_header.startswith("Token ") and query:
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token=token)
+            if not user:
+                return Response(
+                    {
+                        "Message": {
+                            "Token has expired, our has no user associated with it"
+                        }
+                    }
+                )
+            friends = services.find_friend(user=user, query=query)
+            serilizer = UserSerializer(friends, many=True)
+            return Response(serilizer.data)
+        else:
+            Return(
+                f"{'Missing auth header' if not auth_header else "No args were passed in"}"
+            )
 
 
 # ----------------------------------------------------
@@ -227,3 +269,24 @@ class CredentialsLoginView(APIView):
             )
         else:
             return Response({"error": "Invalid credentials"}, status=400)
+
+
+class QuizDescription(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        description = services.get_quiz_description(quizId == quizId)
+        return Response(description)
+
+
+class QuizName(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        name = services.get_quiz_name(quizId == quizId)
+        return Response(name)
+    
+
+class QuestionCount(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        count = services.get_question_count(quizId == quizId)
+        return Response(count)

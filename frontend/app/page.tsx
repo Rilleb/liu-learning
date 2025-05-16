@@ -38,7 +38,6 @@ const QuizComponent = async () => {
     }
     const quizes: QuizList = await res.json()
     console.log("Quizes: ", quizes)
-
     return (
         <div>
             {/*Think it would be cool to make so if you hover on a quiz, the card flip and gives a description*/}
