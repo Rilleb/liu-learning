@@ -1,7 +1,6 @@
 from datetime import datetime, date, timedelta, time
 from django.utils import timezone
 import random
-from django.contrib.auth.models import make_password
 from db_handler.services import (
     create_user,
     create_course,
@@ -15,153 +14,74 @@ from db_handler.services import (
 )
 
 password = "1234"
-gustav = create_user("gstcc", "gustav@test.com", password)
-thea = create_user("thea", "thea@test.com", password)
-rille = create_user("rille", "rille@test.com", password)
+users = [create_user(f"user{i}", f"user{i}@test.com", password) for i in range(5)]
+num_courses = 10
+courses = []
+chapters = []
+quizzes = []
+questions_by_quiz = {}
 
-course1 = create_course("Python", "tdde23", thea)
-course2 = create_course("Neovim", "nvim101", rille)
+# Create courses, chapters, quizzes, and questions
+for i in range(num_courses):
+    owner = random.choice(users)
+    course = create_course(f"Course {i}", f"CODE{i}", owner)
+    courses.append(course)
 
-chapter_1_course_1 = create_chapter("IO-functions", course1, gustav)
-chapter_2_course_1 = create_chapter("terminal", course1, gustav)
-chapter_1_course_2 = create_chapter("noob-stuff", course2, thea)
+    chapter = create_chapter(f"Chapter {i}", course, owner)
+    chapters.append(chapter)
 
+    for j in range(random.randint(1, 3)):
+        quiz = create_quiz(
+            f"Quiz {i}-{j}",
+            course,
+            chapter,
+            owner,
+            f"Description for Quiz {i}-{j}",
+            date_created=date.today(),
+        )
+        quizzes.append(quiz)
 
-# Create quizzes for course 1
-quiz_1_course_1 = create_quiz(
-    "Python Basics Quiz",
-    course1,
-    chapter_1_course_1,
-    thea,
-    "A beginner-level quiz about Python basics",
-    date_created=date.today(),
-)
-quiz_2_course_1 = create_quiz(
-    "Advanced Python Quiz",
-    course1,
-    chapter_2_course_1,
-    gustav,
-    "An advanced-level quiz for Python",
-    date_created=date.today(),
-)
+        questions = []
+        for k in range(random.randint(2, 4)):
+            q = create_question(
+                quiz,
+                f"Question {k} for Quiz {i}-{j}",
+                k + 1,
+                is_multiple=False,
+                correct_answer="Correct",
+            )
+            questions.append(q)
+        questions_by_quiz[quiz] = questions
 
-# Create quizzes for course 2
-quiz_1_course_2 = create_quiz(
-    "Neovim Basics Quiz",
-    course2,
-    chapter_1_course_2,
-    rille,
-    "A basic quiz for Neovim",
-    date_created=date.today(),
-)
+# Mark all users as having read all courses
+for user in users:
+    for course in courses:
+        mark_course_as_read(user, course)
 
-# Create questions for quiz 1 of course 1
-question_1_quiz_1_course_1 = create_question(
-    quiz_1_course_1,
-    "What is Python?",
-    1,
-    is_multiple=False,
-    correct_answer="A programming language",
-)
-question_2_quiz_1_course_1 = create_question(
-    quiz_1_course_1,
-    "What is the output of print(2 + 3)?",
-    2,
-    is_multiple=False,
-    correct_answer="5",
-)
-question_3_quiz_1_course_1 = create_question(
-    quiz_1_course_1,
-    "Which of the following is not a Python data type?",
-    3,
-    is_multiple=True,
-    alt_1="Integer",
-    alt_2="String",
-    alt_3="Character",
-    correct_answer="Character",
-)
-
-# Create questions for quiz 2 of course 1
-question_1_quiz_2_course_1 = create_question(
-    quiz_2_course_1,
-    "What is a list comprehension?",
-    1,
-    is_multiple=False,
-    correct_answer="A concise way to create lists",
-)
-question_2_quiz_2_course_1 = create_question(
-    quiz_2_course_1,
-    "How do you handle exceptions in Python?",
-    2,
-    is_multiple=False,
-    correct_answer="Using try-except blocks",
-)
-
-# Create a question for quiz 1 of course 2
-question_1_quiz_1_course_2 = create_question(
-    quiz_1_course_2,
-    "What is Neovim?",
-    1,
-    is_multiple=False,
-    correct_answer="A text editor",
-)
-
-# Mark courses as read for each user
-mark_course_as_read(gustav, course1)
-mark_course_as_read(thea, course1)
-mark_course_as_read(rille, course2)
-
-# Add friends
-add_friend(gustav, thea)
-add_friend(thea, rille)
-add_friend(rille, gustav)
+# Add all users as friends with each other
+for i, user in enumerate(users):
+    for other_user in users[i + 1 :]:
+        add_friend(user, other_user)
 
 
 def random_time_on_day(day):
-    hour = random.randint(8, 22)  # Between 8 AM and 10 PM
+    hour = random.randint(8, 22)
     minute = random.randint(0, 59)
     second = random.randint(0, 59)
     return datetime.combine(day, time(hour, minute, second))
 
 
-# Creating quiz attempts for users
-for i in range(40):
-    passed = random.choice([True, False])
-
+# Create attempts for each user on random quizzes
+for i in range(50):
     day = date.today() - timedelta(days=i)
     started_at = timezone.make_aware(random_time_on_day(day))
     ended_at = started_at + timedelta(seconds=random.randint(60, 600))
 
-    quiz_attempt_1_gustav = create_quiz_attempt(
-        gustav,
-        quiz_1_course_1,
-        started_at=started_at,
-        ended_at=ended_at,
-        passed=passed,
-    )
+    user = random.choice(users)
+    quiz = random.choice(quizzes)
+    passed = random.choice([True, False])
 
-    # Thea’s attempt always today, random time
-    thea_start = timezone.make_aware(random_time_on_day(date.today()))
-    thea_end = thea_start + timedelta(seconds=random.randint(60, 600))
+    attempt = create_quiz_attempt(user, quiz, started_at, ended_at, passed)
 
-    quiz_attempt_2_thea = create_quiz_attempt(
-        thea,
-        quiz_2_course_1,
-        started_at=thea_start,
-        ended_at=thea_end,
-        passed=False,
-    )
-
-    # Creating quiz answers for quiz attempts
-    create_quiz_answer(
-        quiz_attempt_1_gustav, question_1_quiz_1_course_1, is_correct=passed
-    )
-    create_quiz_answer(
-        quiz_attempt_1_gustav, question_2_quiz_1_course_1, is_correct=passed
-    )
-    create_quiz_answer(
-        quiz_attempt_2_thea, question_1_quiz_2_course_1, is_correct=False
-    )
-    create_quiz_answer(
-        quiz_attempt_2_thea, question_2_quiz_2_course_1, is_correct=False
-    )
+    for question in questions_by_quiz[quiz]:
+        create_quiz_answer(attempt, question, is_correct=passed)

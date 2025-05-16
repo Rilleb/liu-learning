@@ -1,31 +1,9 @@
-import { getQuizzesForCourse , get_course_name} from '../../lib/get_data'
+import { getQuizzesForCourse, get_course_name } from '../../lib/get_data'
 import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
 import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
 import { UserList, QuizList } from "../../data_types/data_types"
-
-async function FriendsComponent() {
-    const session = await getServerSession(options);
-    if (!session) {
-        return <div>Not authenticated</div>;
-    }
-
-    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    });
-
-    if (!res.ok) {
-        return <div>Error loading friends</div>;
-    }
-
-    const friends: UserList = await res.json();
-    return <FriendsBar friends={friends} />;
-}
 
 const QuizComponent = async ({ id }: { id: number }) => {
     const session = await getServerSession(options)
@@ -36,30 +14,41 @@ const QuizComponent = async ({ id }: { id: number }) => {
             </div>
         )
     }
-    const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            //@ts-ignore
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    })
+    let quizzes: QuizList = [];
+    try {
 
-    if (!res.ok) {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                //@ts-ignore
+                'Authorization': `Token ${session.accessToken}`,
+            }
+        })
+
+        if (!res.ok) {
+            return (
+                <div>
+                    <p>Error fetching quizes</p>
+                    <p>Make sure you are logged in</p>
+                </div>
+            )
+        }
+        quizzes = await res.json()
+        console.log("Quizes: ", quizzes)
+    } catch (e) {
+        console.error("Error: ", e)
         return (
             <div>
-                <p>Error fetching quizes</p>
-                <p>Make sure you are logged in</p>
+                <p>Error fetching quizzes </p>
             </div>
         )
     }
-    const quizes: QuizList = await res.json()
-    console.log("Quizes: ", quizes)
     return (
         <div>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quizes &&
-                    quizes.map((quiz) => {
+                {quizzes &&
+                    quizzes.map((quiz) => {
                         return (
                             <li
                                 key={quiz.id}
@@ -94,7 +83,7 @@ export default function Home({ params }: { params: { course_id: number } }) {
             </div>
             {/*Friends*/}
             <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsComponent/>
+                <FriendsBar />
             </div>
         </div>
     )
