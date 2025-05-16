@@ -1,19 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createQuiz } from './actions/quiz_action';
+import { Course } from '@/app/data_types/data_types';
+import { options } from '@/app/api/auth/[...nextauth]/options';
+import { getServerSession } from 'next-auth';
 
 type MultipleChoiceAnswerProps = {
     index: number;
-    answers: string[];
-    setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
+    answers: string[][];
+    setAnswers: React.Dispatch<React.SetStateAction<string[][]>>;
 };
 
 const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index, answers, setAnswers }) => {
-    const handleMultipleChoiceAnswerChange = (index: number, value: string) => {
+    const handleMultipleChoiceAnswerChange = (choiceIndex: number, value: string) => {
         const newAnswers = [...answers];
-        newAnswers[index] = value;
+        const currentAnswers = [...(newAnswers[index] || ['', '', '', ''])];
+        currentAnswers[choiceIndex] = value;
+        newAnswers[index] = currentAnswers;
         setAnswers(newAnswers);
     };
+
 
     return (
         /* Use string[string[]] for answers ??? */
@@ -21,26 +28,30 @@ const MultipleChoiceAnswer: React.FC<MultipleChoiceAnswerProps> = ({ index, answ
             <input
                 name={`question[${index}].correctAnswer`}
                 type="text"
-                placeholder="Correct Answer"
+                placeholder="Alternative 1 (correct answer)"
                 className="border px-2 py-1 rounded"
+                onChange={(e) => handleMultipleChoiceAnswerChange(0, e.target.value)}
             />
             <input
                 name={`question[${index}].alternative1`}
                 type="text"
-                placeholder="Alternative 1"
+                placeholder="Alternative 2"
                 className="border px-2 py-1 rounded"
+                onChange={(e) => handleMultipleChoiceAnswerChange(1, e.target.value)}
             />
             <input
                 name={`question[${index}].alternative2`}
                 type="text"
-                placeholder="Alternative 2"
+                placeholder="Alternative 3"
                 className="border px-2 py-1 rounded"
+                onChange={(e) => handleMultipleChoiceAnswerChange(2, e.target.value)}
             />
             <input
                 name={`question[${index}].alternative3`}
                 type="text"
-                placeholder="Alternative 3"
+                placeholder="Alternative 4"
                 className="border px-2 py-1 rounded"
+                onChange={(e) => handleMultipleChoiceAnswerChange(3, e.target.value)}
             />
         </div>
     );
@@ -51,8 +62,8 @@ type QuizQuestionsProps = {
     setQuestions: React.Dispatch<React.SetStateAction<string[]>>;
     answerTypes: string[];
     setAnswerType: React.Dispatch<React.SetStateAction<string[]>>;
-    answers: string[];
-    setAnswers: React.Dispatch<React.SetStateAction<string[]>>;
+    answers: string[][];
+    setAnswers: React.Dispatch<React.SetStateAction<string[][]>>;
 }
 
 const QuizQuestions: React.FC<QuizQuestionsProps> = ({
@@ -74,13 +85,16 @@ const QuizQuestions: React.FC<QuizQuestionsProps> = ({
     const handleAddQuestion = () => {
         setQuestions([...questions, '']);
         setAnswerType([...answerTypes, '']);
+        setAnswers([...answers, ['', '', '', '']]);
     };
 
     const handleRemoveQuestion = (index: number) => {
         const newQuestions = questions.filter((_, i) => i !== index);
         const newAnswerTypes = answerTypes.filter((_, i) => i !== index);
+        const newAnswers = answers.filter((_, i) => i !== index);
         setQuestions(newQuestions);
         setAnswerType(newAnswerTypes);
+        setAnswers(newAnswers);
     };
 
     const handleQuestionChange = (index: number, value: string) => {
@@ -91,7 +105,7 @@ const QuizQuestions: React.FC<QuizQuestionsProps> = ({
 
     const handleFreeTextAnswerChange = (index: number, value: string) => {
         const newAnswers = [...answers];
-        newAnswers[index] = value;
+        newAnswers[index] = [value];
         setAnswers(newAnswers);
     };
 
@@ -167,20 +181,52 @@ export default function CreateQuizForm() {
     const [code, setCode] = useState('');
     const [answerTypes, setAnswerType] = useState<string[]>(['']);
     const [questions, setQuestions] = useState<string[]>(['']);
-    const [answers, setAnswers] = useState<string[]>(['']);
+    const [answers, setAnswers] = useState<string[][]>([['']]);
+    const [status, setStatus] = useState('')
+    const [courses, setCourses] = useState<Course[]>([])
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
+    useEffect(() => {
+        const fetchCourses = async () => {
 
-        const res = await createCourse({ title, code, description, chapters });
+            const session = await getServerSession(options)
+            if (!session) {
+                return (
+                    <div>
+                        <p>Could not fetch courses, no logged in user</p>
+                    </div>
+                )
+            }
+            const res = await fetch(`${process.env.BACKEND_URL}/api/courses/`, {
+                method: 'GET',
+                headers: {
+                    'Content-type': 'application/json',
+                    'Authorization': `Token ${session.accessToken}`,
+                },
+                cache: 'no-store', // optional: prevents Next.js from caching the fetch
+            })
 
-        if (res.success) {
-            setStatus("Succesfully created course")
-        } else {
-            // const data = await res.json()data.message 
-            setStatus('Failed to create course')
-        }
-    };
+            if (!res.ok) {
+                return <div>Error fetching courses</div>
+            }
+            const data = await res.json();
+            setCourses(data);
+        };
+
+        fetchCourses();
+
+        const handleSubmit = async (e: React.FormEvent) => {
+            e.preventDefault()
+
+            // const res = await createQuiz({   });
+            //
+            // if (res.success) {
+            //     setStatus("Succesfully created course")
+            // } else {
+            //     // const data = await res.json()data.message 
+            //     setStatus('Failed to create course')
+            // }
+        };
+    })
 
     return (
         /* ADD onSubmit later */
@@ -201,13 +247,22 @@ export default function CreateQuizForm() {
                     className="w-full border px-2 py-1 rounded"
                     onChange={(e) => setCode(e.target.value)}
                 >
-                    {/* TODO list actual course codes */}
+                    {}
                     <option> Select a course</option>
-                    <option> Code1 </option>
-                    <option> Code2 </option>
-                    <option> Code3 </option>
+                    {courses.map((course, i) => (
+                        <option key={i} value={course.name}>
+                            {course.name}
+                        </option>
+                    ))}
                 </select>
-                <QuizQuestions />
+                <QuizQuestions
+                    questions={questions}
+                    setQuestions={setQuestions}
+                    answerTypes={answerTypes}
+                    setAnswerType={setAnswerType}
+                    answers={answers}
+                    setAnswers={setAnswers}
+                />
             </div>
             <button
                 type="submit"
@@ -215,6 +270,7 @@ export default function CreateQuizForm() {
             >
                 Create Quiz
             </button>
+            {status && <p>{status}</p>}
         </form>
     );
 }
