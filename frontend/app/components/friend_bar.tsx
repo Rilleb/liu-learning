@@ -1,20 +1,61 @@
 "use client"
 import Image from "next/image";
-import { UserList } from "../data_types/data_types";
+import { FriendsList, UserList } from "@/app/data_types/data_types";
+import { useSelector } from 'react-redux';
+import { setFriends } from "../store/friendSlice";
+import { RootState, useAppDispatch, useAppSelector } from "../store";
+import { useEffect } from "react";
+import { useSession } from "next-auth/react";
 
-interface Props {
-    friends: UserList
-}
 
-export default function FriendsBar({ friends }: Props) {
-    console.log(friends)
-    const activeFriends = friends.filter((f) => f.is_active)
-    const offlineFriends = friends.filter((f) => !f.is_active)
+export default function FriendsBar() {
+    const dispatch = useAppDispatch();
+    const { data: session, status } = useSession();
+
+    const hasFriends = useAppSelector((state) => {
+        if (state.friends.online && state.friends.offline) {
+            return state.friends.online.length > 0 || state.friends.offline.length > 0
+        } else {
+            return false
+        }
+    }
+    );
+
+    useEffect(() => {
+        if (!hasFriends) {
+            //moved the fetching to here to leverage redux to avoid fetching multiple times when switching routes
+            const fetchFriends = async () => {
+                try {
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/friends/`, {
+                        headers: {
+                            'Content-type': 'application/json',
+                            'Authorization': `Token ${session?.accessToken}`,
+                        }
+                    });
+                    if (response.ok) {
+                        const friendsData: FriendsList = await response.json();
+                        dispatch(setFriends(friendsData));
+                    } else {
+                        console.error("Error fetching friends");
+                    }
+                } catch (e) {
+                    console.error(`Error fetching friends, ${e}`)
+                }
+            };
+
+            fetchFriends();
+        }
+    }, [hasFriends, session, status, dispatch]);  // Re-run only when necessary
+
+    const online: UserList = useSelector((state: RootState) => state.friends.online);
+    const offline: UserList = useSelector((state: RootState) => state.friends.offline);
+
+
     return (
         <div>
             <h3>Active</h3>
             <ul>
-                {activeFriends && activeFriends.map((friend, index) => {
+                {online && online.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
                             <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
@@ -26,7 +67,7 @@ export default function FriendsBar({ friends }: Props) {
             </ul>
             <h3>Offline</h3>
             <ul>
-                {offlineFriends && offlineFriends.map((friend, index) => {
+                {offline && offline.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
                             <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />

@@ -27,3 +27,5 @@ Our goal is to create an engaging, gamified learning platform where users can tr
 - The database will be SQL-based since the application involves user accounts, courses, study questions, leaderboards, and progress tracking—all of which fit well into a structured relational model with clear relationships. 
 - If a 1v1 gamemode is created django channels will also be used, to connect players and update scores in real time.
 - AI-based question generation (if implemented) will run as a separate background service, probably based on the smallest deepseek model.
+
+![Image](./database_design.png)

@@ -4,10 +4,10 @@ import ProgressBar from './components/progress_bar'
 import Link from 'next/link'
 import { CourseList, FriendsList, QuizList, UserList } from "./data_types/data_types"
 import FriendsBar from './components/friend_bar'
-import { get_latest_quizes } from "./lib/get_data"
 
 type Props = {
     userId: number
+
 }
 
 const QuizComponent = async () => {
@@ -19,32 +19,42 @@ const QuizComponent = async () => {
             </div>
         )
     }
-    const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            //@ts-ignore
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    })
+    let quizzes: QuizList = []
+    try {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                //@ts-ignore
+                'Authorization': `Token ${session.accessToken}`,
+            }
+        })
 
-    if (!res.ok) {
+        if (!res.ok) {
+            return (
+                <div>
+                    <p>Error fetching quizes</p>
+                    <p>Make sure you are logged in</p>
+                </div>
+            )
+        }
+        quizzes = await res.json()
+    } catch (e) {
+        console.error(`Error: ${e}`)
         return (
             <div>
-                <p>Error fetching quizes</p>
-                <p>Make sure you are logged in</p>
+                <p>Could not fetch quizzes</p>
             </div>
         )
     }
-    const quizes: QuizList = await res.json()
-    console.log("Quizes: ", quizes)
+
     return (
         <div>
             {/*Think it would be cool to make so if you hover on a quiz, the card flip and gives a description*/}
             <h1>Upcoming Quizes</h1>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quizes &&
-                    quizes.map((quiz) => {
+                {quizzes &&
+                    quizzes.map((quiz) => {
                         return (
                             <li
                                 key={quiz.id}
@@ -70,20 +80,31 @@ export async function CourseComponent() {
             </div>
         )
     }
-    const res = await fetch(`http://localhost:8000/api/courses`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
-        },
-        cache: 'no-store', // optional: prevents Next.js from caching the fetch
-    })
+    let courses: CourseList = []
+    try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/courses/`, {
+            method: 'GET',
+            headers: {
+                'Content-type': 'application/json',
+                'Authorization': `Token ${session.accessToken}`,
+            },
+            cache: 'no-store', // optional: prevents Next.js from caching the fetch
+        })
 
-    if (!res.ok) {
-        return <div>Error fetching courses</div>
+        if (!res.ok) {
+            return <div>Error fetching courses</div>
+        }
+
+        courses = await res.json()
+    } catch (e) {
+        console.error(`Error: ${e}`)
+        return (
+            <div>
+                <p>Could not fetch courses</p>
+            </div>
+        )
+
     }
-
-    const courses: CourseList = await res.json()
 
     return (
         <div>
@@ -116,17 +137,7 @@ export async function CourseComponent() {
 
 export default async function Home() {
     const session = await getServerSession(options)
-    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    })
-    if (!res.ok) {
 
-    }
-    const friends: UserList = await res.json()
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
@@ -137,7 +148,7 @@ export default async function Home() {
             </div>
             {/*Friends*/}
             <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsBar friends={friends} />
+                <FriendsBar />
             </div>
             {/*Courses*/}
             <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">

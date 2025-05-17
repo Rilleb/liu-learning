@@ -1,23 +1,32 @@
 import { FriendStats } from "../components/stats/friend_comparison"
-import Stats from "../components/stats/stats"
+import { getServerSession } from "next-auth"
+import { options } from "../api/auth/[...nextauth]/options"
+import { CombinedQuizStatistics } from "../data_types/data_types"
 
-export interface AttemptsData {
-    date: Date
-    total_attempts: number
-    ratio: number
-    successfull_attempts: number
-    daily_time_spent: number
-}
 
-export default function Profile() {
+export default async function Profile() {
+    const session = await getServerSession(options)
+    if (!session || !session.accessToken) {
+        return (
+            <div>
+                <p>Could not get session, make sure you are logged in</p>
+            </div>
+        )
+    }
+    const res = await fetch(`${process.env.BACKEND_URL}/api/statistics/quiz/attempts`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Token ${session.accessToken}`
+        }
+    })
+
+    const data: CombinedQuizStatistics = await res.json() //Data should be returned in order 
+    console.log(data)
+
     return (
-        <div className="h-full w-full grid grid-cols-5">
-            <div className="col-span-2 rounded-sm shadow-lg">
-                <Stats />
-            </div>
-            <div className="col-span-2">
-                <FriendStats />
-            </div>
+        <div className="h-full w-full">
+            <FriendStats userData={data} />
         </div>
     )
 }

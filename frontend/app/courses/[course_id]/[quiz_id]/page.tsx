@@ -6,33 +6,33 @@ import QuizDescription from '../../../components/QuizDescription'
 
 interface QuizData {
     name: string
-    description : string
-    questions : number
+    description: string
+    questions: number
 }
 
-async function FriendsComponent() {
-    const session = await getServerSession(options);
-    if (!session) {
-        return <div>Not authenticated</div>;
-    }
+// async function FriendsComponent() {
+//     const session = await getServerSession(options);
+//     if (!session) {
+//         return <div>Not authenticated</div>;
+//     }
+//
+//     const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
+//         method: 'GET',
+//         headers: {
+//             'Content-type': 'application/json',
+//             'Authorization': `Token ${session.accessToken}`,
+//         }
+//     });
+//
+//     if (!res.ok) {
+//         return <div>Error loading friends</div>;
+//     }
+//
+//     const friends: UserList = await res.json();
+//     return <FriendsBar friends={friends} />;
+// }
 
-    const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-            'Authorization': `Token ${session.accessToken}`,
-        }
-    });
-
-    if (!res.ok) {
-        return <div>Error loading friends</div>;
-    }
-
-    const friends: UserList = await res.json();
-    return <FriendsBar friends={friends} />;
-}
-
-async function getQuizData(quiz_id:number ) : Promise<QuizData> {
+async function getQuizData(quiz_id: number): Promise<QuizData> {
 
     const resDesc = await fetch(`${process.env.BACKEND_URL}/api/quiz/description?quiz_id=${quiz_id}`, {
         method: 'GET',
@@ -41,7 +41,7 @@ async function getQuizData(quiz_id:number ) : Promise<QuizData> {
         }
     });
     const desc: string = await resDesc.json()
-    
+
     const resName = await fetch(`${process.env.BACKEND_URL}/api/quiz/description?quiz_id=${quiz_id}`, {
         method: 'GET',
         headers: {
@@ -57,11 +57,11 @@ async function getQuizData(quiz_id:number ) : Promise<QuizData> {
         }
     });
     const questions: number = await resQuestion.json()
-    
+
     const data: QuizData = {
-        description:desc ,
-        name: name ,
-        questions: questions, 
+        description: desc,
+        name: name,
+        questions: questions,
     }
     return data
 }
@@ -74,12 +74,12 @@ export default async function Home({ params }: { params: { quiz_id: number, cour
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             {/*Quizzes*/}
             <div className="h-screen tile-marker col-span-2 border-2 overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
-                <QuizDescription quiz_id={params.quiz_id} name={quiz_data.name} description={quiz_data.description} questions={quiz_data.questions} course_id={params.course_id}/>
-                
+                <QuizDescription quiz_id={params.quiz_id} name={quiz_data.name} description={quiz_data.description} questions={quiz_data.questions} course_id={params.course_id} />
+
             </div>
             {/*Friends*/}
             <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
-                <FriendsComponent />
+                <FriendsBar />
             </div>
         </div>
     )

@@ -27,4 +27,9 @@ urlpatterns = [
     path("quiz_attempt/", QuizAttempt.as_view(), name="quiz_attempt"),
     path("question_attempt/", QuestionAttempt.as_view(), name="question-attempt"),
     path("quiz_attempt/change", ChangeQuizAttempt.as_view(), name="change_quiz_attempt"),
+    path(
+        "statistics/compare/stats",
+        FriendStatisticsView.as_view(),
+        name="compare-with-friend",
+    ),
 ]

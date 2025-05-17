@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from db_handler.serializers import (
     CourseSerializer,
     QuizSerializer,
@@ -6,12 +7,13 @@ from db_handler.serializers import (
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import get_user_model, authenticate
+from django.contrib.auth import get_user_model, authenticate, user_logged_in
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 import json
 from django.contrib.auth.hashers import make_password
 from db_handler import services
+from django_redis import get_redis_connection
 
 
 def get_user_from_token(token):
@@ -68,9 +70,13 @@ class Friendsview(APIView):
             user = get_user_from_token(token=token)
             if not user:
                 return Response({"Message": {"Token was not included or has expired"}})
-            friends = services.get_friends(user=user)
-            serilizer = UserSerializer(friends, many=True)
-            return Response(serilizer.data)
+            offline, online = services.get_friends(user=user)
+            online_serilizer = UserSerializer(online, many=True)
+            offline_serilizer = UserSerializer(offline, many=True)
+
+            return Response(
+                {"online": online_serilizer.data, "offline": offline_serilizer.data}
+            )
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
 
@@ -90,6 +96,30 @@ class AttemptStatisticsView(APIView):
                     }
                 )
             attempts = services.get_quiz_statistics(user=user)
+            return Response(attempts)
+        else:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+
+class FriendStatisticsView(APIView):
+    def get(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        friend = request.query_params.get("friend")
+        if auth_header and auth_header.startswith("Token ") and friend:
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token)
+            if not user:
+                return Response(
+                    {
+                        "Message": {
+                            "Token has expired, our has no user associated with it"
+                        }
+                    }
+                )
+
+            if not services.is_friend_with(user, friend):
+                return Response({"Message": "Can only get statistics from friends"})
+            attempts = services.get_combined_quiz_statistics(user=user, friend=friend)
             return Response(attempts)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
@@ -150,6 +180,10 @@ class GoogleSyncView(APIView):
             user.first_name = name  # update name if needed
             user.save()
 
+        user.last_login = now()
+        user.save(update_fields=["last_login"])
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
+
         token, _ = Token.objects.get_or_create(user=user)
 
         return Response({"access_token": token.key})
@@ -178,6 +212,10 @@ class GithubSyncView(APIView):
         if not created:
             user.first_name = name  # update name if needed
             user.save()
+
+        user.last_login = now()
+        user.save(update_fields=["last_login"])
+        user_logged_in.send(sender=user.__class__, request=request, user=user)
 
         token, _ = Token.objects.get_or_create(user=user)
 
@@ -215,6 +253,10 @@ class CredentialsLoginView(APIView):
 
         user = authenticate(username=user.username, password=password)
         if user:
+            user.last_login = now()
+            user.save(update_fields=["last_login"])
+            user_logged_in.send(sender=user.__class__, request=request, user=user)
+
             token, _ = Token.objects.get_or_create(user=user)
             return Response(
                 {"access_token": token.key, "user_id": user.id, "email": user.email}
@@ -235,7 +277,7 @@ class QuizName(APIView):
         quizId = request.query_params.get("quiz_id", None)
         name = services.get_quiz_name(quizId == quizId)
         return Response(name)
-    
+
 
 class QuestionCount(APIView):
     def get(self, request):
