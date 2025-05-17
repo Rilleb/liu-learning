@@ -21,31 +21,64 @@ def create_course(name, code, description, created_by, chapters, date_created=No
         course = internal_services.create_course(
             name, code, description, created_by, date_created
         )
-
         for chapter in chapters:
-            create_chapter(chapter, course, created_by)
+            internal_services.create_chapter(chapter, course, created_by, date_created)
 
-            return course
+        return course
     except Exception as e:
         print(f"Error creating course: {e}")
         return None
 
 
-def create_chapter(name, course, created_by, date_created=None):
+def create_quiz(
+    name,
+    course,
+    chapter,
+    questions,
+    answerTypes,
+    answers,
+    created_by_user,
+    date_created=None,
+):
     try:
-        return internal_services.create_chapter(name, course, created_by, date_created)
+        print(course)
+        quiz = internal_services.create_quiz(
+            name, course, chapter, created_by_user, date_created
+        )
+        for i in range(len(questions)):
+            is_multiple = answerTypes[i] == "multiple-choice"
+            if is_multiple:
+                internal_services.create_question(
+                    quiz,
+                    questions[i],
+                    i,
+                    is_multiple,
+                    answers[i][0],
+                    answers[i][1],
+                    answers[i][2],
+                    answers[i][3],
+                )
+            else:
+                internal_services.create_question(
+                    quiz,
+                    questions[i],
+                    i,
+                    is_multiple,
+                    answers[i][0],
+                )
+
+        return quiz
     except Exception as e:
-        print(f"Error creating chapter: {e}")
+        print(f"Error creating quiz: {e}")
         return None
 
 
-def create_quiz(name, course, chapter, created_by, description="", date_created=None):
+def get_course_chapters(course_id):
     try:
-        return internal_services.create_quiz(
-            name, course, chapter, created_by, description, date_created
-        )
+        related_course = models.Course.objects.filter(id=course_id).first()
+        return models.Chapter.objects.filter(course=related_course)
     except Exception as e:
-        print(f"Error creating quiz: {e}")
+        print(f"Error getting course chapters: {e}")
         return None
 
 

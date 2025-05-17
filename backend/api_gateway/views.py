@@ -1,6 +1,6 @@
 from db_handler.models import Course
-from db_handler.services import create_course, create_chapter
-from db_handler.serializers import CourseSerializer
+from db_handler.services import create_course
+from db_handler.serializers import ChapterSerializer, CourseSerializer
 from django.utils.timezone import now
 from db_handler.serializers import (
     CourseSerializer,
@@ -86,7 +86,53 @@ class CourseView(APIView):
         return Response(serilizer.data)
 
 
+class ChaptersView(APIView):
+
+    def get(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        course_id = request.query_params.get("id", "")
+
+        chapters = services.get_course_chapters(course_id)
+
+        print(chapters)
+
+        serializer = ChapterSerializer(chapters, many=True)
+        return Response(serializer.data)
+
+
 class QuizView(APIView):
+
+    def post(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        data = request.data
+        name = data.get("title")
+        course = data.get("course")
+        chapter = data.get("chapter")
+        questions = data.get("questions")
+        answerTypes = data.get("answerTypes")
+        answers = data.get("answers")
+
+        created_by_user = get_user_from_token(token)
+        if not created_by_user:
+            return Response(
+                {"Message": {"Token was not included or has expired"}},
+                status.HTTP_401_UNAUTHORIZED,
+            )
+
+        quiz = services.create_quiz(
+            name, course, chapter, questions, answerTypes, answers, created_by_user
+        )
+        if quiz:
+            return Response({"message": "Course created"}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Something went wrong"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     def get(self, request):
         auth_header = request.META.get("HTTP_AUTHORIZATION", "")

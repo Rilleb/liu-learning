@@ -38,7 +38,6 @@ class Question(models.Model):
     description = models.TextField()
     index = models.IntegerField()
     is_multiple = models.BooleanField()
-    free_text_answer = models.TextField()
     alt_1 = models.TextField()
     alt_2 = models.TextField()
     alt_3 = models.TextField()
@@ -52,7 +51,6 @@ class ReadCourse(models.Model):
 
     class Meta:
         unique_together = ("user", "course")
-
 
 
 class QuizAttempt(models.Model):

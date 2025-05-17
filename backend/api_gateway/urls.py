@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path("courses/", CourseView.as_view(), name="courses"),
+    path("courses/chapters/", ChaptersView.as_view(), name="chapters"),
     path("auth/google-login/", GoogleSyncView.as_view(), name="google-sync"),
     path("auth/github-login/", GithubSyncView.as_view(), name="github-sync"),
     path(

@@ -1,8 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { createQuiz } from './actions/quiz_action';
-import { Course } from '@/app/data_types/data_types';
-import { options } from '@/app/api/auth/[...nextauth]/options';
-import { getServerSession } from 'next-auth';
+import { Chapter, Course } from '@/app/data_types/data_types';
+import { getChapters } from './actions/get_chapters_action';
 
 type MultipleChoiceAnswerProps = {
     index: number;
@@ -179,33 +178,49 @@ type QuizFormProps = {
 };
 
 export default function CreateQuizForm({ courses }: QuizFormProps) {
+    // TODO: Add description to quiz
     const [title, setTitle] = useState('');
-    const [code, setCode] = useState('');
     const [answerTypes, setAnswerType] = useState<string[]>(['']);
     const [questions, setQuestions] = useState<string[]>(['']);
     const [answers, setAnswers] = useState<string[][]>([['']]);
     const [status, setStatus] = useState('');
     const [course, setCourse] = useState<Course | null>(null);
+    const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
+    const [availableChapters, setAvailableChapters] = useState<Chapter[]>([]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        if (!course || !selectedChapter) {
+            setStatus("No course/chapter was selected");
+            return;
+        }
 
 
-    useEffect(() => {
-        const handleSubmit = async (e: React.FormEvent) => {
-            e.preventDefault()
+        const res = await createQuiz({ title, course, selectedChapter, questions, answerTypes, answers });
 
-            // const res = await createQuiz({   });
-            //
-            // if (res.success) {
-            //     setStatus("Succesfully created course")
-            // } else {
-            //     // const data = await res.json()data.message 
-            //     setStatus('Failed to create course')
-            // }
-        };
-    })
+        if (res.success) {
+            setStatus("Succesfully created course")
+        } else {
+            // const data = await res.json()data.message 
+            setStatus('Failed to create course')
+        }
+    };
+
+    const getCourseChapters = async (course: Course) => {
+        const res = await getChapters({ course })
+
+        if (res.success && res.data) {
+            const chapters: Chapter[] = res.data
+            setAvailableChapters(chapters)
+        }
+        else {
+            setStatus('Failed to fetch chapters from related course: ${}')
+        }
+    };
 
     return (
-        /* ADD onSubmit later */
-        <form className="space-y-4 max-w-md">
+        <form className="space-y-4 max-w-md" onSubmit={(e) => handleSubmit(e)}>
             <div>
                 <label className="block text-sm font-medium">Quiz Title</label>
                 <input
@@ -220,16 +235,50 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
                     name="courseCode"
                     required
                     className="w-full border px-2 py-1 rounded"
-                    onChange={(e) => setCode(e.target.value)}
+                    onChange={(e) => {
+                        const selectedName = e.target.value;
+                        const selectedCourse = courses.find(c => c.name === selectedName);
+                        if (selectedCourse) {
+                            setCourse(selectedCourse);
+                            getCourseChapters(selectedCourse)
+                        }
+                    }}
                 >
                     {}
-                    <option> Select a course</option>
+                    <option value=""> Select a course</option>
                     {courses.map((course, i) => (
                         <option key={i} value={course.name}>
                             {course.name}
                         </option>
                     ))}
                 </select>
+                {availableChapters.length > 0 && (
+                    <>
+                        <label className="block text-sm font-medium">Chapter</label>
+                        <select
+                            name="chapter"
+                            required
+                            className="w-full border px-2 py-1 rounded"
+                            value={selectedChapter ? selectedChapter.name : ""}
+                            onChange={(e) => {
+                                const selectedChapterName = e.target.value;
+                                if (selectedChapterName === "") {
+                                    setSelectedChapter(null);
+                                } else {
+                                    const chapter = availableChapters.find(c => c.name === selectedChapterName);
+                                    if (chapter) setSelectedChapter(chapter);
+                                }
+                            }}
+                        >
+                            <option value="">Select a chapter</option>
+                            {availableChapters.map((chapter, i) => (
+                                <option key={i} value={chapter.name}>
+                                    {chapter.name}
+                                </option>
+                            ))}
+                        </select>
+                    </>
+                )}
                 <QuizQuestions
                     questions={questions}
                     setQuestions={setQuestions}
