@@ -77,10 +77,23 @@ const QuizComponent = async ({ id }: { id: number }) => {
 }
 
 
+async function getCourseName(id: number) {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/name?course_id=${id}`, {
+        method: 'GET',
+    });
+
+    if (!res.ok) {
+        return "Error loading course name";
+    }
+    const course_name: string = await res.json();
+    return course_name;
+}
+
+
 export default function Home({ params }: { params: { course_id: number } }) {
     const courseId = Number(params.course_id)
 
-    const courseName = String(get_course_name(courseId))
+    const courseName = getCourseName(courseId)
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
