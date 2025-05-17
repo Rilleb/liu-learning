@@ -4,17 +4,17 @@ import { FriendsList, UserList } from "@/app/data_types/data_types";
 import { useSelector } from 'react-redux';
 import { setFriends } from "../store/friendSlice";
 import { RootState, useAppDispatch, useAppSelector } from "../store";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/data_types/data_types";
 import * as Popover from '@radix-ui/react-popover';
+import { useSocket } from "@/app/components/socketContext";
 
 
 export default function FriendsBar() {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [showPopup, setShowPopup] = useState(false)
+    const { socket, ready } = useSocket()
 
     const hasFriends = useAppSelector((state) => {
         if (state.friends.online && state.friends.offline) {
@@ -54,8 +54,17 @@ export default function FriendsBar() {
     const online: UserList = useSelector((state: RootState) => state.friends.online);
     const offline: UserList = useSelector((state: RootState) => state.friends.offline);
 
-    const inviteUser = (friend: User) => {
 
+
+    if (!ready) {
+        return <p>Connecting</p>
+    }
+
+    const inviteUser = (friend: User) => {
+        if (!socket) { return null }
+        if (socket?.readyState == WebSocket.OPEN) {
+            socket.send(JSON.stringify({ "type": "invite_user", "user_id": friend.id }))
+        }
 
     }
 
