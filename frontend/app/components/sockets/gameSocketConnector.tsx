@@ -38,7 +38,11 @@ export default function GameSocketConnector({ children, gameId }: { children: Re
         console.error("WebSocket error", error);
       };
 
-      return () => ws.close();
+      return () => {
+        if (ws.readyState == ws.OPEN) {
+          ws.close();
+        }
+      }
     }
   }, [session, status]);
 

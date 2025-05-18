@@ -21,7 +21,6 @@ export default function WebSocketConnector({ children }: { children: React.React
       const ws = new WebSocket(`ws://localhost:8000/ws/users/${session.user.id}/`);
       setSocket(ws)
 
-
       ws.onopen = () => {
         console.log("Connected to WebSocket");
         setReady(true)
@@ -57,19 +56,14 @@ export default function WebSocketConnector({ children }: { children: React.React
             },
           })
         } else if (data.type == "game_invite_answered") {
+          console.log(data)
           if (data.accepted) {
-            toast(`${data.user} accepted you game invite`, {
-              description: "Do you want to jump into the game?",
-              action: {
-                label: "Yes",
-                onClick: () => {
-                  router.push(`game/${data.game_id}`)
-                }
-              }
-            })
+            toast(`${data.username} accepted you game invite`)
           } else {
-            toast(`${data.user} declined you game invite`)
+            toast(`${data.username} declined you game invite`)
           }
+        } else if (data.type == "unique_room_id_created") {
+          router.push(`/game/${data.game_id}`)
         }
       };
 

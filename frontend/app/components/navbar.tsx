@@ -13,6 +13,7 @@ export default function Navbar() {
         { href: '/courses', label: 'Courses' },
         { href: '/create', label: 'Create' },
         { href: '/profile', label: 'Profile' },
+        { href: '/play', label: "Play with friends" }
     ]
 
     return (
@@ -39,11 +40,10 @@ export default function Navbar() {
                         {isOpen && (
                             <Link
                                 href={href}
-                                className={`block px-2 py-1 rounded transition ${
-                                    pathname === href
-                                        ? 'bg-[var(--background)] font-bold'
-                                        : 'hover:bg-[var(--color3)]'
-                                }`}
+                                className={`block px-2 py-1 rounded transition ${pathname === href
+                                    ? 'bg-[var(--background)] font-bold'
+                                    : 'hover:bg-[var(--color3)]'
+                                    }`}
                             >
                                 <span className="ml-2">{label}</span>
                             </Link>

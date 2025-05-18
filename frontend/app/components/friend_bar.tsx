@@ -9,12 +9,18 @@ import { useSession } from "next-auth/react";
 import { User } from "@/app/data_types/data_types";
 import * as Popover from '@radix-ui/react-popover';
 import { useSocket } from "@/app/components/sockets/socketContext";
+import { useRouter } from "next/navigation";
 
+interface params {
+    gameId: string
+}
 
-export default function FriendsBar() {
+export default function FriendsBar({ gameId }: params) {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
     const { socket, ready } = useSocket()
+    const router = useRouter()
+    console.log("gameId:", gameId)
 
     const hasFriends = useAppSelector((state) => {
         if (state.friends.online && state.friends.offline) {
@@ -62,8 +68,11 @@ export default function FriendsBar() {
 
     const inviteUser = (friend: User) => {
         if (!socket) { return null }
+        if (!gameId) {
+            router.push("/game")
+        }
         if (socket?.readyState == WebSocket.OPEN) {
-            socket.send(JSON.stringify({ "type": "invite_user", "user_id": friend.id }))
+            socket.send(JSON.stringify({ "type": "invite_user", "user_id": friend.id, "game_id": gameId }))
         }
 
     }

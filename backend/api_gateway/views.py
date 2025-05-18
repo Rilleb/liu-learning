@@ -314,17 +314,24 @@ class QuizAttempt(APIView):
             end = request.data.get("ended_at")
             passed = request.data.get("passed")
             # Create user in the database
-            attempt = services.create_quiz_attempt(user=user, quiz=quiz, ended_at=end, passed=passed)
+            attempt = services.create_quiz_attempt(
+                user=user, quiz=quiz, ended_at=end, passed=passed
+            )
             if attempt:
-                return Response({
-                    "message": "Successfully added attempt",
-                    "attempt_id": attempt.id
-                }, status=status.HTTP_201_CREATED)
+                return Response(
+                    {"message": "Successfully added attempt", "attempt_id": attempt.id},
+                    status=status.HTTP_201_CREATED,
+                )
             else:
-                return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)
+                return Response(
+                    "Error, could not add quiz attempt",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         else:
-            return Response( "Error, could not find user", status=status.HTTP_400_BAD_REQUEST)
-        
+            return Response(
+                "Error, could not find user", status=status.HTTP_400_BAD_REQUEST
+            )
+
 
 class QuestionAttempt(APIView):
     def post(self, request):
@@ -337,24 +344,39 @@ class QuestionAttempt(APIView):
         started = data.get("started_at")
         ended = data.get("ended_at")
 
-        attempt = services.create_question_answer(attempt=attempt, question=question, is_correct=is_correct, 
-                                                  multiple_choice_answer=is_multiple, free_text_answer=free_text, 
-                                                  started_at=started, ended_at=ended)
+        attempt = services.create_question_answer(
+            attempt=attempt,
+            question=question,
+            is_correct=is_correct,
+            multiple_choice_answer=is_multiple,
+            free_text_answer=free_text,
+            started_at=started,
+            ended_at=ended,
+        )
         if attempt:
-            return Response("Successfully added question attempt", status=status.HTTP_201_CREATED)
+            return Response(
+                "Successfully added question attempt", status=status.HTTP_201_CREATED
+            )
         else:
-            return Response( "Error, could not add question attempt", status=status.HTTP_400_BAD_REQUEST)
-    
-        
+            return Response(
+                "Error, could not add question attempt",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
 class ChangeQuizAttempt(APIView):
     def put(self, request):
         data = json.loads(request.body)
         attempt_id = data.get("attempt_id")
         end = data.get("ended_at")
         passed = data.get("passed")
-        attempt = services.change_quiz_attempt(attempt_id=attempt_id, ended_at=end, passed=passed)
+        attempt = services.change_quiz_attempt(
+            attempt_id=attempt_id, ended_at=end, passed=passed
+        )
         serializer = QuizAttemptSerializer(attempt)
         if attempt:
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
-            return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST
+            )

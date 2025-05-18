@@ -4,8 +4,14 @@ from django.contrib.auth import user_logged_in, user_logged_out
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.authtoken.models import Token
 
+from db_handler import services
 from realtime import utils
-from realtime.utils import notify_inviter_on_response, notify_user_on_invite
+from realtime.utils import (
+    cache_quiz_questions,
+    create_new_game_id,
+    notify_inviter_on_response,
+    notify_user_on_invite,
+)
 
 
 class UserConsumer(AsyncJsonWebsocketConsumer):
@@ -36,9 +42,22 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
                 await self.close()
+        elif type == "create_game":
+            game_id = create_new_game_id()
+            await self.send_json(
+                {
+                    "game_id": game_id,
+                    "type": "unique_room_id_created",
+                    "owner": self.user.id,
+                    "owner_name": self.user.username,
+                }
+            )
+
         elif type == "invite_user":
             friend = content.get("user_id")
-            await notify_user_on_invite(friend, self.user)
+            game_id = content.get("game_id")
+            print(content)
+            await notify_user_on_invite(friend, self.user, game_id)
         elif type == "game_invite_accepted":
             invite_from = content.get("invite_came_from")
             await notify_inviter_on_response(
@@ -62,7 +81,16 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
+    async def user_logged_off(self, event):
+        await self.send_json(
+            {
+                "type": "friend_logged_off",
+                "user_id": event["user_id"],
+            }
+        )
+
     async def game_invite_answered(self, event):
+        print(event)
         await self.send_json(
             {
                 "type": "game_invite_answered",
@@ -73,23 +101,12 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
         )
 
     async def game_invite_received(self, event):
-        game_id = utils.create_new_game_id()
-        if not game_id:
-            return None
         await self.send_json(
             {
                 "type": "game_invite_received",
                 "from": event["from"],
-                "game_id": game_id,
                 "username": event["username"],
-            }
-        )
-
-    async def user_logged_off(self, event):
-        await self.send_json(
-            {
-                "type": "friend_logged_off",
-                "user_id": event["user_id"],
+                "game_id": event["game_id"],
             }
         )
 
@@ -126,29 +143,25 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
                 await self.close()
-        else:
+        elif type == "game_started":
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
-                    "type": "game_event",
-                    "message": content.get("message", "Default message"),
-                    "user": "some_user_id",  # Optional payload
+                    "type": "game_started",
                 },
             )
+        elif type == "quiz_selected":
+            quiz_id = content.get("quiz")
+            await cache_quiz_questions(quiz_id=quiz_id)
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             f"user_{self.user.id}", self.channel_name
         )
 
-    async def game_event(self, event):
+    async def game_started(self, event):
         await self.send_json(
             {
-                "type": "event",
-                "message": event["message"],
-                "user": event.get("user"),
+                "type": "game_start",
             }
         )
-
-    async def game_invite_received(self, event):
-        await self.send_json({"type": "game_invite_received", "from": event["user_id"]})
