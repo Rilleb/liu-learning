@@ -107,19 +107,47 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
 class GameConsumer(AsyncJsonWebsocketConsumer):
 
     async def connect(self):
+        self.room_name = self.scope["url_route"]["kwargs"]["room_id"]
+        self.room_group_name = f"game_{self.room_name}"
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         self.user = AnonymousUser()  # Until authenticated
 
     async def receive_json(self, content):
         type = content.get("type")
         if type == "auth":
-            print("got into auth")
-        elif type == "event":
-            print("event")
+            token_key = content.get("token")
+            try:
+                token = await sync_to_async(Token.objects.select_related("user").get)(
+                    key=token_key
+                )
+                self.user = token.user
+                await self.send_json({"status": "authenticated game socket"})
+            except Token.DoesNotExist:
+                await self.send_json({"error": "Invalid token"})
+                await self.close()
+        else:
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    "type": "game_event",
+                    "message": content.get("message", "Default message"),
+                    "user": "some_user_id",  # Optional payload
+                },
+            )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             f"user_{self.user.id}", self.channel_name
+        )
+
+    async def game_event(self, event):
+        await self.send_json(
+            {
+                "type": "event",
+                "message": event["message"],
+                "user": event.get("user"),
+            }
         )
 
     async def game_invite_received(self, event):

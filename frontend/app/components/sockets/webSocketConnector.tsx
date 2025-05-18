@@ -3,14 +3,10 @@ import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
 import { setFriendOffline, setFriendOnline } from "@/app/store/friendSlice";
-import { SocketContext } from "@/app/components/socketContext";
+import { SocketContext } from "@/app/components/sockets/socketContext";
 import { Toaster, toast } from 'sonner';
 import { useRouter } from "next/navigation";
 
-type SocketContextValue = {
-  socket: WebSocket | null;
-  ready: boolean;
-};
 
 export default function WebSocketConnector({ children }: { children: React.ReactNode }) {
   const { data: session, status } = useSession();

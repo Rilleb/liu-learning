@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { User } from "@/app/data_types/data_types";
 import * as Popover from '@radix-ui/react-popover';
-import { useSocket } from "@/app/components/socketContext";
+import { useSocket } from "@/app/components/sockets/socketContext";
 
 
 export default function FriendsBar() {
