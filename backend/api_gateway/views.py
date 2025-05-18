@@ -3,6 +3,7 @@ from db_handler.serializers import (
     CourseSerializer,
     QuizSerializer,
     UserSerializer,
+    QuizAttemptSerializer,
 )
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -283,3 +284,77 @@ class QuestionCount(APIView):
         quizId = request.query_params.get("quiz_id", None)
         count = services.get_question_count(quizId == quizId)
         return Response(count)
+
+
+class CourseName(APIView):
+    def get(self, request):
+        courseId = request.query_params.get("course_id", None)
+        name = services.get_course_name(courseId)
+        return Response(name)
+
+
+class Questions(APIView):
+    def get(self, request):
+        try:
+            quiz_id = request.query_params.get("quiz_id", None)
+            questions = services.get_questions_for_quiz(quiz_id)
+            return Response(questions)
+        except:
+            return Response({"error": "Could not get quiz questions"}, status=400)
+
+
+class QuizAttempt(APIView):
+    def post(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth_header and auth_header.startswith("Token "):
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token=token)
+
+            quiz = request.data.get("quiz_id")
+            end = request.data.get("ended_at")
+            passed = request.data.get("passed")
+            # Create user in the database
+            attempt = services.create_quiz_attempt(user=user, quiz=quiz, ended_at=end, passed=passed)
+            if attempt:
+                return Response({
+                    "message": "Successfully added attempt",
+                    "attempt_id": attempt.id
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response( "Error, could not find user", status=status.HTTP_400_BAD_REQUEST)
+        
+
+class QuestionAttempt(APIView):
+    def post(self, request):
+        data = json.loads(request.body)
+        attempt = data.get("attempt")
+        question = data.get("question")
+        is_correct = data.get("is_correct")
+        is_multiple = data.get("is_multiple_choice")
+        free_text = data.get("free_text_answer")
+        started = data.get("started_at")
+        ended = data.get("ended_at")
+
+        attempt = services.create_question_answer(attempt=attempt, question=question, is_correct=is_correct, 
+                                                  multiple_choice_answer=is_multiple, free_text_answer=free_text, 
+                                                  started_at=started, ended_at=ended)
+        if attempt:
+            return Response("Successfully added question attempt", status=status.HTTP_201_CREATED)
+        else:
+            return Response( "Error, could not add question attempt", status=status.HTTP_400_BAD_REQUEST)
+    
+        
+class ChangeQuizAttempt(APIView):
+    def put(self, request):
+        data = json.loads(request.body)
+        attempt_id = data.get("attempt_id")
+        end = data.get("ended_at")
+        passed = data.get("passed")
+        attempt = services.change_quiz_attempt(attempt_id=attempt_id, ended_at=end, passed=passed)
+        serializer = QuizAttemptSerializer(attempt)
+        if attempt:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)

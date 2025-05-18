@@ -77,7 +77,6 @@ class QuestionSerializer(serializers.ModelSerializer):
             "description",
             "index",
             "is_multiple",
-            "free_text_answer",
             "alt_1",
             "alt_2",
             "alt_3",

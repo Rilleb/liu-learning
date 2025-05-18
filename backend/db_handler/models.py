@@ -37,7 +37,6 @@ class Question(models.Model):
     description = models.TextField()
     index = models.IntegerField()
     is_multiple = models.BooleanField()
-    free_text_answer = models.TextField()
     alt_1 = models.TextField()
     alt_2 = models.TextField()
     alt_3 = models.TextField()
@@ -56,8 +55,8 @@ class ReadCourse(models.Model):
 class QuizAttempt(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    attempt_started_at = models.DateTimeField()  # Need in seconds for statistics
-    attempt_ended_at = models.DateTimeField()
+    attempt_started_at = models.DateTimeField(auto_now_add=True)  # Need in seconds for statistics
+    attempt_ended_at = models.DateTimeField(null=True)
     passed = models.BooleanField()
 
 
@@ -65,7 +64,7 @@ class QuizAnswer(models.Model):
     attempt = models.ForeignKey(QuizAttempt, on_delete=models.CASCADE)
     is_correct = models.BooleanField()
     attempt_started_at = models.DateTimeField()
-    attempt_ended_at = models.DateTimeField()
+    attempt_ended_at = models.DateTimeField(auto_now_add=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     multiple_chooice_answer = models.IntegerField()
     free_text_answer = models.TextField()
