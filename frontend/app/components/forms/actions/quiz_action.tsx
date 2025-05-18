@@ -4,10 +4,11 @@ import { getServerSession } from 'next-auth';
 import { options } from '@/app/api/auth/[...nextauth]/options';
 import { Chapter, Course } from '@/app/data_types/data_types';
 
-export async function createQuiz({ title, course, selectedChapter, questions, answerTypes, answers }: {
+export async function createQuiz({ title, courseId, description, chapterId, questions, answerTypes, answers }: {
     title: string;
-    course: Course;
-    selectedChapter: Chapter;
+    courseId: Course["id"];
+    description: string;
+    chapterId: Chapter["id"];
     questions: string[];
     answerTypes: string[];
     answers: string[][];
@@ -24,8 +25,7 @@ export async function createQuiz({ title, course, selectedChapter, questions, an
             'Content-Type': 'application/json',
             'Authorization': `Token ${session.accessToken}`,
         },
-        // TODO: send id's instead of whole course and fetch it on the backend
-        body: JSON.stringify({ title, course, selectedChapter, questions, answerTypes, answers }),
+        body: JSON.stringify({ title, courseId, description, chapterId, questions, answerTypes, answers }),
     });
 
     if (!res.ok) {

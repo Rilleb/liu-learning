@@ -178,7 +178,6 @@ type QuizFormProps = {
 };
 
 export default function CreateQuizForm({ courses }: QuizFormProps) {
-    // TODO: Add description to quiz
     const [title, setTitle] = useState('');
     const [answerTypes, setAnswerType] = useState<string[]>(['']);
     const [questions, setQuestions] = useState<string[]>(['']);
@@ -187,6 +186,7 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
     const [course, setCourse] = useState<Course | null>(null);
     const [selectedChapter, setSelectedChapter] = useState<Chapter | null>(null);
     const [availableChapters, setAvailableChapters] = useState<Chapter[]>([]);
+    const [description, setDescription] = useState('');
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
@@ -196,8 +196,9 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
             return;
         }
 
-
-        const res = await createQuiz({ title, course, selectedChapter, questions, answerTypes, answers });
+        const courseId = course.id;
+        const chapterId = selectedChapter.id;
+        const res = await createQuiz({ title, courseId, description, chapterId, questions, answerTypes, answers });
 
         if (res.success) {
             setStatus("Succesfully created course")
@@ -279,6 +280,15 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
                         </select>
                     </>
                 )}
+
+                <label className="block text-sm font-medium mt-4">Quiz Description</label>
+                <textarea
+                    name="description"
+                    className="w-full border px-2 py-1 rounded"
+                    rows={4}
+                    onChange={(e) => setDescription(e.target.value)}
+                    value={description}
+                />
                 <QuizQuestions
                     questions={questions}
                     setQuestions={setQuestions}

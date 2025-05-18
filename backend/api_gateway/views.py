@@ -112,8 +112,9 @@ class QuizView(APIView):
 
         data = request.data
         name = data.get("title")
-        course = data.get("course")
-        chapter = data.get("chapter")
+        courseId = data.get("courseId")
+        chapterId = data.get("chapterId")
+        description = data.get("description")
         questions = data.get("questions")
         answerTypes = data.get("answerTypes")
         answers = data.get("answers")
@@ -126,7 +127,14 @@ class QuizView(APIView):
             )
 
         quiz = services.create_quiz(
-            name, course, chapter, questions, answerTypes, answers, created_by_user
+            name,
+            courseId,
+            chapterId,
+            description,
+            questions,
+            answerTypes,
+            answers,
+            created_by_user,
         )
         if quiz:
             return Response({"message": "Course created"}, status=status.HTTP_200_OK)

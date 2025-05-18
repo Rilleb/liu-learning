@@ -30,7 +30,7 @@ class Quiz(models.Model):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     date_created = models.DateField()
-    description = models.TextField()
+    description = models.TextField(default="", blank=True)
 
 
 class Question(models.Model):
@@ -38,9 +38,9 @@ class Question(models.Model):
     description = models.TextField()
     index = models.IntegerField()
     is_multiple = models.BooleanField()
-    alt_1 = models.TextField()
-    alt_2 = models.TextField()
-    alt_3 = models.TextField()
+    alt_1 = models.TextField(default="", blank=True)
+    alt_2 = models.TextField(default="", blank=True)
+    alt_3 = models.TextField(default="", blank=True)
     correct_answer = models.TextField()
 
 

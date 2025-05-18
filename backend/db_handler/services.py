@@ -32,8 +32,9 @@ def create_course(name, code, description, created_by, chapters, date_created=No
 
 def create_quiz(
     name,
-    course,
-    chapter,
+    course_id,
+    chapter_id,
+    description,
     questions,
     answerTypes,
     answers,
@@ -41,9 +42,11 @@ def create_quiz(
     date_created=None,
 ):
     try:
-        print(course)
+        course = models.Course.objects.get(id=course_id)
+        chapter = models.Chapter.objects.get(id=chapter_id)
+
         quiz = internal_services.create_quiz(
-            name, course, chapter, created_by_user, date_created
+            name, course, chapter, created_by_user, description, date_created
         )
         for i in range(len(questions)):
             is_multiple = answerTypes[i] == "multiple-choice"
@@ -87,11 +90,10 @@ def create_question(
     description,
     index,
     is_multiple=False,
-    free_text_answer="",
+    correct_answer="",
     alt_1="",
     alt_2="",
     alt_3="",
-    correct_answer="",
 ):
     try:
         return internal_services.create_question(
@@ -99,11 +101,10 @@ def create_question(
             description,
             index,
             is_multiple,
-            free_text_answer,
+            correct_answer,
             alt_1,
             alt_2,
             alt_3,
-            correct_answer,
         )
     except Exception as e:
         print(f"Error creating question: {e}")
