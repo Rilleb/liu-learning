@@ -76,9 +76,8 @@ def mark_course_as_read(user, course):
     return read_course
 
 
-def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False):
-    if started_at is None:
-        started_at = datetime.date.today()
+def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
+    started_at = datetime.date.today()
     if ended_at is None:
         ended_at = datetime.date.today()
     attempt = QuizAttempt.objects.create(
@@ -91,7 +90,7 @@ def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False
     return attempt
 
 
-def create_quiz_answer(
+def create_question_answer(
     attempt,
     question,
     is_correct,

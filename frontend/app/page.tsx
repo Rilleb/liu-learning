@@ -115,7 +115,7 @@ export async function CourseComponent() {
                         key={course.id}
                         className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                     >
-                        <Link href={`/course/${course.id}`}>
+                        <Link href={`/courses/${course.id}`}>
                             <div className="space-y-2">
                                 <h3 className="hover:underline">
                                     {course.name}

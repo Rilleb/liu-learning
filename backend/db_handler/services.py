@@ -127,17 +127,20 @@ def mark_course_as_read(user, course):
         return None
 
 
-def create_quiz_attempt(user, quiz, started_at=None, ended_at=None, passed=False):
+def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
     try:
+        actual_quiz = models.Quiz.objects.filter(id = quiz).first()
+        if not passed: 
+            passed = False
         return internal_services.create_quiz_attempt(
-            user, quiz, started_at, ended_at, passed
+            user, actual_quiz, ended_at, passed
         )
     except Exception as e:
         print(f"Error creating quiz attempt: {e}")
         return None
 
 
-def create_quiz_answer(
+def create_question_answer(
     attempt,
     question,
     is_correct,
@@ -147,9 +150,13 @@ def create_quiz_answer(
     ended_at=None,
 ):
     try:
-        return internal_services.create_quiz_answer(
-            attempt,
-            question,
+        actual_attempt = models.QuizAttempt.objects.filter(id = attempt).first()
+        actual_question = models.Question.objects.filter(id = question).first()
+        if not multiple_choice_answer:
+            multiple_choice_answer = False
+        return internal_services.create_question_answer(
+            actual_attempt,
+            actual_question,
             is_correct,
             multiple_choice_answer,
             free_text_answer,
@@ -225,7 +232,7 @@ def get_quiz_description(quiz_id):
         description = models.Quiz.objects.filter(id=quiz_id).first().description
         return description
     except Exception as e:
-        print(f"Could not get quizes: {e}")
+        print(f"Could not get quiz description: {e}")
         return None
 
 
@@ -234,7 +241,7 @@ def get_quiz_name(quiz_id):
         name = models.Quiz.objects.filter(id=quiz_id).first().name
         return name
     except Exception as e:
-        print(f"Could not get quizes: {e}")
+        print(f"Could not get quiz name: {e}")
         return None
 
 
@@ -243,7 +250,7 @@ def get_question_count(quiz_id):
         count = models.Question.objects.filter(quiz_id=quiz_id).count()
         return count
     except Exception as e:
-        print(f"Could not get quizes: {e}")
+        print(f"Could not get question count: {e}")
         return None
 
 
@@ -406,6 +413,61 @@ def find_friend(user, query):
         return None
 
 
+def get_course_name(course_id):
+    try:
+        print(course_id)
+        name = models.Course.objects.filter(id=course_id).first().name
+        return name
+    except Exception as e:
+        print(f"Could not get course name: {e}")
+        return None
+    
+def get_questions_for_quiz(quiz_id):
+    try:
+        print("id ", quiz_id)
+        questions = models.Question.objects.filter(quiz=quiz_id)
+        
+        questions_data = []
+        print(questions)
+        for q in questions:
+            question_data = {
+                "id": q.id,
+                "question": q.description,
+                "answer": q.correct_answer,
+                "is_multiple": q.is_multiple,
+                "alternatives": None
+            }
+    
+            if q.is_multiple:
+                question_data["alternatives"] = {
+                    "alt1": q.alt_1,
+                    "alt2": q.alt_2,
+                    "alt3": q.alt_3
+                }
+            questions_data.append(question_data)
+        return questions_data
+    except Exception as e:
+        print(f"Error fetching quiz questions: {e}")
+        return None
+      
+
+def change_quiz_attempt(attempt_id, ended_at=None, passed=False):
+    attempt = models.QuizAttempt.objects.filter(id=attempt_id).first()
+    if not attempt:
+        print(f"No quiz attempt found with ID: {attempt_id}")
+        return None
+    
+    try:
+        if ended_at is not None:
+            attempt.ended_at = ended_at
+        attempt.passed = passed
+        attempt.save()
+        return attempt 
+    except Exception as e:
+        print(f"Error updating quiz attempt: {e}")
+        return None
+      
+      
 def is_friend_with(user, friend_id):
     try:
         return models.Friendship.objects.filter(
