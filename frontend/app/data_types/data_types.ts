@@ -34,6 +34,22 @@ export interface Quiz {
     description: string
 }
 
+export interface Question {
+    id: number
+    question: string
+    answer: string
+    is_multiple: boolean
+    alternatives: any
+}
+
+export interface QuizAttempt {
+    quiz: Quiz
+    user: User
+    start: Date
+    end: Date
+    passed: boolean
+}
+
 export interface DateBasedStat {
     date: Date
     user_total_attempts?: number
@@ -56,6 +72,7 @@ export interface CombinedQuizStatistics {
     date_based: DateBasedStat[]
     course_based: CourseBasedStat[]
 }
+
 export type QuizList = Quiz[]
 export type CourseList = Course[]
 export type UserList = User[]
