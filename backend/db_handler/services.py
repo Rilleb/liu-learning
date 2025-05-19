@@ -119,18 +119,28 @@ def add_friend(user1, user2):
         return None
 
 
-def mark_course_as_read(user, course):
+def follow_course(user, course_id):
     try:
-        return internal_services.mark_course_as_read(user, course)
+        course = models.Course.objects.get(id=course_id)
+        return internal_services.follow_course(user, course)
     except Exception as e:
-        print(f"Error marking course as read: {e}")
+        print(f"Error when trying to follow course: {e}")
+        return None
+
+
+def unfollow_course(user, course_id):
+    try:
+        course = models.Course.objects.get(id=course_id)
+        return internal_services.unfollow_course(user, course)
+    except Exception as e:
+        print(f"Error when trying to unfollowing course: {e}")
         return None
 
 
 def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
     try:
-        actual_quiz = models.Quiz.objects.filter(id = quiz).first()
-        if not passed: 
+        actual_quiz = models.Quiz.objects.filter(id=quiz).first()
+        if not passed:
             passed = False
         return internal_services.create_quiz_attempt(
             user, actual_quiz, ended_at, passed
@@ -150,8 +160,8 @@ def create_question_answer(
     ended_at=None,
 ):
     try:
-        actual_attempt = models.QuizAttempt.objects.filter(id = attempt).first()
-        actual_question = models.Question.objects.filter(id = question).first()
+        actual_attempt = models.QuizAttempt.objects.filter(id=attempt).first()
+        actual_question = models.Question.objects.filter(id=question).first()
         if not multiple_choice_answer:
             multiple_choice_answer = False
         return internal_services.create_question_answer(
@@ -184,14 +194,13 @@ def get_courses(user):
 def get_all_courses():
     try:
         courses = models.Course.objects
-        print("Courses", courses)
         return courses
     except Exception as e:
         print(f"Error creating quiz answer: {e}")
         return None
 
 
-def get_quizes(user):
+def get_quizzes(user):
     try:
         quizes = models.Quiz.objects.filter(
             course__in=models.ReadCourse.objects.filter(user=user).values("course_id")
@@ -199,6 +208,17 @@ def get_quizes(user):
         return quizes
     except Exception as e:
         print(f"Could not get quizes: {e}")
+        return None
+
+
+def get_quizzes_from_course(course_id):
+    try:
+        course = models.Course.objects.filter(id=course_id).first()
+        quizzes = models.Quiz.objects.filter(course=course)
+
+        return quizzes
+    except Exception as e:
+        print(f"Error creating quiz answer: {e}")
         return None
 
 
@@ -421,12 +441,13 @@ def get_course_name(course_id):
     except Exception as e:
         print(f"Could not get course name: {e}")
         return None
-    
+
+
 def get_questions_for_quiz(quiz_id):
     try:
         print("id ", quiz_id)
         questions = models.Question.objects.filter(quiz=quiz_id)
-        
+
         questions_data = []
         print(questions)
         for q in questions:
@@ -435,39 +456,39 @@ def get_questions_for_quiz(quiz_id):
                 "question": q.description,
                 "answer": q.correct_answer,
                 "is_multiple": q.is_multiple,
-                "alternatives": None
+                "alternatives": None,
             }
-    
+
             if q.is_multiple:
                 question_data["alternatives"] = {
                     "alt1": q.alt_1,
                     "alt2": q.alt_2,
-                    "alt3": q.alt_3
+                    "alt3": q.alt_3,
                 }
             questions_data.append(question_data)
         return questions_data
     except Exception as e:
         print(f"Error fetching quiz questions: {e}")
         return None
-      
+
 
 def change_quiz_attempt(attempt_id, ended_at=None, passed=False):
     attempt = models.QuizAttempt.objects.filter(id=attempt_id).first()
     if not attempt:
         print(f"No quiz attempt found with ID: {attempt_id}")
         return None
-    
+
     try:
         if ended_at is not None:
             attempt.ended_at = ended_at
         attempt.passed = passed
         attempt.save()
-        return attempt 
+        return attempt
     except Exception as e:
         print(f"Error updating quiz attempt: {e}")
         return None
-      
-      
+
+
 def is_friend_with(user, friend_id):
     try:
         return models.Friendship.objects.filter(

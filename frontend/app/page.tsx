@@ -108,7 +108,7 @@ export async function CourseComponent() {
 
     return (
         <div>
-            <h1>Courses</h1>
+            <h1>Followed Courses</h1>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 ">
                 {courses && courses.map((course) => (
                     <li

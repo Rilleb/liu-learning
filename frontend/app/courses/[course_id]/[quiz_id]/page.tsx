@@ -4,11 +4,6 @@ import { options } from "../../../api/auth/[...nextauth]/options"
 import { UserList } from "../../../data_types/data_types"
 import QuizDescription from '../../../components/QuizDescription'
 
-interface QuizData {
-    name: string
-    description: string
-    questions: number
-}
 
 // async function FriendsComponent() {
 //     const session = await getServerSession(options);
@@ -32,6 +27,12 @@ interface QuizData {
 //     return <FriendsBar friends={friends} />;
 // }
 
+interface QuizData {
+    name: string
+    description: string
+    questions: number
+}
+
 async function getQuizData(quiz_id: number): Promise<QuizData> {
 
     const resDesc = await fetch(`${process.env.BACKEND_URL}/api/quiz/description?quiz_id=${quiz_id}`, {
@@ -50,7 +51,7 @@ async function getQuizData(quiz_id: number): Promise<QuizData> {
     });
     const name: string = await resName.json()
 
-    const resQuestion = await fetch(`${process.env.BACKEND_URL}/api/quiz/questionCount?quiz_id=${quiz_id}`, {
+    const resQuestion = await fetch(`${process.env.BACKENQuizzesD_URL}/api/quiz/questionCount?quiz_id=${quiz_id}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',

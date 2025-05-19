@@ -4,9 +4,9 @@ import random
 from db_handler.services import (
     create_user,
     create_course,
-    mark_course_as_read,
+    follow_course,
     create_quiz_attempt,
-    create_quiz_answer,
+    # create_quiz_answer,
     add_friend,
 )
 from db_handler.internal_services import (
@@ -61,7 +61,7 @@ for i in range(num_courses):
 # Mark all users as having read all courses
 for user in users:
     for course in courses:
-        mark_course_as_read(user, course)
+        follow_course(user, course.id)
 
 # Add all users as friends with each other
 for i, user in enumerate(users):
@@ -86,7 +86,7 @@ for i in range(50):
     quiz = random.choice(quizzes)
     passed = random.choice([True, False])
 
-    attempt = create_quiz_attempt(user, quiz, started_at, ended_at, passed)
+    # attempt = create_quiz_attempt(user, quiz, started_at, ended_at, passed)
 
-    for question in questions_by_quiz[quiz]:
-        create_quiz_answer(attempt, question, is_correct=passed)
+    # for question in questions_by_quiz[quiz]:
+    #   create_quiz_answer(attempt, question, is_correct=passed)

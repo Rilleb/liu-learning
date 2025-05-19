@@ -5,7 +5,7 @@ import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
 import { UserList, QuizList } from "../../data_types/data_types"
 
-const QuizComponent = async ({ id }: { id: number }) => {
+const QuizComponent = async ({ courseId }: { courseId: number }) => {
     const session = await getServerSession(options)
     if (!session) {
         return (
@@ -17,7 +17,7 @@ const QuizComponent = async ({ id }: { id: number }) => {
     let quizzes: QuizList = [];
     try {
 
-        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?id=${courseId}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -54,7 +54,7 @@ const QuizComponent = async ({ id }: { id: number }) => {
                                 key={quiz.id}
                                 className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                             >
-                                <Link href={`/courses/${id}/${quiz.id}`}>
+                                <Link href={`/courses/${courseId}/${quiz.id}`}>
                                     <p>Quiz: {quiz.name} </p>
                                 </Link>
                             </li>

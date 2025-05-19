@@ -4,6 +4,7 @@ from .views import *
 urlpatterns = [
     path("courses/", CourseView.as_view(), name="courses"),
     path("courses/chapters/", ChaptersView.as_view(), name="chapters"),
+    path("courses/follow/", ToggleFollowCourse.as_view(), name="follow-course"),
     path("auth/google-login/", GoogleSyncView.as_view(), name="google-sync"),
     path("auth/github-login/", GithubSyncView.as_view(), name="github-sync"),
     path(
@@ -27,7 +28,9 @@ urlpatterns = [
     path("quiz/questions", Questions.as_view(), name="questions-from-quiz"),
     path("quiz_attempt/", QuizAttempt.as_view(), name="quiz_attempt"),
     path("question_attempt/", QuestionAttempt.as_view(), name="question-attempt"),
-    path("quiz_attempt/change", ChangeQuizAttempt.as_view(), name="change_quiz_attempt"),
+    path(
+        "quiz_attempt/change", ChangeQuizAttempt.as_view(), name="change_quiz_attempt"
+    ),
     path(
         "statistics/compare/stats",
         FriendStatisticsView.as_view(),

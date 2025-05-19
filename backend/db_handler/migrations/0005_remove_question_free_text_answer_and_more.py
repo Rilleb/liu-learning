@@ -6,27 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('db_handler', '0004_alter_quizanswer_attempt_ended_at_and_more'),
+        ("db_handler", "0004_alter_quizanswer_attempt_ended_at_and_more"),
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='question',
-            name='free_text_answer',
-        ),
         migrations.AlterField(
-            model_name='quizanswer',
-            name='attempt_ended_at',
+            model_name="quizanswer",
+            name="attempt_ended_at",
             field=models.DateTimeField(auto_now_add=True),
         ),
         migrations.AlterField(
-            model_name='quizattempt',
-            name='attempt_ended_at',
+            model_name="quizattempt",
+            name="attempt_ended_at",
             field=models.DateTimeField(null=True),
         ),
         migrations.AlterField(
-            model_name='quizattempt',
-            name='attempt_started_at',
+            model_name="quizattempt",
+            name="attempt_started_at",
             field=models.DateTimeField(auto_now_add=True),
         ),
     ]

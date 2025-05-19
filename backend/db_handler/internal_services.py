@@ -71,9 +71,18 @@ def add_friend(user1, user2):
     return friends
 
 
-def mark_course_as_read(user, course):
-    read_course = ReadCourse.objects.create(user=user, course=course)
-    return read_course
+def unfollow_course(user, course):
+    followed_course = ReadCourse.objects.filter(user=user, course=course).first()
+    if followed_course:
+        followed_course.delete()
+    return None
+
+
+def follow_course(user, course):
+    followed_course = ReadCourse.objects.filter(user=user, course=course).first()
+    if not followed_course:
+        followed_course = ReadCourse.objects.create(user=user, course=course)
+    return followed_course
 
 
 def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
