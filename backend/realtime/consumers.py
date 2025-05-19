@@ -9,8 +9,10 @@ from realtime import utils
 from realtime.utils import (
     cache_quiz_questions,
     create_new_game_id,
+    get_cached_quiz_questions,
     notify_inviter_on_response,
     notify_user_on_invite,
+    update_user_progress,
 )
 
 
@@ -52,7 +54,6 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                     "owner_name": self.user.username,
                 }
             )
-
         elif type == "invite_user":
             friend = content.get("user_id")
             game_id = content.get("game_id")
@@ -144,15 +145,31 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json({"error": "Invalid token"})
                 await self.close()
         elif type == "game_started":
+            questions = await get_cached_quiz_questions(content.get("quiz"))
+            # print(content)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     "type": "game_started",
+                    "questions": questions,
+                    "quiz": content.get("quiz"),
+                    "timelimit": content.get("timelimit"),
                 },
             )
         elif type == "quiz_selected":
             quiz_id = content.get("quiz")
             await cache_quiz_questions(quiz_id=quiz_id)
+        elif type == "question_answered":
+            progress = update_user_progress(
+                self.room_name,
+                content.get("user_id"),
+                content.get("username"),
+                content.get("is_correct"),
+            )
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {"type": "user_progress", "users": progress},
+            )
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
@@ -163,5 +180,11 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(
             {
                 "type": "game_start",
+                "questions": event["questions"],
+                "quiz": event["quiz"],
+                "timelimit": event["timelimit"],
             }
         )
+
+    async def user_progress(self, event):
+        await self.send_json({"type": "user_progress", "users": event["users"]})

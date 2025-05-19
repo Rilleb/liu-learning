@@ -96,15 +96,15 @@ export const options: AuthOptions = {
             // Check if user exists (i.e., first time the JWT callback is called)
             if (user) {
                 token.accessToken = user.accessToken // Store accessToken in the token
-
                 token.id = user.id
+                token.username = user.username
             }
             return token
         },
         async session({ session, token }) {
             session.accessToken = token.accessToken
-
             session.user.id = token.id
+            session.user.username = token.username
             return session
         },
     },

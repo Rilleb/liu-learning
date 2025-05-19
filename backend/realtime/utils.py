@@ -46,7 +46,6 @@ async def notify_user_on_invite(friend_id, user, game_id):
     if not (friend_id in online_ids):
         return None  # You can't invite someone that's offline, since we don't store invites in db
     channel_layer = get_channel_layer()
-    print(game_id)
     await channel_layer.group_send(
         f"user_{friend_id}",
         {
@@ -94,3 +93,43 @@ async def cache_quiz_questions(quiz_id):
             quiz_id=quiz_id
         )
         conn.setex(quiz_id, 600, json.dumps(questions))
+
+
+async def get_cached_quiz_questions(quiz_id):
+    conn = get_redis_connection("default")
+    cached = conn.get(quiz_id)
+
+    if cached:
+        return json.loads(cached)
+
+    await cache_quiz_questions(quiz_id)
+    return await get_cached_quiz_questions(quiz_id)
+
+
+def update_user_progress(room_id, user_id, username, is_correct):
+    key = f"game:room:{room_id}"
+    conn = get_redis_connection("default")
+    raw = conn.get(key)
+
+    if raw:
+        state = json.loads(raw)
+    else:
+        state = {"users": {}}
+
+    user_data = state["users"].get(
+        str(user_id),
+        {
+            "username": username,
+            "question_index": 0,
+            "correct_count": 0,
+        },
+    )
+
+    user_data["question_index"] += 1
+    if is_correct:
+        user_data["correct_count"] += 1
+
+    state["users"][str(user_id)] = user_data
+    conn.set(key, json.dumps(state))
+
+    return list(state["users"].values())

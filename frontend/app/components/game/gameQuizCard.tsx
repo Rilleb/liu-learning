@@ -1,9 +1,10 @@
-"use client"
-
-import { Question } from "./../data_types/data_types"
+import { Question } from "@/app/data_types/data_types";
 import { useState, useEffect } from "react";
-import EnhancedTextbox from './text_box';
 import { useRouter } from 'next/navigation';
+import EnhancedTextbox from "@/app/components/text_box";
+import { useGameSocket } from "../sockets/gameSocketContext";
+import { useSession } from "next-auth/react";
+
 
 async function addQuestionAttempt({
   attempt,
@@ -12,6 +13,9 @@ async function addQuestionAttempt({
   is_multiple_choice,
   free_text_answer,
   started_at,
+  socket,
+  userId,
+  username,
 }: {
   attempt: number;
   question: number;
@@ -19,6 +23,9 @@ async function addQuestionAttempt({
   is_multiple_choice: boolean;
   free_text_answer: string;
   started_at: string;
+  socket: WebSocket;
+  userId: number;
+  username: string
 }) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/question_attempt/`, {
@@ -40,12 +47,14 @@ async function addQuestionAttempt({
       throw new Error("Failed to record attempt");
     }
 
-    const data = await res.text();
-    console.log("Question attempt recorded:", data);
+    //send to backend to notify this user has moved on to next question (or wrong answer)
+    socket.send(JSON.stringify({ type: "question_answered", is_correct: is_correct, username: username, user_id: userId }))
+
   } catch (err) {
     console.error("Error submitting attempt:", err);
   }
 }
+
 
 
 export function AnswerDiv({
@@ -138,20 +147,19 @@ export function FreeText({
 }
 
 
-export default function QuizCard({
+export default function GameQuizCard({
   questions,
   name,
-  course_id,
   quiz_id,
   quiz_attempt_id,
+  handleDone
 }: {
   questions: Question[];
   name: string;
-  course_id: number;
   quiz_id: number;
   quiz_attempt_id: number;
+  handleDone: () => void
 }) {
-  const router = useRouter();
   const [buttonText, setButtonText] = useState("Check answer");
   const [index, setIndex] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false);
@@ -161,14 +169,15 @@ export default function QuizCard({
   const [passedQuiz, setPassedQuiz] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [freeTextAnswer, setFreeTextAnswer] = useState('');
+  const { socket, ready } = useGameSocket()
+  const { data: session, status } = useSession()
 
   useEffect(() => {
-    if (index == questions.length - 1) {
-      setButtonText("End quiz")
+    if (index == questions.length) {
+      handleDone()
     }
     if (index >= questions.length) {
       const time = new Date().toISOString()
-      router.push(`/courses/${course_id}/${quiz_id}/ended?attempt_id=${quiz_attempt_id}&ended_at=${time}&passed=${passedQuiz}`);
     }
   }, [index])
 
@@ -197,7 +206,7 @@ export default function QuizCard({
       }
     }
 
-    if (buttonVisible === true) {
+    if (buttonVisible === true && socket && ready && (selectedAnswer || freeTextAnswer)) {
       addQuestionAttempt({
         attempt: quiz_attempt_id,
         question: questions[index].id,
@@ -205,6 +214,9 @@ export default function QuizCard({
         is_multiple_choice: questions[index].is_multiple,
         free_text_answer: freeTextAnswer,
         started_at: startedAt,
+        socket: socket,
+        userId: session?.user.id,
+        username: session?.user.username
       });
     }
   }, [buttonVisible])
@@ -222,7 +234,7 @@ export default function QuizCard({
               className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
               onClick={async () => {
                 if (buttonText === "Check answer") {
-                  if (questions[index].is_multiple) {
+                  if (questions[index].is_multiple && ready && socket) {
                     await addQuestionAttempt({
                       attempt: quiz_attempt_id,
                       question: questions[index].id,
@@ -230,6 +242,9 @@ export default function QuizCard({
                       is_multiple_choice: questions[index].is_multiple,
                       free_text_answer: "",
                       started_at: startedAt,
+                      socket: socket,
+                      userId: session?.user.id,
+                      username: session?.user.username,
                     });
                   }
                 } else {
@@ -238,6 +253,9 @@ export default function QuizCard({
                 }
                 setShowAnswer(!showAnswer)
                 setButtonText(prev => prev === "Check answer" ? "Next Question" : "Check answer")
+                if (index == questions.length - 1) {
+                  setButtonText("End Quiz")
+                }
               }}
             >
               {buttonText}
@@ -250,7 +268,7 @@ export default function QuizCard({
               <button
                 type="button"
                 className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
-                onClick={async () => {
+                onClick={() => {
                   setButtonVisible(true)
                   setPassed(true)
                 }}
@@ -260,7 +278,7 @@ export default function QuizCard({
               <button
                 type="button"
                 className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
-                onClick={async () => {
+                onClick={() => {
                   setButtonVisible(true)
                   setPassed(false)
                 }}

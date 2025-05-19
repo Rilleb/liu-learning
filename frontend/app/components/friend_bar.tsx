@@ -20,7 +20,6 @@ export default function FriendsBar({ gameId }: params) {
     const { data: session, status } = useSession();
     const { socket, ready } = useSocket()
     const router = useRouter()
-    console.log("gameId:", gameId)
 
     const hasFriends = useAppSelector((state) => {
         if (state.friends.online && state.friends.offline) {

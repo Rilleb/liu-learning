@@ -20,7 +20,6 @@ export default function HomePage() {
             return null
         }
         socket.send(JSON.stringify({ type: "create_game" }))
-
     }
 
     if (!ready) {

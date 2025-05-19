@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useEffect, useState } from "react"
@@ -8,17 +9,16 @@ import { useGameSocket } from "../sockets/gameSocketContext"
 
 interface params {
   gameId: string
+  isRoomOwner: boolean
 }
 
-export default function LandingPage({ gameId }: params) {
+export default function LandingPage({ gameId, isRoomOwner }: params) {
   const [quizzes, setQuizzes] = useState<QuizList>([])
   const [selectedQuiz, setSelectedQuiz] = useState<Quiz | null>(null)
   const [timeLimit, setTimeLimit] = useState<number>(30)
   const [error, setError] = useState<string | null>(null)
   const { data: session } = useSession()
   const { socket, ready } = useGameSocket()
-
-
 
   useEffect(() => {
     const fetchQuizzes = async () => {
@@ -46,7 +46,6 @@ export default function LandingPage({ gameId }: params) {
     fetchQuizzes()
   }, [session?.accessToken])
 
-
   const handleSelectQuiz = (quizId: number) => {
     const quiz = quizzes.find(q => q.id === quizId) || null
     setSelectedQuiz(quiz)
@@ -57,21 +56,27 @@ export default function LandingPage({ gameId }: params) {
 
   const handleStartQuiz = () => {
     if (!selectedQuiz) return
-    console.log("Starting quiz:", selectedQuiz, "with time limit:", timeLimit)
-    socket?.send(JSON.stringify({ type: "game_started", "quiz": selectedQuiz.id }))
+    socket?.send(JSON.stringify({ type: "game_started", "quiz": selectedQuiz.id, "timelimit": timeLimit }))
   }
 
   if (!ready) {
-    return (
-      <p>Loading...</p>
-    )
+    return <p>Loading...</p>
   }
 
+  if (!isRoomOwner) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white p-6 rounded-lg shadow text-center space-y-4">
+          <h2 className="text-xl font-semibold text-gray-800">Waiting for the room owner to start the game...</h2>
+          <p className="text-gray-600">Hang tight! You'll join the quiz as soon as it begins.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left side: Quiz content (2/3 of width) */}
         <div className="lg:col-span-2 space-y-6">
           <h1 className="text-2xl font-bold text-gray-800">Select a Quiz</h1>
 
@@ -112,7 +117,7 @@ export default function LandingPage({ gameId }: params) {
                   onChange={(e) => setTimeLimit(parseInt(e.target.value))}
                   className="border rounded px-2 py-1 text-sm"
                 >
-                  {[15, 30, 60, 120].map((t) => (
+                  {[30, 60, 120, 300].map((t) => (
                     <option key={t} value={t}>
                       {t} seconds
                     </option>

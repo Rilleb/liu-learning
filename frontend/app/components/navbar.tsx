@@ -13,7 +13,7 @@ export default function Navbar() {
         { href: '/courses', label: 'Courses' },
         { href: '/create', label: 'Create' },
         { href: '/profile', label: 'Profile' },
-        { href: '/play', label: "Play with friends" }
+        { href: '/game', label: "Play with friends" }
     ]
 
     return (
