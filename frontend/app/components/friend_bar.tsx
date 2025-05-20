@@ -79,7 +79,7 @@ export default function FriendsBar({ gameId }: params) {
 
     return (
         <div>
-            <h3>Active</h3>
+            <h3>Friends Online</h3>
             <ul>
                 {online && online.map((friend, index) => {
                     return (
@@ -114,7 +114,7 @@ export default function FriendsBar({ gameId }: params) {
                     )
                 })}
             </ul>
-            <h3>Offline</h3>
+            <h3>Friends Offline</h3>
             <ul>
 
                 {offline && offline.map((friend, index) => (

@@ -133,3 +133,55 @@ def update_user_progress(room_id, user_id, username, is_correct):
     conn.set(key, json.dumps(state))
 
     return list(state["users"].values())
+
+
+def get_room_members(room_name):
+    conn = get_redis_connection("default")
+    key = f"game_players:{room_name}"
+    raw = conn.hgetall(key)
+    return {
+        k.decode(): v.decode() for k, v in raw.items()
+    }  # Convert from bytes to str in a set
+
+
+def all_users_finished(room_name, podium_usernames):
+    members = get_room_members(room_name)
+    member_usernames = set(members.values())
+    print(member_usernames)
+    print(podium_usernames)
+    return member_usernames.issubset(set(podium_usernames))
+
+
+async def compute_podium(room_name, user):
+    conn = get_redis_connection("default")
+    podium_key = f"podium:{room_name}"
+
+    # Get existing podium
+    raw = conn.get(podium_key)
+    if raw:
+        podium = json.loads(raw)
+    else:
+        podium = []
+
+    if user not in podium:
+        podium.append(user)
+
+    conn.set(
+        podium_key, json.dumps(podium)
+    )  # We are saving all users finish, but only displaying top 3
+
+    # Check if all users are finished
+    if all_users_finished(room_name, podium):
+        print(True)
+        print(f"All users finished in room {room_name}. Final podium: {podium[:3]}")
+        # Need to fire event to alert room to go back to select quiz state
+        channel_layer = get_channel_layer()
+        await channel_layer.group_send(
+            f"game_{room_name}", {"type": "all_players_finished"}
+        )
+        # Cleanup some old game data
+        conn.delete(f"podium:{room_name}")
+        conn.delete(f"game:room:{room_name}")
+        conn.delete(f"game_players:{room_name}")
+
+    return podium[:3]

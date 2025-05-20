@@ -8,7 +8,7 @@ export default async function Game({ params, }: { params: Promise<{ gameId: stri
 	// Need to change so not everyone is room owner
 	return (
 		<GameSocketConnector gameId={gameId}>
-			<GameHandeler gameId={gameId} isRoomOwner={true} />
+			<GameHandeler gameId={gameId} />
 		</GameSocketConnector>
 	)
 }

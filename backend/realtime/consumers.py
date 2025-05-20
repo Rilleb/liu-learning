@@ -3,11 +3,10 @@ from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth import user_logged_in, user_logged_out
 from django.contrib.auth.models import AnonymousUser
 from rest_framework.authtoken.models import Token
-
-from db_handler import services
-from realtime import utils
+from django_redis import get_redis_connection
 from realtime.utils import (
     cache_quiz_questions,
+    compute_podium,
     create_new_game_id,
     get_cached_quiz_questions,
     notify_inviter_on_response,
@@ -140,13 +139,41 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                     key=token_key
                 )
                 self.user = token.user
+
+                # Store user in Redis set for the room
+                conn = get_redis_connection("default")
+                key = f"room_members:{self.room_name}"
+                conn.hset(key, self.user.id, self.user.username)
+                conn = get_redis_connection("default")
+                owner_key = f"room_owner:{self.room_name}"
+                current_owner = conn.get(owner_key)
+
+                if current_owner is None:
+                    conn.set(owner_key, self.user.id)
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {"type": "room_owner_changed", "owner_id": self.user.id},
+                    )
+
                 await self.send_json({"status": "authenticated game socket"})
+                if current_owner:
+                    await self.send_json(
+                        {
+                            "type": "room_owner_changed",
+                            "owner_id": int(current_owner),
+                        }
+                    )  # Each time someone connects (or reconnects send owner since it can change/they need to know)
+
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
                 await self.close()
         elif type == "game_started":
             questions = await get_cached_quiz_questions(content.get("quiz"))
-            # print(content)
+            conn = get_redis_connection("default")
+            members = conn.hgetall(f"room_members:{self.room_name}")
+            conn.delete(f"game_players:{self.room_name}")
+            for user_id, username in members.items():
+                conn.hset(f"game_players:{self.room_name}", user_id, username)
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
@@ -170,11 +197,46 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
                 self.room_group_name,
                 {"type": "user_progress", "users": progress},
             )
+        elif type == "user_finished":
+            username = content.get("user")
+            podium = await compute_podium(self.room_name, username)
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "podium_updated", "podium": podium}
+            )
+        elif type == "restart_game":
+            await self.channel_layer.group_send(
+                self.room_group_name, {"type": "restart_game"}
+            )
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            f"user_{self.user.id}", self.channel_name
-        )
+        if (
+            hasattr(self, "user")
+            and self.user
+            and not isinstance(self.user, AnonymousUser)
+        ):
+            conn = get_redis_connection("default")
+            key = f"game_players:{self.room_name}"
+            conn.hdel(key, self.user.id)
+            key = f"room_members:{self.room_name}"
+            conn.hdel(key, self.user.id)
+            # Check if this user was the room owner
+            owner_key = f"room_owner:{self.room_name}"
+            current_owner = conn.get(owner_key)
+            if current_owner and int(current_owner.decode()) == self.user.id:
+                # Reassign ownership
+                members = conn.hgetall(key)
+                if members:
+                    new_owner_id = next(iter(members.keys()))
+                    conn.set(owner_key, new_owner_id)
+                    await self.channel_layer.group_send(
+                        self.room_group_name,
+                        {"type": "room_owner_changed", "owner_id": int(new_owner_id)},
+                    )
+                else:
+                    # If no members remove from cache
+                    conn.delete(owner_key)
+
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def game_started(self, event):
         await self.send_json(
@@ -186,5 +248,19 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             }
         )
 
+    async def restart_game(self, event):
+        await self.send_json({"type": "restart_game"})
+
     async def user_progress(self, event):
         await self.send_json({"type": "user_progress", "users": event["users"]})
+
+    async def podium_updated(self, event):
+        await self.send_json({"type": "podium_updated", "podium": event["podium"]})
+
+    async def all_players_finished(self, event):
+        await self.send_json({"type": "all_players_finished"})
+
+    async def room_owner_changed(self, event):
+        await self.send_json(
+            {"type": "room_owner_changed", "owner_id": event["owner_id"]}
+        )
