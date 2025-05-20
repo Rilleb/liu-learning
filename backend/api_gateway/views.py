@@ -1,5 +1,5 @@
 from db_handler.models import Course
-from db_handler.services import create_course
+from db_handler.services import create_course, follow_course, unfollow_course
 from db_handler.serializers import ChapterSerializer, CourseSerializer
 from django.utils.timezone import now
 from db_handler.serializers import (
@@ -77,14 +77,69 @@ class CourseView(APIView):
             )
 
         fetch_all = request.query_params.get("all", "").lower() == "true"
+        course_id = request.query_params.get("id", "").lower()
 
         if fetch_all:
             courses = services.get_all_courses()
+            many = True
+        elif course_id:
+            courses = services.get_course_by_id(course_id)
+            many = False
         else:
             courses = services.get_courses(user=user)
+            many = True
 
-        serilizer = CourseSerializer(courses, many=True)
+        serilizer = CourseSerializer(courses, many=many)
         return Response(serilizer.data)
+
+
+class CourseName(APIView):
+    def get(self, request):
+        course_id = request.query_params.get("course_id", None)
+        name = services.get_course_name(course_id)
+        return Response(name)
+
+
+class FollowCourse(APIView):
+    def post(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_user_from_token(token=token)
+        if not user:
+            return Response(
+                {"Message": {"Token was not included or has expired"}},
+                status.HTTP_401_UNAUTHORIZED,
+            )
+
+        course_id = request.data.get("courseId")
+
+        follow_course(user, course_id)
+
+        return Response(
+            {"Message": {"Succesfully followed course"}}, status=status.HTTP_200_OK
+        )
+
+    def delete(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        user = get_user_from_token(token=token)
+        if not user:
+            return Response(
+                {"Message": {"Token was not included or has expired"}},
+                status.HTTP_401_UNAUTHORIZED,
+            )
+
+        course_id = request.data.get("courseId")
+
+        unfollow_course(user, course_id)
+
+        return Response(
+            {"Message": {"Successfully unfollowed course"}}, status=status.HTTP_200_OK
+        )
 
 
 class ChaptersView(APIView):
@@ -153,8 +208,18 @@ class QuizView(APIView):
                     {"Message": {"Token was not included or has expired"}},
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
-            quizes = services.get_quizes(user=user)
-            serilizer = QuizSerializer(quizes, many=True)
+
+            courseId = request.query_params.get("id", "")
+            if courseId:
+                quizzes = services.get_quizzes_from_course(
+                    courseId
+                )  # Fetch all quizes for specific course
+            else:
+                quizzes = services.get_quizzes(
+                    user=user
+                )  # Fetch quizes from followed courses
+
+            serilizer = QuizSerializer(quizzes, many=True)
             return Response(serilizer.data)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
@@ -245,6 +310,116 @@ class FindUser(APIView):
         else:
             return Response(
                 f"{'Missing auth header' if not auth_header else 'No args were passed in'}"
+            )
+
+
+class QuizDescription(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        description = services.get_quiz_description(quizId == quizId)
+        return Response(description)
+
+
+class QuizName(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        name = services.get_quiz_name(quizId == quizId)
+        return Response(name)
+
+
+class QuestionCount(APIView):
+    def get(self, request):
+        quizId = request.query_params.get("quiz_id", None)
+        count = services.get_question_count(quizId == quizId)
+        return Response(count)
+
+
+class Questions(APIView):
+    def get(self, request):
+        try:
+            quiz_id = request.query_params.get("quiz_id", None)
+            questions = services.get_questions_for_quiz(quiz_id)
+            return Response(questions)
+        except:
+            return Response({"error": "Could not get quiz questions"}, status=400)
+
+
+class QuizAttempt(APIView):
+    def post(self, request):
+        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
+        if auth_header and auth_header.startswith("Token "):
+            token = auth_header.split("Token ")[1]
+            user = get_user_from_token(token=token)
+
+            quiz = request.data.get("quiz_id")
+            end = request.data.get("ended_at")
+            passed = request.data.get("passed")
+            # Create user in the database
+            attempt = services.create_quiz_attempt(
+                user=user, quiz=quiz, ended_at=end, passed=passed
+            )
+            if attempt:
+                return Response(
+                    {"message": "Successfully added attempt", "attempt_id": attempt.id},
+                    status=status.HTTP_201_CREATED,
+                )
+            else:
+                return Response(
+                    "Error, could not add quiz attempt",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        else:
+            return Response(
+                "Error, could not find user", status=status.HTTP_400_BAD_REQUEST
+            )
+
+
+class QuestionAttempt(APIView):
+    def post(self, request):
+        data = json.loads(request.body)
+        attempt = data.get("attempt")
+        question = data.get("question")
+        is_correct = data.get("is_correct")
+        is_multiple = data.get("is_multiple_choice")
+        free_text = data.get("free_text_answer")
+        started = data.get("started_at")
+        ended = data.get("ended_at")
+
+        attempt = services.create_question_answer(
+            attempt=attempt,
+            question=question,
+            is_correct=is_correct,
+            multiple_choice_answer=is_multiple,
+            free_text_answer=free_text,
+            started_at=started,
+            ended_at=ended,
+        )
+        if attempt:
+            return Response(
+                "Successfully added question attempt", status=status.HTTP_201_CREATED
+            )
+        else:
+            return Response(
+                "Error, could not add question attempt",
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+
+class ChangeQuizAttempt(APIView):
+    def put(self, request):
+        data = json.loads(request.body)
+        attempt_id = data.get("attempt_id")
+        end = data.get("ended_at")
+        passed = data.get("passed")
+        attempt = services.change_quiz_attempt(
+            attempt_id=attempt_id, ended_at=end, passed=passed
+        )
+        serializer = QuizAttemptSerializer(attempt)
+        if attempt:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            return Response(
+                "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST
             )
 
 
@@ -372,98 +547,3 @@ class CredentialsLoginView(APIView):
             )
         else:
             return Response({"error": "Invalid credentials"}, status=400)
-
-
-class QuizDescription(APIView):
-    def get(self, request):
-        quizId = request.query_params.get("quiz_id", None)
-        description = services.get_quiz_description(quizId == quizId)
-        return Response(description)
-
-
-class QuizName(APIView):
-    def get(self, request):
-        quizId = request.query_params.get("quiz_id", None)
-        name = services.get_quiz_name(quizId == quizId)
-        return Response(name)
-
-
-class QuestionCount(APIView):
-    def get(self, request):
-        quizId = request.query_params.get("quiz_id", None)
-        count = services.get_question_count(quizId == quizId)
-        return Response(count)
-
-
-class CourseName(APIView):
-    def get(self, request):
-        courseId = request.query_params.get("course_id", None)
-        name = services.get_course_name(courseId)
-        return Response(name)
-
-
-class Questions(APIView):
-    def get(self, request):
-        try:
-            quiz_id = request.query_params.get("quiz_id", None)
-            questions = services.get_questions_for_quiz(quiz_id)
-            return Response(questions)
-        except:
-            return Response({"error": "Could not get quiz questions"}, status=400)
-
-
-class QuizAttempt(APIView):
-    def post(self, request):
-        auth_header = request.META.get("HTTP_AUTHORIZATION", "")
-        if auth_header and auth_header.startswith("Token "):
-            token = auth_header.split("Token ")[1]
-            user = get_user_from_token(token=token)
-
-            quiz = request.data.get("quiz_id")
-            end = request.data.get("ended_at")
-            passed = request.data.get("passed")
-            # Create user in the database
-            attempt = services.create_quiz_attempt(user=user, quiz=quiz, ended_at=end, passed=passed)
-            if attempt:
-                return Response({
-                    "message": "Successfully added attempt",
-                    "attempt_id": attempt.id
-                }, status=status.HTTP_201_CREATED)
-            else:
-                return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response( "Error, could not find user", status=status.HTTP_400_BAD_REQUEST)
-        
-
-class QuestionAttempt(APIView):
-    def post(self, request):
-        data = json.loads(request.body)
-        attempt = data.get("attempt")
-        question = data.get("question")
-        is_correct = data.get("is_correct")
-        is_multiple = data.get("is_multiple_choice")
-        free_text = data.get("free_text_answer")
-        started = data.get("started_at")
-        ended = data.get("ended_at")
-
-        attempt = services.create_question_answer(attempt=attempt, question=question, is_correct=is_correct, 
-                                                  multiple_choice_answer=is_multiple, free_text_answer=free_text, 
-                                                  started_at=started, ended_at=ended)
-        if attempt:
-            return Response("Successfully added question attempt", status=status.HTTP_201_CREATED)
-        else:
-            return Response( "Error, could not add question attempt", status=status.HTTP_400_BAD_REQUEST)
-    
-        
-class ChangeQuizAttempt(APIView):
-    def put(self, request):
-        data = json.loads(request.body)
-        attempt_id = data.get("attempt_id")
-        end = data.get("ended_at")
-        passed = data.get("passed")
-        attempt = services.change_quiz_attempt(attempt_id=attempt_id, ended_at=end, passed=passed)
-        serializer = QuizAttemptSerializer(attempt)
-        if attempt:
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        else:
-            return Response( "Error, could not add quiz attempt", status=status.HTTP_400_BAD_REQUEST)
