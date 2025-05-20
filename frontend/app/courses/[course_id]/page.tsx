@@ -3,9 +3,11 @@ import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
 import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
-import { UserList, QuizList } from "../../data_types/data_types"
+import { UserList, QuizList, Course } from "../../data_types/data_types"
+import FollowButton from '@/app/components/followButton'
 
-const QuizComponent = async ({ id }: { id: number }) => {
+
+const QuizComponent = async ({ courseId }: { courseId: number }) => {
     const session = await getServerSession(options)
     if (!session) {
         return (
@@ -17,7 +19,7 @@ const QuizComponent = async ({ id }: { id: number }) => {
     let quizzes: QuizList = [];
     try {
 
-        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz`, {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?course_id=${courseId}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -54,7 +56,7 @@ const QuizComponent = async ({ id }: { id: number }) => {
                                 key={quiz.id}
                                 className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
                             >
-                                <Link href={`/courses/${id}/${quiz.id}`}>
+                                <Link href={`/courses/${courseId}/${quiz.id}`}>
                                     <p>Quiz: {quiz.name} </p>
                                 </Link>
                             </li>
@@ -66,33 +68,58 @@ const QuizComponent = async ({ id }: { id: number }) => {
 }
 
 
-async function getCourseName(id: number) {
-    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/name?course_id=${id}`, {
+async function getCourse(id: number) {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/?id=${id}`, {
         method: 'GET',
     });
 
     if (!res.ok) {
         return "Error loading course name";
     }
-    const course_name: string = await res.json();
-    return course_name;
+    const course: Course = await res.json();
+    return course;
 }
 
 
-export default function Home({ params }: { params: { course_id: number } }) {
-    const courseId = Number(params.course_id)
+export default async function Home({ params }: { params: { course_id: number } }) {
+    const courseId = await Number(params.course_id)
 
-    const courseName = getCourseName(courseId)
+    const session = await getServerSession(options)
+
+    if (!session) {
+        return (
+            <div>
+                <p>Error fetching auth token</p>
+            </div>
+        )
+    }
+
+
+    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/?id=${courseId}`, {
+        headers: {
+            'Authorization': `Token ${session.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+    });
+
+    if (!res.ok) {
+        return "Error loading course";
+    }
+
+    const course: Course = await res.json();
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="tile-marker col-span-2  overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
             <div className='col-span-2'>
-                <h1> {courseName} </h1>
+                <h1> {course.name} : {course.code} </h1>
+                <FollowButton courseId={courseId} accessToken={session.accessToken} />
             </div>
+            <p className="text-gray-600 text-sm">{course.description}</p>
             {/*Quizzes*/}
             <div className="h-screen tile-marker col-span-2 border-2 overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
                 <h1>Quizzes</h1>
-                <QuizComponent id={courseId} />
+                <QuizComponent courseId={courseId} />
             </div>
             {/*Friends*/}
             <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">

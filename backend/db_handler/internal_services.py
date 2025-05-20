@@ -7,11 +7,15 @@ def create_user(username, email, password):
     return user
 
 
-def create_course(name, code, created_by, date_created=None):
+def create_course(name, code, description, created_by, date_created=None):
     if date_created is None:
         date_created = datetime.date.today()
     course = Course.objects.create(
-        name=name, code=code, created_by=created_by, date_created=date_created
+        name=name,
+        code=code,
+        description=description,
+        created_by=created_by,
+        date_created=date_created,
     )
     return course
 
@@ -44,18 +48,16 @@ def create_question(
     description,
     index,
     is_multiple=False,
-    free_text_answer="",
+    correct_answer="",
     alt_1="",
     alt_2="",
     alt_3="",
-    correct_answer="",
 ):
     question = Question.objects.create(
         quiz=quiz,
         description=description,
         index=index,
         is_multiple=is_multiple,
-        free_text_answer=free_text_answer,
         alt_1=alt_1,
         alt_2=alt_2,
         alt_3=alt_3,
@@ -69,9 +71,18 @@ def add_friend(user1, user2):
     return friends
 
 
-def mark_course_as_read(user, course):
-    read_course = ReadCourse.objects.create(user=user, course=course)
-    return read_course
+def unfollow_course(user, course):
+    followed_course = ReadCourse.objects.filter(user=user, course=course).first()
+    if followed_course:
+        followed_course.delete()
+    return None
+
+
+def follow_course(user, course):
+    followed_course = ReadCourse.objects.filter(user=user, course=course).first()
+    if not followed_course:
+        followed_course = ReadCourse.objects.create(user=user, course=course)
+    return followed_course
 
 
 def create_quiz_attempt(user, quiz, ended_at=None, passed=False):

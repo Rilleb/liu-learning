@@ -4,13 +4,15 @@ import random
 from db_handler.services import (
     create_user,
     create_course,
+    follow_course,
+    create_quiz_attempt,
+    # create_quiz_answer,
+    add_friend,
+)
+from db_handler.internal_services import (
     create_chapter,
     create_quiz,
     create_question,
-    mark_course_as_read,
-    create_quiz_attempt,
-    create_quiz_answer,
-    add_friend,
 )
 
 password = "1234"
@@ -24,8 +26,11 @@ questions_by_quiz = {}
 # Create courses, chapters, quizzes, and questions
 for i in range(num_courses):
     owner = random.choice(users)
-    course = create_course(f"Course {i}", f"CODE{i}", owner)
+
+    course = create_course(f"Course {i}", f"CODE{i}", f"Description{i}", owner, [])
     courses.append(course)
+
+    print(course)
 
     chapter = create_chapter(f"Chapter {i}", course, owner)
     chapters.append(chapter)
@@ -33,8 +38,8 @@ for i in range(num_courses):
     for j in range(random.randint(1, 3)):
         quiz = create_quiz(
             f"Quiz {i}-{j}",
-            course,
-            chapter,
+            courses[i],
+            chapters[i],
             owner,
             f"Description for Quiz {i}-{j}",
             date_created=date.today(),
@@ -56,7 +61,7 @@ for i in range(num_courses):
 # Mark all users as having read all courses
 for user in users:
     for course in courses:
-        mark_course_as_read(user, course)
+        follow_course(user, course.id)
 
 # Add all users as friends with each other
 for i, user in enumerate(users):
@@ -81,7 +86,7 @@ for i in range(50):
     quiz = random.choice(quizzes)
     passed = random.choice([True, False])
 
-    attempt = create_quiz_attempt(user, quiz, started_at, ended_at, passed)
+    # attempt = create_quiz_attempt(user, quiz, started_at, ended_at, passed)
 
-    for question in questions_by_quiz[quiz]:
-        create_quiz_answer(attempt, question, is_correct=passed)
+    # for question in questions_by_quiz[quiz]:
+    #   create_quiz_answer(attempt, question, is_correct=passed)

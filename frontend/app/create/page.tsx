@@ -1,57 +1,31 @@
-"use client";
-
 import { useState } from 'react';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { Button, Flex } from '@radix-ui/themes'
 import { ChevronDownIcon } from '@radix-ui/react-icons'; 
 import CreateCourseForm from '../components/forms/create_course';
 import CreateQuizForm from '../components/forms/create_quiz';
+import { getServerSession } from "next-auth";
+import { options } from "@/app/api/auth/[...nextauth]/options";
+import CreatePageClient from "@/app/components/create_page_client";
 
-export default function Page() {
-    const [formType, setFormType] = useState('course');
+export default async function CreatePage() {
+    const session = await getServerSession(options);
+  
+    if (!session) {
+        return <p>Not logged in</p>;
+    }
 
-    return (
-        <div >
-            <div className="ml-auto mr-[40%] w-fit">
-                <Flex gap="3" className="mb-6">
-                    <DropdownMenu.Root>
-                        <DropdownMenu.Trigger asChild>
-                        <Button variant="soft" color="indigo" size="4" className="flex items-center gap-2">
-                            Options
-                            <ChevronDownIcon />
-                        </Button>
-                        </DropdownMenu.Trigger>
-            
-                        <DropdownMenu.Content
-                        sideOffset={5}
-                        className="bg-white/90 backdrop-blur-md shadow-md rounded-md p-2"
-                        >
-                        <DropdownMenu.Item
-                            onSelect={() => setFormType('course')}
-                            className="flex justify-between items-center px-2 py-1.5 rounded cursor-pointer hover:bg-indigo-100"
-                        >
-                            Course
-                        </DropdownMenu.Item>
-                        <DropdownMenu.Item
-                            onSelect={() => setFormType('quiz')}
-                            className="flex justify-between items-center px-2 py-1.5 rounded cursor-pointer hover:bg-indigo-100"
-                        >
-                            Quiz
-                        </DropdownMenu.Item>
-                        </DropdownMenu.Content>
-                    </DropdownMenu.Root>
-                </Flex>
-            </div>
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/courses/?all=true`, {
+        headers: {
+            'Authorization': `Token ${session.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+    });
 
-            <div className="overflow-auto flex flex-col items-center p-6">
+    const courses = await res.json();
+    console.log(courses)
 
-        
-                {/* Forms */}
-                <div className="overflow-auto w-full max-w-2xl px-4">
-                <h1 className="text-xl font-semibold mb-4">Create new {formType}</h1>
-                {formType === 'course' ? <CreateCourseForm /> : <CreateQuizForm />}
-                </div>
-            </div>
-        </div>
-    );
+    return <CreatePageClient courses={courses} />;
 }
+
