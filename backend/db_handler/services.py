@@ -463,7 +463,6 @@ def get_course_name(course_id):
 
 def get_questions_for_quiz(quiz_id):
     try:
-        print("id ", quiz_id)
         questions = models.Question.objects.filter(quiz=quiz_id)
 
         questions_data = []
