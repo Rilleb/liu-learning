@@ -57,7 +57,7 @@ function SearchBar() {
 
 export default function Header() {
     return (
-        <div className="w-full bg-[var(--foreground)] h-16 flex items-center justify-between px-6">
+        <div className="!no-scroll w-full bg-[var(--foreground)] h-16 flex items-center justify-between px-6">
             {/* Left section (can be empty or logo) */}
             <div className="w-1/3"></div>
 

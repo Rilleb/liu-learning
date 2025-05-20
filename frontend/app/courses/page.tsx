@@ -29,16 +29,16 @@ export default async function Home() {
     allCourses = await allCoursesRes.json()
 
     return (
-        <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
+        <div className="container h-screen m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 !overflow-auto">
             {/* Courses */}
-            <div className="h-screen tile-marker col-span-2 border-2 overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+            <div className="h-screen tile-marker col-span-2 border-2 !overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
                 <CourseComponent
                     allCourses={allCourses}
                     accessToken={token}
                 />
             </div>
             {/* Friends */}
-            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
+            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 !overflow-auto">
                 <FriendsBar />
             </div>
         </div>

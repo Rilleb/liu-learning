@@ -1,9 +1,3 @@
-import { useState } from 'react';
-import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Button, Flex } from '@radix-ui/themes'
-import { ChevronDownIcon } from '@radix-ui/react-icons'; 
-import CreateCourseForm from '../components/forms/create_course';
-import CreateQuizForm from '../components/forms/create_quiz';
 import { getServerSession } from "next-auth";
 import { options } from "@/app/api/auth/[...nextauth]/options";
 import CreatePageClient from "@/app/components/create_page_client";
