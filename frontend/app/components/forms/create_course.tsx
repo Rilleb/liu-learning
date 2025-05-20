@@ -39,7 +39,7 @@ export default function CreateCourseForm() {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <Form onSubmit={handleSubmit} className="space-y-4 max-w-md">
             <div>
                 <label className="block text-sm font-medium">Course Title</label>
                 <input
@@ -72,10 +72,10 @@ export default function CreateCourseForm() {
                 />
             </div>
 
-            <div>
+            <div className='space-y-2 border-2 border-[var(--color3)] rounded-md p-3'>
                 <label className="block text-sm font-medium">Chapters</label>
                 {chapters.map((chapter, index) => (
-                    <div key={index} className="flex items-center gap-2">
+                    <div key={index} className="flex items-center gap-3">
                         <input
                             name={`chapters[${index}]`}
                             type="text"
@@ -87,29 +87,33 @@ export default function CreateCourseForm() {
                         <button
                             type="button"
                             onClick={() => handleRemoveChapter(index)}
-                            className="text-red-500 text-sm"
+                            className="text-[var(--color_red)] text-sm py-2"
                         >
                             ✕
                         </button>
                     </div>
                 ))}
-                <button
-                    type="button"
-                    onClick={handleAddChapter}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    + Add Chapter
-                </button>
+                <div className="flex justify-end">
+                    <button
+                        type="button"
+                        onClick={handleAddChapter}
+                        className="bg-[var(--color2)] text-white px-2 py-1.5 rounded hover:bg-[var(--color3)]"
+                    >
+                        + Add Chapter
+                    </button>
+                </div>
             </div>
 
-            <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-                Create Course
-            </button>
-            {status && <p>{status}</p>}
-        </form>
+            <div className="flex justify-end">
+                <button
+                    type="submit"
+                    className="bg-[var(--color_green)] text-white px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
+                >
+                    Create Course
+                </button>
+                {status && <p>{status}</p>}
+            </div>   
+        </Form>
     );
 }
 

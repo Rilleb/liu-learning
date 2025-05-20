@@ -11,7 +11,7 @@ const QuizComponent = async ({ quizzes }: { quizzes: QuizList }) => {
     return (
         <div>
             {/*Think it would be cool to make so if you hover on a quiz, the card flip and gives a description*/}
-            <h1>Upcoming Quizes</h1>
+            <h1>Upcoming Quizzes</h1>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {quizzes &&
                     quizzes.map((quiz) => {
@@ -108,17 +108,17 @@ export default async function Home() {
 
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-        <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
-            {/*Quizes*/}
-            <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
+        <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-hidden">
+            {/*Quizzes*/}
+            <div className="tile-marker col-span-2 border-2 row-span-2 rounded-sm border-[var(--color3)] p-4 overflow-hidden">
                 <QuizComponent quizzes={quizzes} />
             </div>
             {/*Friends*/}
-            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
+            <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm border-[var(--color3)] p-4 overflow-hidden">
                 <FriendsBar />
             </div>
             {/*Courses*/}
-            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+            <div className=" tile-marker col-span-2 border-2 overflow-auto md-col-span-2 row-span-2 rounded-sm border-[var(--color3)] p-4">
                 <CourseComponent courses={courses} />
             </div>
         </div>

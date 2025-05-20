@@ -22,7 +22,6 @@ async function QuizComponent({quiz_id, course_id}: {quiz_id: number, course_id: 
 
     const name: string = await resName.json();
 
-    console.log(quiz_id)
     const resQuestionIds = await fetch(`${process.env.BACKEND_URL}/api/quiz/questions?quiz_id=${quiz_id}`, {
         method: 'GET',
         headers: {
@@ -57,8 +56,6 @@ async function QuizComponent({quiz_id, course_id}: {quiz_id: number, course_id: 
         </div>); 
     }
     const attempt = await attemptRes.json();
-    
-    console.log(attempt, "ATTTEMMMPTTT")
 
     return (
         <QuizCard questions={question_data} name={name} quiz_id={quiz_id} course_id={course_id} quiz_attempt_id={attempt.attempt_id}/>

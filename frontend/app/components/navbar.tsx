@@ -21,15 +21,13 @@ export default function Navbar() {
         >
             {/* Toggle Button */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
-                className="absolute top-4 mx-2 w-6 h-6 flex items-center justify-center z-50"
-                aria-label="Toggle Sidebar"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Toggle Sidebar"
+            className="absolute top-4 left-4 z-50 w-8 h-8 flex flex-col items-center justify-center space-y-[3px]"
             >
-                <div className="w-6 flex flex-col gap-1">
-                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
-                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
-                    <span className="h-0.5 w-full bg-[var(--foreground)]"></span>
-                </div>{' '}
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
             </button>
 
             {/* Nav Links */}

@@ -14,8 +14,8 @@ export default function QuizDescription({
 }) {
   return (
     <div className="font-medium">
-      <h1>Quiz: {quiz.name}</h1>
-      <h2>Description: {quiz.description} </h2>
+      <h1>{quiz.name}</h1>
+      <h2>{quiz.description} </h2>
       <h2>Number of cards: {quiz_length} </h2>
       <Link href={`/courses/${course_id}/${quiz.id}/started`}>
         <button

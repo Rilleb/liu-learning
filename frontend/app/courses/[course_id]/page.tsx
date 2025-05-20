@@ -110,8 +110,8 @@ export default async function Home({ params }: { params: { course_id: number } }
     const course: Course = await res.json();
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-        <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
-            <div className='col-span-2 flex items-center gap-4'>
+        <div className="tile-marker col-span-2  overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+            <div className='col-span-2'>
                 <h1> {course.name} : {course.code} </h1>
                 <FollowButton courseId={courseId} accessToken={session.accessToken} />
             </div>
