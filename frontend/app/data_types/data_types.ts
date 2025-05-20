@@ -2,6 +2,7 @@ export interface Course {
     id: number
     name: string
     code: string
+    description: string
     created_by: User
     date_created: string // ISO date string, e.g., 2025-05-05T10:00:00Z
 }
@@ -26,7 +27,7 @@ export interface User {
 
 export interface Quiz {
     id: number
-    course_id: number
+    course: Course
     name: string
     chapter_id: number
     created_by: number

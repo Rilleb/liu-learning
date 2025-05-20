@@ -220,7 +220,7 @@ def get_quizzes(user):
         return None
 
 
-def get_quizzes_from_course(course_id):
+def get_quizzes_by_course(course_id):
     try:
         course = models.Course.objects.filter(id=course_id).first()
         quizzes = models.Quiz.objects.filter(course=course)
@@ -228,6 +228,15 @@ def get_quizzes_from_course(course_id):
         return quizzes
     except Exception as e:
         print(f"Error creating quiz answer: {e}")
+        return None
+
+
+def get_quiz_by_id(quiz_id):
+    try:
+        quiz = models.Quiz.objects.get(id=quiz_id)
+        return quiz
+    except Exception as e:
+        print(f"Error fetching course by id: {e}")
         return None
 
 

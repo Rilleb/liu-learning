@@ -209,17 +209,23 @@ class QuizView(APIView):
                     status=status.HTTP_401_UNAUTHORIZED,
                 )
 
-            courseId = request.query_params.get("id", "")
-            if courseId:
-                quizzes = services.get_quizzes_from_course(
-                    courseId
-                )  # Fetch all quizes for specific course
+            course_id = request.query_params.get("course_id", "")
+            quiz_id = request.query_params.get("quiz_id", "")
+            if course_id:
+                quizzes = services.get_quizzes_by_course(
+                    course_id
+                )  # All quizzes in course
+                many = True
+            elif quiz_id:
+                quizzes = services.get_quiz_by_id(quiz_id)  # Single quiz by id
+                many = False
             else:
                 quizzes = services.get_quizzes(
                     user=user
-                )  # Fetch quizes from followed courses
+                )  # All quizzes from followed courses
+                many = True
 
-            serilizer = QuizSerializer(quizzes, many=True)
+            serilizer = QuizSerializer(quizzes, many=many)
             return Response(serilizer.data)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)

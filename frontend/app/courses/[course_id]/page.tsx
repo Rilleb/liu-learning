@@ -3,7 +3,7 @@ import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
 import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
-import { UserList, QuizList } from "../../data_types/data_types"
+import { UserList, QuizList, Course } from "../../data_types/data_types"
 import FollowButton from '@/app/components/followButton'
 
 
@@ -19,7 +19,7 @@ const QuizComponent = async ({ courseId }: { courseId: number }) => {
     let quizzes: QuizList = [];
     try {
 
-        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?id=${courseId}`, {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?course_id=${courseId}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -68,22 +68,21 @@ const QuizComponent = async ({ courseId }: { courseId: number }) => {
 }
 
 
-async function getCourseName(id: number) {
-    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/name?course_id=${id}`, {
+async function getCourse(id: number) {
+    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/?id=${id}`, {
         method: 'GET',
     });
 
     if (!res.ok) {
         return "Error loading course name";
     }
-    const course_name: string = await res.json();
-    return course_name;
+    const course: Course = await res.json();
+    return course;
 }
 
-// Follow/Unfollow Button Component
 
 export default async function Home({ params }: { params: { course_id: number } }) {
-    const courseId = Number(params.course_id)
+    const courseId = await Number(params.course_id)
 
     const session = await getServerSession(options)
 
@@ -96,14 +95,27 @@ export default async function Home({ params }: { params: { course_id: number } }
     }
 
 
-    const courseName = await getCourseName(courseId)
+    const res = await fetch(`${process.env.BACKEND_URL}/api/courses/?id=${courseId}`, {
+        headers: {
+            'Authorization': `Token ${session.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        cache: 'no-store',
+    });
+
+    if (!res.ok) {
+        return "Error loading course";
+    }
+
+    const course: Course = await res.json();
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             <div className='col-span-2 flex items-center gap-4'>
-                <h1> {courseName} </h1>
+                <h1> {course.name} : {course.code} </h1>
                 <FollowButton courseId={courseId} accessToken={session.accessToken} />
             </div>
+            <p className="text-gray-600 text-sm">{course.description}</p>
             {/*Quizzes*/}
             <div className="h-screen tile-marker col-span-2 border-2 overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
                 <h1>Quizzes</h1>
