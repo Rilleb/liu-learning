@@ -72,7 +72,7 @@ const QuizQuestions = () => {
         <div className="space-y-6 mt-4">
             <label className="block text-sm font-medium">Questions</label>
             {questions.map((question, index) => (
-                <div key={index} className="border p-4 rounded space-y-2">
+                <div key={index} className="border-2 border-[var(--color3)] p-4 rounded space-y-2">
                     <div className="flex items-center gap-2">
                         <input
                             name={`question[${index}].text`}
@@ -123,13 +123,15 @@ const QuizQuestions = () => {
                     )}
                 </div>
             ))}
-            <button
-                type="button"
-                onClick={handleAddQuestion}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            >
-                + Add Question
-            </button>
+            <div className='flex justify-end'> 
+                <button
+                    type="button"
+                    onClick={handleAddQuestion}
+                    className="bg-[var(--color2)] text-white px-4 py-2 rounded hover:bg-[var(--color3)]"
+                >
+                    + Add Question
+                </button>
+            </div>
         </div>
     )
 }
@@ -160,12 +162,14 @@ export default function CreateQuestionsForm() {
                 </select>
                 <QuizQuestions />
             </div>
-            <button
-                type="submit"
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-            >
-                Create Quiz
-            </button>
+            <div className="flex justify-end">
+                <button
+                    type="submit"
+                    className="bg-[var(--color_green)] text-white px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
+                >
+                    Create Quiz
+                </button>
+            </div>   
         </Form>
     );
 }

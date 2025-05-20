@@ -39,8 +39,10 @@ export default function RootLayout({
                 <Provider store={storeRef.current} >
                     <SessionProviderWrapper>
                         <WebSocketConnector />
-                        <Header />
-                        <div className="flex h-screen w-full overflow-hidden">
+                        <div className="shrink-0">
+                            <Header/>
+                        </div>
+                        <div className="flex flex-1 overflow-visible">
                             <Navbar />
                             <main className="flex-1 overflow-auto p-6">{children}</main>
                         </div>

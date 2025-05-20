@@ -85,8 +85,8 @@ export default function Home({ params }: { params: { course_id: number } }) {
     const courseName = getCourseName(courseId)
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-        <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
-            <div className='col-span-2 '>
+        <div className="tile-marker col-span-2  overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+            <div className='col-span-2'>
                 <h1> {courseName} </h1>
             </div>
             {/*Quizzes*/}

@@ -58,21 +58,28 @@ export default function FriendsBar() {
                 {online && online.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
-                            <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
                             {friend.username}
-                            <span className="h-2 w-2 rounded-full bg-green-500 inline-block m-1" />
+                            <span className="h-2 w-2 rounded-full bg-[var(--color_green)] inline-block m-1" />
                         </div>
                     )
                 })}
             </ul>
+            <span className="flex items-center">
+                <span className="h-0.25 flex-1 bg-[var(--color3)] rounded-full"></span>
+            </span>
             <h3>Offline</h3>
             <ul>
                 {offline && offline.map((friend, index) => {
                     return (
                         <div key={index} className="flex items-center">
-                            <Image src={"/globe.svg"} alt="Profile-Pic" width={15} height={15} className="m-1" />
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
                             {friend.username}
-                            <span className="h-2 w-2 rounded-full bg-red-500 inline-block m-1" />
+                            <span className="h-2 w-2 rounded-full bg-[var(--color_red)] inline-block m-1" />
                         </div>
                     )
                 })}

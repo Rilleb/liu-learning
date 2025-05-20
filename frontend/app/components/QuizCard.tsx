@@ -211,7 +211,7 @@ export default function QuizCard({
     
     return (
         <div>
-            <h1>{name}</h1>
+            <h1 className= "!text-[var(--color3)] !font-normal !text-2xl">{name}</h1>
             {index < questions.length && (
                 <>
                     <CheckMultiple questions={questions} index={index} onAnswerChange={setFreeTextAnswer} onSelect={setSelectedAnswer} />
