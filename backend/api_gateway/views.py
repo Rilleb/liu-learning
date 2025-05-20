@@ -77,13 +77,19 @@ class CourseView(APIView):
             )
 
         fetch_all = request.query_params.get("all", "").lower() == "true"
+        course_id = request.query_params.get("id", "").lower()
 
         if fetch_all:
             courses = services.get_all_courses()
+            many = True
+        elif course_id:
+            courses = services.get_course_by_id(course_id)
+            many = False
         else:
             courses = services.get_courses(user=user)
+            many = True
 
-        serilizer = CourseSerializer(courses, many=True)
+        serilizer = CourseSerializer(courses, many=many)
         return Response(serilizer.data)
 
 
@@ -94,7 +100,7 @@ class CourseName(APIView):
         return Response(name)
 
 
-class ToggleFollowCourse(APIView):
+class FollowCourse(APIView):
     def post(self, request):
         token = get_auth_token(request)
         if not token:

@@ -187,16 +187,25 @@ def get_courses(user):
         print("Courses", courses)
         return courses
     except Exception as e:
-        print(f"Error creating quiz answer: {e}")
+        print(f"Error fetching followed courses: {e}")
         return None
 
 
 def get_all_courses():
     try:
-        courses = models.Course.objects
+        courses = models.Course.objects.all()
         return courses
     except Exception as e:
-        print(f"Error creating quiz answer: {e}")
+        print(f"Error fetching all courses: {e}")
+        return None
+
+
+def get_course_by_id(course_id):
+    try:
+        course = models.Course.objects.get(id=course_id)
+        return course
+    except Exception as e:
+        print(f"Error fetching course by id: {e}")
         return None
 
 
