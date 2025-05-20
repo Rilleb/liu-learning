@@ -1,31 +1,28 @@
-'use client'; 
+'use client';
 
 import Link from 'next/link'
+import { Quiz } from '../data_types/data_types';
 
 export default function QuizDescription({
-  quiz_id,
-  name,
-  description,
-  questions, 
+  quiz,
+  quiz_length,
   course_id
 }: {
-  quiz_id: number;
-  name: string;
-  description: string;
-  questions: number;
+  quiz: Quiz;
+  quiz_length: number
   course_id: number;
 }) {
   return (
     <div className="font-medium">
-      <h1>Quiz: {name}</h1>
-      <h2>Description: {description} </h2>
-      <h2>Number of cards: {questions} </h2>
-      <Link href={`/courses/${course_id}/${quiz_id}/started`}>
+      <h1>Quiz: {quiz.name}</h1>
+      <h2>Description: {quiz.description} </h2>
+      <h2>Number of cards: {quiz_length} </h2>
+      <Link href={`/courses/${course_id}/${quiz.id}/started`}>
         <button
-            type="button"
-            className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
+          type="button"
+          className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
         >
-            Start
+          Start
         </button>
       </Link>
     </div>

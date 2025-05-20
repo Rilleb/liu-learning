@@ -19,7 +19,7 @@ const QuizComponent = async ({ courseId }: { courseId: number }) => {
     let quizzes: QuizList = [];
     try {
 
-        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?id=${courseId}`, {
+        const res = await fetch(`${process.env.BACKEND_URL}/api/quiz/?course_id=${courseId}`, {
             method: 'GET',
             headers: {
                 'Content-type': 'application/json',
@@ -80,10 +80,9 @@ async function getCourseName(id: number) {
     return course_name;
 }
 
-// Follow/Unfollow Button Component
 
 export default async function Home({ params }: { params: { course_id: number } }) {
-    const courseId = Number(params.course_id)
+    const courseId = await Number(params.course_id)
 
     const session = await getServerSession(options)
 
