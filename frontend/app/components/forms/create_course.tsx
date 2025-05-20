@@ -39,7 +39,7 @@ export default function CreateCourseForm() {
     }
 
     return (
-        <Form onSubmit={handleSubmit} className="space-y-4 max-w-md">
+        <form onSubmit={handleSubmit} className="space-y-4 max-w-md">
             <div>
                 <label className="block text-sm font-medium">Course Title</label>
                 <input
@@ -113,7 +113,7 @@ export default function CreateCourseForm() {
                 </button>
                 {status && <p>{status}</p>}
             </div>   
-        </Form>
+        </form>
     );
 }
 

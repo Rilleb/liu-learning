@@ -110,19 +110,19 @@ export default async function Home({ params }: { params: { course_id: number } }
     const course: Course = await res.json();
     return (
         /*I'm not sure if we're going to use grid-but this seems to be quite a good site for it: https://refine.dev/blog/tailwind-grid/#reorder-regions*/
-        <div className="tile-marker col-span-2  overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+        <div className="tile-marker col-span-2  !overflow-auto md-col-span-2 rounded-sm border-[var(--color3)] p-4">
             <div className='col-span-2'>
                 <h1> {course.name} : {course.code} </h1>
                 <FollowButton courseId={courseId} accessToken={session.accessToken} />
             </div>
             <p className="text-gray-600 text-sm">{course.description}</p>
             {/*Quizzes*/}
-            <div className="h-screen tile-marker col-span-2 border-2 overflow-auto md-col-span-2 rounded-sm shadow-lg border-[var(--color3)] p-4">
+            <div className="h-screen tile-marker col-span-2 border-2 !overflow-auto md-col-span-2 rounded-sm border-[var(--color3)] p-4">
                 <h1>Quizzes</h1>
                 <QuizComponent courseId={courseId} />
             </div>
             {/*Friends*/}
-            <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm shadow-lg border-[var(--color3)] p-4 overflow-auto">
+            <div className="tile-marker co-span-1 col-start-3 border-2 row-span-4 rounded-sm border-[var(--color3)] p-4 !overflow-auto">
                 <FriendsBar />
             </div>
         </div>

@@ -223,7 +223,7 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
     };
 
     return (
-        <Form className="space-y-4 max-w-md" onSubmit={(e) => handleSubmit(e)}>
+        <form className="space-y-4 max-w-md" onSubmit={(e) => handleSubmit(e)}>
             <div>
                 <label className="block text-sm font-medium">Quiz Title</label>
                 <input
@@ -309,7 +309,7 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
                 </button>
                 {status && <p>{status}</p>}
             </div>   
-        </Form>
+        </form>
     );
 }
 
