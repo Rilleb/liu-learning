@@ -178,6 +178,13 @@ def create_question_answer(
         return None
 
 
+def create_friend_invite(from_friend, to):
+    try:
+        internal_services.create_friend_invite(from_friend=from_friend, to=to)
+    except Exception as e:
+        print(f"Error creating friend invite: {e}")
+
+
 User = get_user_model()
 
 
@@ -435,6 +442,13 @@ def get_combined_quiz_statistics(user, friend):
     }
 
 
+def are_friends(user1, user2):
+    friendship = models.Friendship.objects.filter(
+        Q(user1=user1, user2=user2) | Q(user2=user1, user1=user2)
+    ).first()
+    return friendship
+
+
 def find_friend(user, query):
     try:
         friendships = models.Friendship.objects.filter(Q(user1=user) | Q(user2=user))
@@ -515,3 +529,24 @@ def is_friend_with(user, friend_id):
     except Exception as e:
         print(f"Could not check friendship: {e}")
         return False
+
+
+def get_user_from_username(username):
+    try:
+        return models.User.objects.get(username=username)
+    except User.DoesNotExist:
+        return None
+
+
+def get_friend_invites(user):
+    invites = models.FriendInvites.objects.filter(to=user).select_related(
+        "from_friend", "to"
+    )
+    return [
+        {
+            "from": invite.from_friend.id,
+            "from_username": invite.from_friend.username,
+            "to": invite.to.id,
+        }
+        for invite in invites
+    ]

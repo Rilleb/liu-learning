@@ -74,6 +74,39 @@ async def notify_inviter_on_response(invite_from, user, accepted, game_id=None):
     )
 
 
+async def notify_friend_on_friend_invite(
+    invite_from_id, invite_from_username, invite_to
+):
+    channel_layer = get_channel_layer()
+    await channel_layer.group_send(
+        f"user_{invite_to}",
+        {
+            "type": "friend_invite_received",
+            "from": invite_from_id,
+            "username": invite_from_username,
+        },
+    )
+
+
+async def add_friend_invite(from_friend, to):
+    to_friend = await sync_to_async(services.get_user_from_username)(to)
+    # if to_friend and (not services.are_friends(from_friend, to_friend)):
+    if to_friend and (
+        not await sync_to_async(services.are_friends)(from_friend, to_friend)
+    ):
+        # You shouldn't be able to make an invite to people you are friends with
+        await sync_to_async(services.create_friend_invite)(
+            from_friend=from_friend, to=to_friend
+        )
+        online_ids = get_online_users()
+        if to_friend.id in online_ids:
+            await notify_friend_on_friend_invite(
+                invite_from_id=from_friend.id,
+                invite_from_username=from_friend.username,
+                invite_to=to_friend.id,
+            )
+
+
 def create_new_game_id():
     conn = get_redis_connection("default")
     max_attempts = 10

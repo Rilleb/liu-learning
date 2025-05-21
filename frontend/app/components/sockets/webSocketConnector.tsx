@@ -56,7 +56,6 @@ export default function WebSocketConnector({ children }: { children: React.React
             },
           })
         } else if (data.type == "game_invite_answered") {
-          console.log(data)
           if (data.accepted) {
             toast(`${data.username} accepted you game invite`)
           } else {
@@ -64,6 +63,16 @@ export default function WebSocketConnector({ children }: { children: React.React
           }
         } else if (data.type == "unique_room_id_created") {
           router.push(`/game/${data.game_id}`)
+        }
+        else if (data.type == "load_friend_invites") {
+          //Get data from data.invites and set them in memory {
+          // "from": 6,
+          // "from_username": "test",
+          // "to": 2
+          // }
+        } else if (data.type === "friend_invite_received") {
+          //Show toaster (see above)
+          //Update the stores invites in memory
         }
       };
 

@@ -122,3 +122,10 @@ def create_question_answer(
         attempt_ended_at=ended_at,
     )
     return answer
+
+
+def create_friend_invite(from_friend, to):
+    if from_friend and to:
+        FriendInvites.objects.create(from_friend=from_friend, to=to)
+    else:
+        return None

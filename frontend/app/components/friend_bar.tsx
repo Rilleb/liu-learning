@@ -10,6 +10,8 @@ import { User } from "@/app/data_types/data_types";
 import * as Popover from '@radix-ui/react-popover';
 import { useSocket } from "@/app/components/sockets/socketContext";
 import { useRouter } from "next/navigation";
+import * as Dialog from '@radix-ui/react-dialog';
+import { useState } from 'react';
 
 interface params {
     gameId: string
@@ -20,6 +22,7 @@ export default function FriendsBar({ gameId }: params) {
     const { data: session, status } = useSession();
     const { socket, ready } = useSocket()
     const router = useRouter()
+    const [inviteUsername, setInviteUsername] = useState("");
 
     const hasFriends = useAppSelector((state) => {
         if (state.friends.online && state.friends.offline) {
@@ -76,9 +79,52 @@ export default function FriendsBar({ gameId }: params) {
 
     }
 
+    const sendFriendInvite = () => {
+        if (socket && socket.readyState === WebSocket.OPEN && inviteUsername) {
+            socket.send(JSON.stringify({
+                type: "friend_invite",
+                to: inviteUsername,
+            }));
+            setInviteUsername("");
+        }
+    };
+
 
     return (
         <div>
+
+            <Dialog.Root>
+                <Dialog.Trigger asChild>
+                    <button className="p-2 bg-gray-600 text-white shadow hover:bg-gray-700 mb-4 float-right">
+                        +
+                    </button>
+                </Dialog.Trigger>
+                <Dialog.Portal>
+                    <Dialog.Overlay className="bg-black/30 fixed inset-0" />
+                    <Dialog.Content className="bg-white p-6 rounded-lg shadow-xl w-[300px] fixed top-[20%] left-[calc(50%-150px)]">
+                        <div className="flex justify-between items-center mb-4">
+                            <Dialog.Title className="text-lg font-semibold">Add Friend</Dialog.Title>
+                            <Dialog.Close asChild>
+                                <button>
+                                    X
+                                </button>
+                            </Dialog.Close>
+                        </div>
+                        <input
+                            value={inviteUsername}
+                            onChange={(e) => setInviteUsername(e.target.value)}
+                            placeholder="Enter username"
+                            className="border p-2 w-full rounded mb-4"
+                        />
+                        <button
+                            onClick={sendFriendInvite}
+                            className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
+                        >
+                            Send Invite
+                        </button>
+                    </Dialog.Content>
+                </Dialog.Portal>
+            </Dialog.Root>
             <h3>Friends Online</h3>
             <ul>
                 {online && online.map((friend, index) => {

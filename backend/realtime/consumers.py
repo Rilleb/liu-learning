@@ -2,9 +2,12 @@ from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth import user_logged_in, user_logged_out
 from django.contrib.auth.models import AnonymousUser
+from django.forms.utils import from_current_timezone
 from rest_framework.authtoken.models import Token
 from django_redis import get_redis_connection
+from db_handler import services
 from realtime.utils import (
+    add_friend_invite,
     cache_quiz_questions,
     compute_podium,
     create_new_game_id,
@@ -39,7 +42,15 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                 await self.channel_layer.group_add(
                     f"user_{self.user.id}", self.channel_name
                 )
+
                 await self.send_json({"status": "authenticated"})
+                await self.send_json(
+                    {
+                        "load_friend_invites": await sync_to_async(
+                            services.get_friend_invites
+                        )(self.user)
+                    }
+                )
             except Token.DoesNotExist:
                 await self.send_json({"error": "Invalid token"})
                 await self.close()
@@ -56,7 +67,6 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
         elif type == "invite_user":
             friend = content.get("user_id")
             game_id = content.get("game_id")
-            print(content)
             await notify_user_on_invite(friend, self.user, game_id)
         elif type == "game_invite_accepted":
             invite_from = content.get("invite_came_from")
@@ -66,10 +76,47 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
         elif type == "game_invite_declined":
             invite_from = content.get("invite_came_from")
             await notify_inviter_on_response(invite_from, self.user, False)
+        elif type == "friend_invite":
+            to = content.get("to")
+            await add_friend_invite(from_friend=self.user, to=to)
+        elif type == "accept_friend_invite":
+            invite_id = content.get("invite_id")
+            invite = await sync_to_async(
+                FriendInvites.objects.select_related("from_friend").get
+            )(id=invite_id)
+
+            if invite.to_id != self.user.id:
+                await self.send_json({"error": "Unauthorized"})
+                return
+
+            await self.channel_layer.group_send(
+                f"user_{invite.from_friend.id}",
+                {
+                    "type": "friend_invite_accepted",
+                    "from_id": self.user.id,
+                    "from_username": self.user.username,
+                },
+            )
+
+            await sync_to_async(invite.delete)()
+            await self.send_json({"status": "Friend invite accepted"})
+
+        elif type == "decline_friend_invite":
+            invite_id = content.get("invite_id")
+            invite = await sync_to_async(FriendInvites.objects.get)(id=invite_id)
+
+            if invite.to_id != self.user.id:
+                await self.send_json({"error": "Unauthorized"})
+                return
+
+            await sync_to_async(invite.delete)()
+            await self.send_json({"status": "Friend invite declined"})
         else:
             if self.user.is_authenticated:
                 # Handle other messages here
-                await self.send_json({"echo": content})
+                await self.send_json(
+                    {"echo": "Could not find any matching function", "content": content}
+                )
             else:
                 await self.send_json({"error": "Not authenticated"})
 
@@ -107,6 +154,15 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                 "from": event["from"],
                 "username": event["username"],
                 "game_id": event["game_id"],
+            }
+        )
+
+    async def friend_invite_received(self, event):
+        await self.send_json(
+            {
+                "type": "friend_invite_received",
+                "from": event["from"],
+                "username": event["username"],
             }
         )
 
