@@ -14,7 +14,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useState } from 'react';
 
 interface params {
-    gameId: string
+    gameId?: string
 }
 
 export default function FriendsBar({ gameId }: params) {
@@ -95,13 +95,13 @@ export default function FriendsBar({ gameId }: params) {
 
             <Dialog.Root>
                 <Dialog.Trigger asChild>
-                    <button className="p-2 bg-gray-600 text-white shadow hover:bg-gray-700 mb-4 float-right">
+                    <button className="p-2 bg-[var(--foreground)] text-[var(--background)] rounded shadow hover:bg-[var(--color3)] mb-4 float-right">
                         +
                     </button>
                 </Dialog.Trigger>
                 <Dialog.Portal>
                     <Dialog.Overlay className="bg-black/30 fixed inset-0" />
-                    <Dialog.Content className="bg-white p-6 rounded-lg shadow-xl w-[300px] fixed top-[20%] left-[calc(50%-150px)]">
+                    <Dialog.Content className="bg-[var(--background)] p-6 rounded-lg w-[300px] fixed top-[20%] left-[calc(50%-150px)]">
                         <div className="flex justify-between items-center mb-4">
                             <Dialog.Title className="text-lg font-semibold">Add Friend</Dialog.Title>
                             <Dialog.Close asChild>
@@ -118,7 +118,7 @@ export default function FriendsBar({ gameId }: params) {
                         />
                         <button
                             onClick={sendFriendInvite}
-                            className="bg-blue-500 text-white px-4 py-2 rounded w-full hover:bg-blue-600"
+                            className="bg-[var(--color2)] text-[var(--background)] px-4 py-2 rounded w-full hover:bg-[var(--color3)]"
                         >
                             Send Invite
                         </button>
@@ -131,25 +131,25 @@ export default function FriendsBar({ gameId }: params) {
                     return (
                         <Popover.Root key={`offline-friend-${index}`}>
                             <Popover.Trigger asChild>
-                                <div className="flex items-center p-2 hover:border hover:border-gray-600 cursor-pointer hover:shadow-gray-400 hover:shadow-xl rounded-xl">
+                                <div className="flex items-center p-2 hover:border hover:border-[var(--foreground)] cursor-pointer rounded-xl">
                                     <Image src="/globe.svg" alt="Profile-Pic" width={15} height={15} className="m-1" />
                                     {friend.username}
-                                    <span className="h-2 w-2 rounded-full bg-green-500 inline-block m-1" />
+                                    <span className="h-2 w-2 rounded-full bg-[var(--color_green)] inline-block m-1" />
                                 </div>
                             </Popover.Trigger>
 
                             <Popover.Portal>
                                 <Popover.Content
-                                    className="bg-white border p-4 rounded shadow z-50 w-48"
+                                    className="bg-[var(--background)] border p-4 rounded z-50 w-48"
                                     side="right"
                                     align="start"
                                     sideOffset={8}
                                 >
                                     <p className="font-bold">{friend.username}</p>
-                                    <p className="text-sm text-gray-500">Status: Online</p>
+                                    <p className="text-sm text-[var(--foreground)]">Status: Online</p>
                                     <button
                                         onClick={() => inviteUser(friend)}
-                                        className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm w-full"
+                                        className="mt-2 bg-[var(--foreground)] hover:bg-[var(--color2)] text-white px-3 py-1 rounded text-sm w-full"
                                     >
                                         Invite to Game
                                     </button>
@@ -166,29 +166,29 @@ export default function FriendsBar({ gameId }: params) {
                 {offline && offline.map((friend, index) => (
                     <Popover.Root key={`offline-friend-${index}`}>
                         <Popover.Trigger asChild>
-                            <div className="flex items-center p-2 hover:border hover:border-gray-600 cursor-pointer hover:shadow-gray-400 hover:shadow-xl rounded-xl">
+                            <div className="flex items-center p-2 hover:border hover:border-[var(--foreground)] cursor-pointer rounded-xl">
                                 <Image src="/globe.svg" alt="Profile-Pic" width={15} height={15} className="m-1" />
                                 {friend.username}
-                                <span className="h-2 w-2 rounded-full bg-red-500 inline-block m-1" />
+                                <span className="h-2 w-2 rounded-full bg-[var(--color_red)] inline-block m-1" />
                             </div>
                         </Popover.Trigger>
 
                         <Popover.Portal>
                             <Popover.Content
-                                className="bg-white border p-4 rounded shadow z-50 w-48"
+                                className="bg-[var(--background)] border p-4 rounded z-50 w-48"
                                 side="right"
                                 align="start"
                                 sideOffset={8}
                             >
                                 <p className="font-bold">{friend.username}</p>
-                                <p className="text-sm text-gray-500">Status: Offline</p>
+                                <p className="text-sm text-[var(--color2)]">Status: Offline</p>
                                 <button
                                     onClick={() => inviteUser(friend)}
-                                    className="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm w-full"
+                                    className="mt-2 bg-[var(--foreground)] hover:bg-[var(--color2)] text-white px-3 py-1 rounded text-sm w-full"
                                 >
                                     Invite to Game
                                 </button>
-                                <Popover.Arrow className="fill-white" />
+                                <Popover.Arrow className="fill-[var(--foreground)]" />
                             </Popover.Content>
                         </Popover.Portal>
                     </Popover.Root>
