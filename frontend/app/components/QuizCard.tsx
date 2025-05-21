@@ -12,6 +12,7 @@ async function addQuestionAttempt({
   is_multiple_choice,
   free_text_answer,
   started_at,
+  token,
 }: {
   attempt: number;
   question: number;
@@ -19,12 +20,14 @@ async function addQuestionAttempt({
   is_multiple_choice: boolean;
   free_text_answer: string;
   started_at: string;
+  token: string;
 }) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/question_attempt/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': `Token ${token}`,
       },
       body: JSON.stringify({
         attempt,
@@ -58,7 +61,7 @@ export function AnswerDiv({
   if (show) {
     return (
       <div>
-        <h2>The correct answer is: {question.answer} </h2>
+        <h2>The correct answer is: {question.correct_answer} </h2>
       </div>
     );
   }
@@ -69,11 +72,11 @@ export function AnswerDiv({
 }
 
 export function MultipleChoice({ question, onSelect }: { question: Question, onSelect: (answer: string) => void }) {
-  const options = [question.answer, question.alternatives.alt1, question.alternatives.alt2, question.alternatives.alt3]; // must have 3 alternatives
+  const options = [question.correct_answer, question.alt_1, question.alt_2, question.alt_3]; // must have 3 alternatives
   const shuffled = [...options].sort(() => Math.random() - 0.5);
   return (
     <div>
-      <h2>{question.question}</h2>
+      <h2>{question.description}</h2>
       {options.map((option, idx) => (
         <label key={idx} className="flex items-center gap-2 mb-1">
           <input
@@ -131,7 +134,7 @@ export function FreeText({
 }) {
   return (
     <div>
-      <h2>{question.question}</h2>
+      <h2>{question.description}</h2>
       <EnhancedTextbox key={question.id} onTextChange={onAnswerChange}></EnhancedTextbox>
     </div>
   );
@@ -144,12 +147,14 @@ export default function QuizCard({
   course_id,
   quiz_id,
   quiz_attempt_id,
+  token,
 }: {
   questions: Question[];
   name: string;
   course_id: number;
   quiz_id: number;
   quiz_attempt_id: number;
+  token: string;
 }) {
   const router = useRouter();
   const [buttonText, setButtonText] = useState("Check answer");
@@ -190,7 +195,7 @@ export default function QuizCard({
   useEffect(() => {
     <CheckMultiple questions={questions} index={index} onSelect={setSelectedAnswer} />
     if (questions[index].is_multiple) {
-      if (selectedAnswer == questions[index].answer) {
+      if (selectedAnswer == questions[index].correct_answer) {
         setPassed(true)
       } else {
         setPassed(false)
@@ -205,6 +210,7 @@ export default function QuizCard({
         is_multiple_choice: questions[index].is_multiple,
         free_text_answer: freeTextAnswer,
         started_at: startedAt,
+        token: token
       });
     }
   }, [buttonVisible])
@@ -226,10 +232,11 @@ export default function QuizCard({
                     await addQuestionAttempt({
                       attempt: quiz_attempt_id,
                       question: questions[index].id,
-                      is_correct: selectedAnswer === questions[index].answer,
+                      is_correct: selectedAnswer === questions[index].correct_answer,
                       is_multiple_choice: questions[index].is_multiple,
                       free_text_answer: "",
                       started_at: startedAt,
+                      token: token,
                     });
                   }
                 } else {

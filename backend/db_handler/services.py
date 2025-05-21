@@ -140,8 +140,6 @@ def unfollow_course(user, course_id):
 def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
     try:
         actual_quiz = models.Quiz.objects.filter(id=quiz).first()
-        if not passed:
-            passed = False
         return internal_services.create_quiz_attempt(
             user, actual_quiz, ended_at, passed
         )
@@ -151,8 +149,8 @@ def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
 
 
 def create_question_answer(
-    attempt,
-    question,
+    attempt_id,
+    question_id,
     is_correct,
     multiple_choice_answer=False,
     free_text_answer="",
@@ -160,10 +158,8 @@ def create_question_answer(
     ended_at=None,
 ):
     try:
-        actual_attempt = models.QuizAttempt.objects.filter(id=attempt).first()
-        actual_question = models.Question.objects.filter(id=question).first()
-        if not multiple_choice_answer:
-            multiple_choice_answer = False
+        actual_attempt = models.QuizAttempt.objects.filter(id=attempt_id).first()
+        actual_question = models.Question.objects.filter(id=question_id).first()
         return internal_services.create_question_answer(
             actual_attempt,
             actual_question,
@@ -489,27 +485,8 @@ def get_course_name(course_id):
 
 def get_questions_for_quiz(quiz_id):
     try:
-        questions = models.Question.objects.filter(quiz=quiz_id)
-
-        questions_data = []
-        print(questions)
-        for q in questions:
-            question_data = {
-                "id": q.id,
-                "question": q.description,
-                "answer": q.correct_answer,
-                "is_multiple": q.is_multiple,
-                "alternatives": None,
-            }
-
-            if q.is_multiple:
-                question_data["alternatives"] = {
-                    "alt1": q.alt_1,
-                    "alt2": q.alt_2,
-                    "alt3": q.alt_3,
-                }
-            questions_data.append(question_data)
-        return questions_data
+        questions = models.Question.objects.filter(quiz=quiz_id).all()
+        return questions
     except Exception as e:
         print(f"Error fetching quiz questions: {e}")
         return None
