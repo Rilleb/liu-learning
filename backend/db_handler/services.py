@@ -209,6 +209,20 @@ def get_course_by_id(course_id):
         return None
 
 
+def get_courses_by_query(query):
+    try:
+        if query:
+            courses = models.Course.objects.filter(
+                Q(name__icontains=query) | Q(code__icontains=query)
+            )[:4]
+        else:
+            courses = models.Course.objects.all()[:4]
+        return courses
+    except Exception as e:
+        print(f"Error fetching courses by query: {e}")
+        return None
+
+
 def get_quizzes(user):
     try:
         quizes = models.Quiz.objects.filter(
@@ -237,6 +251,18 @@ def get_quiz_by_id(quiz_id):
         return quiz
     except Exception as e:
         print(f"Error fetching course by id: {e}")
+        return None
+
+
+def get_quizzes_by_query(query):
+    try:
+        if query:
+            quizzes = models.Quiz.objects.filter(Q(name__icontains=query))[:4]
+        else:
+            quizzes = models.Course.objects.all()[:4]
+        return quizzes
+    except Exception as e:
+        print(f"Error fetching quizzes by query: {e}")
         return None
 
 
