@@ -61,12 +61,12 @@ export default function Header() {
             {/* Left section (can be empty or logo) */}
             <div className="w-1/3"></div>
 
-            {/* Centered SearchBar */}
+            {/* SearchBar */}
             <div className="w-1/3 flex justify-center">
                 <SearchBar />
             </div>
 
-            {/* Right-aligned profile icon */}
+            {/* Profile icon */}
             <div className="w-1/3 flex justify-end">
                 <Link href="/settings">
                     <svg

@@ -516,3 +516,24 @@ def is_friend_with(user, friend_id):
     except Exception as e:
         print(f"Could not check friendship: {e}")
         return False
+    
+def get_account_info(user_id):
+    try:
+        res = models.User.objects.filter(id=user_id).values('username', 'email', 'date_joined').first()
+        print(res, "ndsonfkskegnpgkrwmgpeörmgmesrlgm")
+        course_count = models.ReadCourse.objects.filter(user = user_id).count()
+
+        friend_count = models.Friendship.objects.filter(
+                            (Q(user1=user_id) | Q(user2__id=user_id))).count()
+
+        account_data = {
+            "name":res.get("username"), 
+            "email":res.get("email"),
+            "created": res.get("date_joined"),
+            "course_count": course_count,
+            "friend_count": friend_count
+            }
+        return account_data
+    except Exception as e:
+        print(f"Could not get course name: {e}")
+        return None

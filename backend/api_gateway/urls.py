@@ -36,4 +36,6 @@ urlpatterns = [
         FriendStatisticsView.as_view(),
         name="compare-with-friend",
     ),
+    path("account/data", Account.as_view(), name="get_account_data"),
+    path("user/change_password", Account.as_view(), name="change_password"),
 ]

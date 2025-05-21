@@ -553,3 +553,13 @@ class CredentialsLoginView(APIView):
             )
         else:
             return Response({"error": "Invalid credentials"}, status=400)
+        
+class Account(APIView):
+    def get(self, request):
+        try:
+            user_id = request.query_params.get("user_id", None)
+            account_info = services.get_account_info(user_id)
+            print(account_info)
+            return Response(account_info)
+        except:
+            return Response({"error": "Could not get quiz questions"}, status=400)
