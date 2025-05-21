@@ -78,7 +78,16 @@ export type QuizList = Quiz[]
 export type CourseList = Course[]
 export type UserList = User[]
 
+export interface FriendInvite {
+    from: number, 
+    from_username: string, 
+    to: number
+}
+
+export type FriendInviteList = FriendInvite[]
+
 export interface FriendsList {
     online: UserList
     offline: UserList
+    invites: FriendInviteList
 }

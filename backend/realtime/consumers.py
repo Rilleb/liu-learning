@@ -80,7 +80,7 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             to = content.get("to")
             await add_friend_invite(from_friend=self.user, to=to)
         elif type == "accept_friend_invite":
-            invite_id = content.get("invite_id")
+            invite_id = content.get("invitor_id")
             invite = await sync_to_async(
                 FriendInvites.objects.select_related("from_friend").get
             )(id=invite_id)

@@ -1,9 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { FriendsList } from '../data_types/data_types'
+import { FriendInviteList, FriendsList, FriendInvite } from '../data_types/data_types'
 
 const initialState: FriendsList = {
     offline: [],
     online: [],
+    invites: []
 }
 
 const friendSlice = createSlice({
@@ -30,9 +31,17 @@ const friendSlice = createSlice({
                 state.offline = [friend, ...state.offline]
             }
         },
+
+        setFriendInvites(state, action: PayloadAction<FriendInviteList>){
+            state.invites = action.payload
+        },
+
+        addFriendInvite(state, action: PayloadAction<FriendInvite>){
+            state.invites.push(action.payload)
+        },
     },
 })
 
-export const { setFriends, setFriendOnline, setFriendOffline } =
+export const { setFriends, setFriendOnline, setFriendOffline, setFriendInvites, addFriendInvite } =
     friendSlice.actions
 export default friendSlice.reducer
