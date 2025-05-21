@@ -1,9 +1,10 @@
 import QuizCard from '../../../../components/QuizCard'
 import { getServerSession } from "next-auth"
 import { options } from "../../../../api/auth/[...nextauth]/options"
+import { Question, Quiz } from '@/app/data_types/data_types'
 
 
-async function QuizComponent({quiz_id, course_id}: {quiz_id: number, course_id: number}) {
+async function QuizComponent({ quiz_id, course_id }: { quiz_id: number, course_id: number }) {
     const session = await getServerSession(options)
     if (!session) {
         return (
@@ -13,29 +14,30 @@ async function QuizComponent({quiz_id, course_id}: {quiz_id: number, course_id: 
         )
     }
 
-    const resName = await fetch(`${process.env.BACKEND_URL}/api/quiz/description?quiz_id=${quiz_id}`, {
+    const resQuiz = await fetch(`${process.env.BACKEND_URL}/api/quiz/?quiz_id=${quiz_id}`, {
+        method: 'GET',
+        headers: {
+            'Content-type': 'application/json',
+            'Authorization': `Token ${session.accessToken}`,
+        }
+    });
+
+    const quiz: Quiz = await resQuiz.json();
+
+    const resQuestion = await fetch(`${process.env.BACKEND_URL}/api/quiz/questions?quiz_id=${quiz_id}`, {
         method: 'GET',
         headers: {
             'Content-type': 'application/json',
         }
     });
 
-    const name: string = await resName.json();
-
-    const resQuestionIds = await fetch(`${process.env.BACKEND_URL}/api/quiz/questions?quiz_id=${quiz_id}`, {
-        method: 'GET',
-        headers: {
-            'Content-type': 'application/json',
-        }
-    });
-
-    if (!resQuestionIds.ok) {
-        return   (      
-        <div>
-            <h1>{name}</h1>
-        </div>); 
+    if (!resQuestion.ok) {
+        return (
+            <div>
+                <h1>{quiz.name}</h1>
+            </div>);
     }
-    const question_data = await resQuestionIds.json();
+    const question_data: Question[] = await resQuestion.json();
 
     const attemptRes = await fetch(`${process.env.BACKEND_URL}/api/quiz_attempt/`, {
         method: 'POST',
@@ -49,24 +51,24 @@ async function QuizComponent({quiz_id, course_id}: {quiz_id: number, course_id: 
     });
 
     if (!attemptRes.ok) {
-        return   (      
-        <div>
-            <h1>{attemptRes.status}</h1>
-            <h1>{attemptRes.statusText}</h1>
-        </div>); 
+        return (
+            <div>
+                <h1>{attemptRes.status}</h1>
+                <h1>{attemptRes.statusText}</h1>
+            </div>);
     }
     const attempt = await attemptRes.json();
 
     return (
-        <QuizCard questions={question_data} name={name} quiz_id={quiz_id} course_id={course_id} quiz_attempt_id={attempt.attempt_id}/>
+        <QuizCard questions={question_data} name={quiz.name} quiz_id={quiz_id} course_id={course_id} quiz_attempt_id={attempt.attempt_id} token={session.accessToken} />
     );
 }
 
-export default function Home({ params }: { params: { quiz_id: number; course_id: number} }) {
+export default function Home({ params }: { params: { quiz_id: number; course_id: number } }) {
     return (
         <div className="container h-full m-auto grid gap-4 grid-cols-2 lg:grid-cols-3 lg:grid-rows-5 overflow-auto">
             <div className='col-span-2 '>
-                <QuizComponent quiz_id={params.quiz_id} course_id={params.course_id}/>
+                <QuizComponent quiz_id={params.quiz_id} course_id={params.course_id} />
             </div>
         </div>
     )

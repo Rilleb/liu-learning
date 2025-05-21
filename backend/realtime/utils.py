@@ -2,7 +2,7 @@ import json
 from asgiref.sync import sync_to_async
 from channels.layers import channel_layers, get_channel_layer
 from django_redis import get_redis_connection
-from db_handler import services
+from db_handler import serializers, services
 import random
 import string
 
@@ -92,7 +92,10 @@ async def cache_quiz_questions(quiz_id):
         questions = await sync_to_async(services.get_questions_for_quiz)(
             quiz_id=quiz_id
         )
-        conn.setex(quiz_id, 600, json.dumps(questions))
+        serializer_data = await sync_to_async(
+            lambda: serializers.QuestionSerializer(questions, many=True).data
+        )()
+        conn.setex(quiz_id, 600, json.dumps(serializer_data))
 
 
 async def get_cached_quiz_questions(quiz_id):
