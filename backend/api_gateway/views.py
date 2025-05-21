@@ -93,6 +93,16 @@ class CourseView(APIView):
         return Response(serilizer.data)
 
 
+class SearchCourseView(APIView):
+    def get(self, request):
+        query = request.query_params.get("query", "").lower()
+
+        # Only for followed courses instead?
+        courses = services.get_courses_by_query(query)
+        serilizer = CourseSerializer(courses, many=True)
+        return Response(serilizer.data)
+
+
 class CourseName(APIView):
     def get(self, request):
         course_id = request.query_params.get("course_id", None)
@@ -229,6 +239,16 @@ class QuizView(APIView):
             return Response(serilizer.data)
         else:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+
+class SearchQuizView(APIView):
+    def get(self, request):
+        query = request.query_params.get("query", "").lower()
+
+        # Only for followed courses instead?
+        quizzes = services.get_quizzes_by_query(query)
+        serilizer = QuizSerializer(quizzes, many=True)
+        return Response(serilizer.data)
 
 
 class Friendsview(APIView):

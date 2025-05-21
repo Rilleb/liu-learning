@@ -3,6 +3,7 @@ from .views import *
 
 urlpatterns = [
     path("courses/", CourseView.as_view(), name="courses"),
+    path("courses/search/", SearchCourseView.as_view(), name="courses"),
     path("courses/chapters/", ChaptersView.as_view(), name="chapters"),
     path("courses/follow/", FollowCourse.as_view(), name="follow-course"),
     path("auth/google-login/", GoogleSyncView.as_view(), name="google-sync"),
@@ -14,6 +15,7 @@ urlpatterns = [
     ),
     path("auth/credentials-create", UserCreateView.as_view(), name="create-user"),
     path("quiz/", QuizView.as_view(), name="quiz"),
+    path("quiz/search/", SearchQuizView.as_view(), name="quiz"),
     path("friends/", Friendsview.as_view(), name="friends"),
     path("quiz/description/", QuizDescription.as_view(), name="description"),
     path("quiz/name/", QuizName.as_view(), name="quizName"),

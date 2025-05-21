@@ -1,12 +1,12 @@
 "use client"
 
-import SearchBar from "../searchBar";
 import LineChartDate from "../charts/line";
 import { useDebounceCallback } from "usehooks-ts";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { UserList, User, CombinedQuizStatistics, DateBasedStat, CourseBasedStat } from "@/app/data_types/data_types";
 import RadarCourseChart from "../charts/radar";
+import FriendSearchBar from "../searchBars/friendSearchBar";
 
 interface Props {
     userData: CombinedQuizStatistics
@@ -102,7 +102,7 @@ export function FriendStats({ userData }: Props) {
 
             {loading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
             <div className="relative flex items-center gap-4 w-full max-w-md mb-4">
-                <SearchBar onSearch={handleSearch} value={query} />
+                <FriendSearchBar onSearch={handleSearch} value={query} />
 
                 {showDropdown && results.length > 0 && (
                     <ul className="absolute z-50 w-full max-w-md mt-2 bg-white border rounded shadow">

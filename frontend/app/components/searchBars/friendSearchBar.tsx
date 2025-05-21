@@ -8,7 +8,7 @@ interface Props {
 }
 
 
-const SearchBar: React.FC<Props> = ({ onSearch, value }) => {
+const FriendSearchBar: React.FC<Props> = ({ onSearch, value }) => {
     const [query, setQuery] = useState(value)
 
     useEffect(() => {
@@ -33,4 +33,4 @@ const SearchBar: React.FC<Props> = ({ onSearch, value }) => {
         </form>
     )
 }
-export default SearchBar
+export default FriendSearchBar
