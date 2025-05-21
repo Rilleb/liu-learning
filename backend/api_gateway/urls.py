@@ -37,5 +37,5 @@ urlpatterns = [
         name="compare-with-friend",
     ),
     path("account/data", Account.as_view(), name="get_account_data"),
-    path("user/change_password", Account.as_view(), name="change_password"),
+    path("user/change_password", Password.as_view(), name="change_password"),
 ]
