@@ -98,33 +98,39 @@ export function FriendStats({ userData }: Props) {
 
 
         <div className="flex flex-col w-full p-4 box-border h-full">
-
-
             {loading && <p className="mt-2 text-sm text-gray-500">Loading...</p>}
-            <div className="relative flex items-center gap-4 w-full max-w-md mb-4">
+
+            {/* Container with vertical stack for input and dropdown */}
+            <div className="w-full max-w-md mb-4 self-start relative">
                 <FriendSearchBar onSearch={handleSearch} value={query} />
 
                 {showDropdown && results.length > 0 && (
-                    <ul className="absolute z-50 w-full max-w-md mt-2 bg-white border rounded shadow">
+                    <ul className="absolute z-50 w-full mt-1 bg-white border rounded shadow max-h-60 overflow-auto">
                         {results.map((user, index) => (
-                            <li key={index} className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={() => onClick(user)}>
+                            <li
+                                key={index}
+                                className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                                onClick={() => onClick(user)}
+                            >
                                 {user.username}
                             </li>
                         ))}
                     </ul>
                 )}
-
-                <label className="flex items-center gap-2 cursor-pointer">
-                    <input
-                        type="checkbox"
-                        checked={userSelected}
-                        onChange={() => setUserSelected(!userSelected)}
-                        className="form-checkbox h-5 w-5 text-blue-600"
-                    />
-                    <span className="text-sm text-gray-700">Compare with friend</span>
-                </label>
             </div>
 
+            {/* Moved below input to avoid layout conflict */}
+            <label className="flex items-center gap-2 cursor-pointer mb-6">
+                <input
+                    type="checkbox"
+                    checked={userSelected}
+                    onChange={() => setUserSelected(!userSelected)}
+                    className="form-checkbox h-5 w-5 text-blue-600"
+                />
+                <span className="text-sm text-gray-700">Compare with friend</span>
+            </label>
+
+            {/* Chart Section */}
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-6xl self-center">
                 <div className="bg-white rounded-xl shadow p-4 flex flex-col">
                     <p className="font-semibold mb-2">Number of Quiz Attempts</p>
@@ -153,7 +159,6 @@ export function FriendStats({ userData }: Props) {
                         <RadarCourseChart data={courseBasedData} user="PLACEHOLDER" is_multiple={userSelected} />
                     </div>
                 </div>
-
             </div>
         </div>
     )
