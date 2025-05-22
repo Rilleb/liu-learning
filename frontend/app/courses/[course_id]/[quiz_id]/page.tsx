@@ -5,29 +5,6 @@ import { Quiz, UserList } from "../../../data_types/data_types"
 import QuizDescription from '../../../components/QuizDescription'
 
 
-// async function FriendsComponent() {
-//     const session = await getServerSession(options);
-//     if (!session) {
-//         return <div>Not authenticated</div>;
-//     }
-//
-//     const res = await fetch(`${process.env.BACKEND_URL}/api/friends`, {
-//         method: 'GET',
-//         headers: {
-//             'Content-type': 'application/json',
-//             'Authorization': `Token ${session.accessToken}`,
-//         }
-//     });
-//
-//     if (!res.ok) {
-//         return <div>Error loading friends</div>;
-//     }
-//
-//     const friends: UserList = await res.json();
-//     return <FriendsBar friends={friends} />;
-// }
-
-
 export default async function Home({ params }: { params: { quiz_id: number, course_id: number } }) {
     const quiz_id = await params.quiz_id
     const session = await getServerSession(options)

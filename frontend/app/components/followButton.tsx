@@ -43,9 +43,9 @@ export default function FollowButton({ courseId, accessToken }: { courseId: numb
   return (
     <button
       onClick={toggleFollow}
-      className={`ml-4 text-xl px-3 py-1 rounded-full transition-all border hover:opacity-90 ${isFollowed
-        ? 'bg-[var(--color3)] text-[var(--foreground)] border-[var(--color2)]'
-        : 'bg-[var(--color1)] text-white border-[var(--color2)]'
+      className={`ml-4 text-xl px-3 py-1 rounded-full transition-all hover:opacity-90 ${isFollowed
+        ? 'bg-[var(--color3)] text-[var(--foreground)]'
+        : 'bg-[var(--foreground)] text-[var(--background)]'
         }`}
     >
       {isFollowed ? 'Unfollow -' : 'Follow +'}

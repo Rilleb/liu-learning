@@ -123,7 +123,7 @@ const QuizQuestions: React.FC<QuizQuestionsProps> = ({
                         <button
                             type="button"
                             onClick={() => handleRemoveQuestion(index)}
-                            className="text-red-500 text-sm"
+                            className="text-red-500 text-sm py-2"
                         >
                             ✕
                         </button>
@@ -203,7 +203,7 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
         const res = await createQuiz({ title, courseId, description, chapterId, questions, answerTypes, answers });
 
         if (res.success) {
-            setStatus("Succesfully created course")
+            setStatus("Successfully created course")
         } else {
             // const data = await res.json()data.message 
             setStatus('Failed to create course')
@@ -300,14 +300,14 @@ export default function CreateQuizForm({ courses }: QuizFormProps) {
                     setAnswers={setAnswers}
                 />
             </div>
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-4">
+                {status && <p>{status}</p>}
                 <button
                     type="submit"
                     className="bg-[var(--color_green)] text-white px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
                 >
                     Create Quiz
                 </button>
-                {status && <p>{status}</p>}
             </div>   
         </form>
     );
