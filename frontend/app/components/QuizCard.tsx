@@ -162,8 +162,9 @@ export default function QuizCard({
   const [showAnswer, setShowAnswer] = useState(false);
   const [startedAt, setStartedAt] = useState(new Date().toISOString());
   const [buttonVisible, setButtonVisible] = useState(true);
-  const [passed, setPassed] = useState(false);
+  const [passed, setPassed] = useState<boolean|null>(null);
   const [passedQuiz, setPassedQuiz] = useState(true);
+  const [questionAnswered, isAnswered] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [freeTextAnswer, setFreeTextAnswer] = useState('');
 
@@ -187,26 +188,19 @@ export default function QuizCard({
   }, [showAnswer])
 
   useEffect(() => {
-    if (passed == false) {
-      setPassedQuiz(false)
+    if(questionAnswered == true){
+      if (passed == false) {
+        setPassedQuiz(false)
+      }
     }
   }, [passed])
 
   useEffect(() => {
-    <CheckMultiple questions={questions} index={index} onSelect={setSelectedAnswer} />
-    if (questions[index].is_multiple) {
-      if (selectedAnswer == questions[index].correct_answer) {
-        setPassed(true)
-      } else {
-        setPassed(false)
-      }
-    }
-
-    if (buttonVisible === true) {
+    if (buttonVisible == true) {
       addQuestionAttempt({
         attempt: quiz_attempt_id,
         question: questions[index].id,
-        is_correct: passed,
+        is_correct: (passed || false),
         is_multiple_choice: questions[index].is_multiple,
         free_text_answer: freeTextAnswer,
         started_at: startedAt,
@@ -228,7 +222,13 @@ export default function QuizCard({
               className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
               onClick={async () => {
                 if (buttonText === "Check answer") {
+                  isAnswered(true)
                   if (questions[index].is_multiple) {
+                    if (selectedAnswer == questions[index].correct_answer) { 
+                      setPassed(true)
+                    } else {
+                      setPassed(false)
+                    }
                     await addQuestionAttempt({
                       attempt: quiz_attempt_id,
                       question: questions[index].id,
@@ -258,8 +258,9 @@ export default function QuizCard({
                 type="button"
                 className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
                 onClick={async () => {
-                  setButtonVisible(true)
+                  isAnswered(true)
                   setPassed(true)
+                  setButtonVisible(true)
                 }}
               >
                 Yes
@@ -268,8 +269,9 @@ export default function QuizCard({
                 type="button"
                 className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
                 onClick={async () => {
-                  setButtonVisible(true)
+                  isAnswered(true)
                   setPassed(false)
+                  setButtonVisible(true)
                 }}
               >
                 No
