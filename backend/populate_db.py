@@ -83,6 +83,8 @@ for i in range(10):
     )
     quiz_2_attempt.save()
 
+    passed = random.randint(1, 5) < 5
+
     quiz_answers = [
         create_question_answer(quiz_2_attempt, quiz_2_questions[0], i > 1, False, "4x"),
         create_question_answer(
@@ -90,14 +92,41 @@ for i in range(10):
         ),
         create_question_answer(quiz_2_attempt, quiz_2_questions[2], True, False, "1/x"),
         create_question_answer(
-            quiz_2_attempt, quiz_2_questions[3], True, False, "x^(-2)"
+            quiz_2_attempt, quiz_2_questions[3], passed, False, "x^(-2)"
         ),
     ]
 
     quiz_2_attempt = change_quiz_attempt(
         quiz_2_attempt.id,
         datetime.now(tz=tz) - timedelta(days=10 - i),
-        True,
+        passed,
+    )
+
+# Do the same but for thea for profile compare
+for i in range(10):
+    quiz_2_attempt = create_quiz_attempt(users[1], quiz_2)
+    quiz_2_attempt.attempt_started_at = datetime.now(tz=tz) - timedelta(
+        days=10 - i, seconds=5 * i
+    )
+    quiz_2_attempt.save()
+
+    passed = random.randint(1, 5) == 1
+
+    quiz_answers = [
+        create_question_answer(quiz_2_attempt, quiz_2_questions[0], i > 1, False, "4x"),
+        create_question_answer(
+            quiz_2_attempt, quiz_2_questions[1], True, False, "2cos(2x)"
+        ),
+        create_question_answer(quiz_2_attempt, quiz_2_questions[2], True, False, "1/x"),
+        create_question_answer(
+            quiz_2_attempt, quiz_2_questions[3], passed, False, "x^(-2)"
+        ),
+    ]
+
+    quiz_2_attempt = change_quiz_attempt(
+        quiz_2_attempt.id,
+        datetime.now(tz=tz) - timedelta(days=10 - i),
+        passed,
     )
 
 #  Cybersecurity course
@@ -172,6 +201,23 @@ for i in range(4):
         quiz_1_attempt.id, datetime.now(tz=tz) - timedelta(days=10 - i), passed
     )
 
+# Same for thea for profile compare
+for i in range(7):
+    quiz_1_attempt = create_quiz_attempt(users[1], quiz_1)
+    quiz_1_attempt.attempt_started_at = datetime.now(tz=tz) - timedelta(
+        days=10 - i, seconds=random.randint(1, 10) * i
+    )
+    quiz_1_attempt.save()
+    passed = random.randint(0, 1) == 1
+    quiz_answers = [
+        create_question_answer(quiz_1_attempt, quiz_1_questions[0], True, True),
+        create_question_answer(quiz_1_attempt, quiz_1_questions[1], True, True),
+        create_question_answer(quiz_1_attempt, quiz_1_questions[2], passed, True),
+    ]
+
+    quiz_1_attempt = change_quiz_attempt(
+        quiz_1_attempt.id, datetime.now(tz=tz) - timedelta(days=10 - i), passed
+    )
 
 #  Data structure and algorithms course
 # ------------------------------
@@ -220,6 +266,24 @@ quiz_1_questions = [
 # Create 7 quiz attempts for the quiz above on gustav
 for i in range(7):
     quiz_1_attempt = create_quiz_attempt(users[0], quiz_1)
+    quiz_1_attempt.attempt_started_at = datetime.now(tz=tz) - timedelta(
+        days=10 - i, seconds=random.randint(1, 10) * i
+    )
+    quiz_1_attempt.save()
+    passed = random.randint(0, 1) == 1
+    quiz_answers = [
+        create_question_answer(quiz_1_attempt, quiz_1_questions[0], True, False),
+        create_question_answer(quiz_1_attempt, quiz_1_questions[1], True, False),
+        create_question_answer(quiz_1_attempt, quiz_1_questions[2], passed, False),
+    ]
+
+    quiz_1_attempt = change_quiz_attempt(
+        quiz_1_attempt.id, datetime.now(tz=tz) - timedelta(days=10 - i), passed
+    )
+
+# Same for thea for compare
+for i in range(3):
+    quiz_1_attempt = create_quiz_attempt(users[1], quiz_1)
     quiz_1_attempt.attempt_started_at = datetime.now(tz=tz) - timedelta(
         days=10 - i, seconds=random.randint(1, 10) * i
     )
