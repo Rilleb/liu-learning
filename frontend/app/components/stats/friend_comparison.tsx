@@ -24,6 +24,8 @@ export function FriendStats({ userData }: Props) {
     const [courseBasedData, setCourseBasedData] = useState<CourseBasedStat[]>(course_based)
 
     const token = session?.accessToken ?? "";
+    const username = session?.user.username ?? "";
+
     console.log(session)
 
     const onClick = (async (user: User) => {
@@ -133,14 +135,14 @@ export function FriendStats({ userData }: Props) {
             {/* Chart Section */}
             <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-6xl self-center">
                 <div className="bg-white rounded-xl shadow p-4 flex flex-col">
-                    <p className="font-semibold mb-2">Number of Quiz Attempts</p>
+                    <p className="font-semibold mb-2">Number of quiz attempts</p>
                     <div className="flex-grow">
                         <LineChartDate data={dateBasedData} metric="total_attempts" is_multiple={userSelected} />
                     </div>
                 </div>
 
                 <div className="bg-white rounded-xl shadow p-4 flex flex-col">
-                    <p className="font-semibold mb-2">Ratio of correct answers compared to total</p>
+                    <p className="font-semibold mb-2">Ratio of passed quizzes compared to total attempts</p>
                     <div className="flex-grow">
                         <LineChartDate data={dateBasedData} metric="ratio" is_multiple={userSelected} />
                     </div>
@@ -154,9 +156,9 @@ export function FriendStats({ userData }: Props) {
                 </div>
 
                 <div className="bg-white rounded-xl shadow p-4 flex flex-col">
-                    <p className="font-semibold mb-2">Attempts by Course</p>
+                    <p className="font-semibold mb-2">Attempts by course</p>
                     <div className="flex-grow">
-                        <RadarCourseChart data={courseBasedData} user="PLACEHOLDER" is_multiple={userSelected} />
+                        <RadarCourseChart data={courseBasedData} user={username} is_multiple={userSelected} />
                     </div>
                 </div>
             </div>
