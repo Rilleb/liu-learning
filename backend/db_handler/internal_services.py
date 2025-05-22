@@ -1,5 +1,5 @@
+from django.utils import timezone
 from .models import *
-import datetime
 
 
 def create_user(username, email, password):
@@ -9,7 +9,7 @@ def create_user(username, email, password):
 
 def create_course(name, code, description, created_by, date_created=None):
     if date_created is None:
-        date_created = datetime.date.today()
+        date_created = timezone.now()
     course = Course.objects.create(
         name=name,
         code=code,
@@ -22,7 +22,7 @@ def create_course(name, code, description, created_by, date_created=None):
 
 def create_chapter(name, course, created_by, date_created=None):
     if date_created is None:
-        date_created = datetime.date.today()
+        date_created = timezone.now()
     chapter = Chapter.objects.create(
         name=name, course=course, created_by=created_by, date_created=date_created
     )
@@ -31,7 +31,7 @@ def create_chapter(name, course, created_by, date_created=None):
 
 def create_quiz(name, course, chapter, created_by, description="", date_created=None):
     if date_created is None:
-        date_created = datetime.date.today()
+        date_created = timezone.now()
     quiz = Quiz.objects.create(
         name=name,
         course=course,
@@ -86,9 +86,9 @@ def follow_course(user, course):
 
 
 def create_quiz_attempt(user, quiz, ended_at=None, passed=False):
-    started_at = datetime.date.today()
+    started_at = timezone.now()
     if ended_at is None:
-        ended_at = datetime.date.today()
+        ended_at = timezone.now()
     attempt = QuizAttempt.objects.create(
         user=user,
         quiz=quiz,
@@ -109,9 +109,9 @@ def create_question_answer(
     ended_at=None,
 ):
     if started_at is None:
-        started_at = datetime.date.today()
+        started_at = timezone.now()
     if ended_at is None:
-        ended_at = datetime.date.today()
+        ended_at = timezone.now()
     answer = QuizAnswer.objects.create(
         attempt=attempt,
         question=question,
