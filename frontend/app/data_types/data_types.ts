@@ -84,3 +84,11 @@ export interface FriendsList {
     online: UserList
     offline: UserList
 }
+
+export interface AccountInfo {
+    name: string
+    email: string
+    created: Date
+    course_count: number
+    friend_count: number
+}
