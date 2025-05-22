@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
-import { setFriendOffline, setFriendOnline, setFriendInvites, addFriendInvite } from "@/app/store/friendSlice";
+import { setFriendOffline, setFriendOnline, setFriendInvites, addFriendInvite, removeFriendInvite } from "@/app/store/friendSlice";
 import { SocketContext } from "@/app/components/sockets/socketContext";
 import { Toaster, toast } from 'sonner';
 import { useRouter } from "next/navigation";
@@ -67,12 +67,13 @@ export default function WebSocketConnector({ children }: { children: React.React
         else if (data.type == "load_friend_invites") {
           dispatch(setFriendInvites(data.invites))
         } else if (data.type === "friend_invite_received") {
+          console.log(data)
           toast(`You received a friend invite from ${data.username}`, {
             description: "Do you want to accept the invite?",
             action: {
               label: "Accept",
               onClick: () => {
-                ws.send(JSON.stringify({ type: "accept_friend_invite", invite_came_from: data.from, game_id: data.game_id }))
+                ws.send(JSON.stringify({ type: "accept_friend_invite", invite_came_from: data.from, invite_id: data.invite_id }))
               },
             },
             cancel: {
@@ -82,7 +83,10 @@ export default function WebSocketConnector({ children }: { children: React.React
               },
             },
           })
-          addFriendInvite(data.friend_invite)
+          dispatch(addFriendInvite(data.friend_invite))
+        } else if (data.type === "friend_invite_answered") {
+          dispatch(removeFriendInvite(data.to))
+
         }
       };
 

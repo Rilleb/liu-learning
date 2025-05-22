@@ -6,6 +6,7 @@ from django.forms.utils import from_current_timezone
 from rest_framework.authtoken.models import Token
 from django_redis import get_redis_connection
 from db_handler import services
+from db_handler.models import FriendInvites
 from realtime.utils import (
     add_friend_invite,
     cache_quiz_questions,
@@ -80,10 +81,12 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             to = content.get("to")
             await add_friend_invite(from_friend=self.user, to=to)
         elif type == "accept_friend_invite":
-            invite_id = content.get("invitor_id")
+            invite_id = content.get("invite_id")
             invite = await sync_to_async(
-                FriendInvites.objects.select_related("from_friend").get
-            )(id=invite_id)
+                lambda: FriendInvites.objects.select_related("from_friend").get(
+                    id=invite_id
+                )
+            )()
 
             if invite.to_id != self.user.id:
                 await self.send_json({"error": "Unauthorized"})
@@ -98,12 +101,24 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                 },
             )
 
+            await sync_to_async(services.add_friend)(self.user, invite.from_friend)
+
+            await self.send_json(
+                {
+                    "type": "friend_invite_answered",
+                    "status": "accepted",
+                    "from": invite.from_friend.id,
+                }
+            )
             await sync_to_async(invite.delete)()
-            await self.send_json({"status": "Friend invite accepted"})
 
         elif type == "decline_friend_invite":
             invite_id = content.get("invite_id")
-            invite = await sync_to_async(FriendInvites.objects.get)(id=invite_id)
+            invite = await sync_to_async(
+                lambda: FriendInvites.objects.select_related("from_friend").get(
+                    id=invite_id
+                )
+            )()
 
             if invite.to_id != self.user.id:
                 await self.send_json({"error": "Unauthorized"})
@@ -125,6 +140,13 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             {
                 "type": "friend_logged_in",
                 "user_id": event["user_id"],
+            }
+        )
+
+    async def friend_invite_accepted(self, event):
+        await self.send_json(
+            {
+                "type": "friend_invite_accepted",
             }
         )
 
@@ -163,6 +185,7 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                 "type": "friend_invite_received",
                 "from": event["from"],
                 "username": event["username"],
+                "invite_id": event["invite_id"],
             }
         )
 

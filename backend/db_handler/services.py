@@ -176,7 +176,7 @@ def create_question_answer(
 
 def create_friend_invite(from_friend, to):
     try:
-        internal_services.create_friend_invite(from_friend=from_friend, to=to)
+        return internal_services.create_friend_invite(from_friend=from_friend, to=to)
     except Exception as e:
         print(f"Error creating friend invite: {e}")
 
