@@ -562,7 +562,8 @@ class CredentialsLoginView(APIView):
             )
         else:
             return Response({"error": "Invalid credentials"}, status=400)
-        
+
+
 class Account(APIView):
     def get(self, request):
         try:
@@ -573,12 +574,13 @@ class Account(APIView):
         except:
             return Response({"error": "Could not get quiz questions"}, status=400)
 
+
 class Password(APIView):
     def put(self, request):
         token = get_auth_token(request)
         if not token:
             return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
-        
+
         user = get_user_from_token(token)
 
         data = json.loads(request.body)
@@ -586,14 +588,14 @@ class Password(APIView):
         old_password = data.get("old_password")
         new_password = data.get("new_password")
         check_auth = authenticate(username=user.username, password=old_password)
-        if(check_auth):
+        if check_auth:
             check_auth.set_password(new_password)
             check_auth.save()
             return Response("new password set", status=status.HTTP_200_OK)
         else:
             return Response(
-                "Error, could change password", status=status.HTTP_400_BAD_REQUEST)
-            
+                "Error, could change password", status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class AddFriendInvite(APIView):
@@ -658,4 +660,3 @@ class AddFriendInvite(APIView):
             return Response("User not found", status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
->>>>>>> 30d94b8 (Working on friends invite, socket events should be working, thea will take over and finish this part)
