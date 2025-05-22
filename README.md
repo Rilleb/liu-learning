@@ -31,5 +31,6 @@ Our goal is to create an engaging, gamified learning platform where users can tr
 ![Image](./database_design.png)
 
 ## Videos
-[Shared folder where all videos should be placed] (https://liuonline-my.sharepoint.com/:f:/g/personal/gusca083_student_liu_se/Euvmb9LMRQVCo_nC66BhpaUBa7UWBu0_i2WRECPeUsJULQ?e=1BtRIg)
-[Gustav Screen Cast] (https://liuonline-my.sharepoint.com/:v:/g/personal/gusca083_student_liu_se/EQ9_UUFWUWxPvfSNlzswcC0BmOe5CCV6vjgK1j6kwDtgmg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=mLuVJd)
+[Shared folder where all videos should be placed](https://liuonline-my.sharepoint.com/:f:/g/personal/gusca083_student_liu_se/Euvmb9LMRQVCo_nC66BhpaUBa7UWBu0_i2WRECPeUsJULQ?e=1BtRIg)
+
+[Gustav Screen Cast](https://liuonline-my.sharepoint.com/:v:/g/personal/gusca083_student_liu_se/EQ9_UUFWUWxPvfSNlzswcC0BmOe5CCV6vjgK1j6kwDtgmg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=mLuVJd)
