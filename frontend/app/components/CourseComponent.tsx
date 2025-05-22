@@ -31,16 +31,6 @@ export default function CourseComponent({ allCourses, accessToken }: Props) {
               </div>
             </Link>
             <FollowButton courseId={course.id} accessToken={accessToken} />
-            {/* <button */}
-            {/*   onClick={() => toggleFollow(course)} */}
-            {/*   className={`ml-4 text-xl px-3 py-1 rounded-full transition-all border hover:opacity-90 ${isFollowed(course.id) */}
-            {/*     ? 'bg-[var(--color3)] text-[var(--foreground)] border-[var(--color2)]' */}
-            {/*     : 'bg-[var(--color1)] text-white border-[var(--color2)]' */}
-            {/*     }`} */}
-            {/*   title={isFollowed(course.id) ? 'Unfollow course' : 'Follow course'} */}
-            {/* > */}
-            {/*   {isFollowed(course.id) ? '✓' : '+'} */}
-            {/* </button> */}
           </li>
         ))}
       </ul>

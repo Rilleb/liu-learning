@@ -31,7 +31,7 @@ export default function CreateCourseForm() {
         const res = await createCourse({ title, code, description, chapters });
 
         if (res.success) {
-            setStatus("Succesfully created course")
+            setStatus("Successfully created course")
         } else {
             // const data = await res.json()data.message 
             setStatus('Failed to create course')
@@ -104,14 +104,14 @@ export default function CreateCourseForm() {
                 </div>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end gap-4">
+                {status && <p>{status}</p>}
                 <button
                     type="submit"
                     className="bg-[var(--color_green)] text-white px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
                 >
                     Create Course
                 </button>
-                {status && <p>{status}</p>}
             </div>   
         </form>
     );

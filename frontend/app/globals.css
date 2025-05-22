@@ -43,32 +43,32 @@ h1 {
 }
 
 h2 {
-    font-family: Verdana; 
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif; 
     @apply italic text-xl text-[var(--foreground2)];
 }
 
 h3 {
-    font-family: Verdana; 
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif;
     @apply text-xl text-[var(--foreground2)];
 }
 
 label {
-    font-family: Verdana; 
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif; 
 }
 
 ul {
-    font-family: Verdana;
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif;
 }
 
 button {
-    font-family: Verdana;
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif;
     @apply self-end;
 }
 
 textarea {
-    font-family: Verdana;
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif;
 }
 
 input {
-    font-family: Verdana;
+    font-family: Verdana, Helvetica, 'Montserrat', sans-serif;
 }
