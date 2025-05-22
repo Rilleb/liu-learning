@@ -5,6 +5,7 @@ import { AccountInfo } from "../data_types/data_types"
 import { useSession } from 'next-auth/react'
 import { Button, Flex, Text, TextField } from '@radix-ui/themes'
 import * as Dialog from '@radix-ui/react-dialog'
+import InviteBar from './../components/invite_bar'
 
 type Props = {
   accountData: AccountInfo
@@ -181,6 +182,11 @@ export default function Home() {
       {/*Account Information*/}
       <div className="tile-marker col-span-2 row-span-2 rounded-sm border-[var(--color3)] p-4">
         <AccountComponent accountData={accountData} accessToken={session?.accessToken} />
+      </div>
+
+      {/*Invites*/}
+      <div className="tile-marker col-span-1 col-start-3 border-2 row-span-4 rounded-sm border-[var(--color3)] p-4 overflow-auto">
+          <InviteBar />
       </div>
     </div>
   )

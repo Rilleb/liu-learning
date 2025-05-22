@@ -1,5 +1,5 @@
 "use client"
-import Image from "next/image";
+
 import { FriendsList, UserList } from "@/app/data_types/data_types";
 import { useSelector } from 'react-redux';
 import { setFriends } from "../store/friendSlice";
@@ -15,7 +15,7 @@ interface params {
     gameId: string
 }
 
-export default function FriendsBar({ gameId }: params) {
+export default function InviteBar({ gameId }: params) {
     const dispatch = useAppDispatch();
     const { data: session, status } = useSession();
     const { socket, ready } = useSocket()
@@ -79,7 +79,7 @@ export default function FriendsBar({ gameId }: params) {
 
     return (
         <div>
-            <h3>Friends Online</h3>
+            <h3>Friend invites</h3>
             <ul>
                 {online && online.map((friend, index) => {
                     return (
@@ -116,45 +116,6 @@ export default function FriendsBar({ gameId }: params) {
                     )
                 })}
             </ul>
-            <div className="h-px w-full bg-[var(--color3)] my-4" />
-            <h3>Friends Offline</h3>
-            <ul>
-
-                {offline && offline.map((friend, index) => (
-                    <Popover.Root key={`offline-friend-${index}`}>
-                        <Popover.Trigger asChild>
-                            <div className="flex items-center p-2 border border-transparent hover:border-gray-600 cursor-pointer rounded-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
-                                {friend.username}
-                                <span className="h-2 w-2 rounded-full bg-[var(--color_red)] inline-block m-1" />
-                            </div>
-                        </Popover.Trigger>
-
-                        <Popover.Portal>
-                            <Popover.Content
-                                className="bg-[var(--background)] border p-4 rounded z-50 w-48"
-                                side="right"
-                                align="start"
-                                sideOffset={8}
-                            >
-                                <p className="font-bold">{friend.username}</p>
-                                <p className="text-sm text-[var(--color2)]">Status: Offline</p>
-                                <button
-                                    onClick={() => inviteUser(friend)}
-                                    className="mt-2 bg-[var(--foreground)] hover:bg-[var(--color2)] text-[var(--background)] px-3 py-1 rounded text-sm w-full border-none outline-none focus:ring-0"
-                                >
-                                    Invite to Game
-                                </button>
-                                <Popover.Arrow className="fill-white" />
-                            </Popover.Content>
-                        </Popover.Portal>
-                    </Popover.Root>
-                ))}
-
-            </ul>
-
         </div >
     )
 };
