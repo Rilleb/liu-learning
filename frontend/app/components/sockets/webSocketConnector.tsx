@@ -69,6 +69,7 @@ export default function WebSocketConnector({ children }: { children: React.React
           dispatch(setFriendInvites(data.invites))
         } else if (data.type === "friend_invite_received") {
           console.log(data)
+          dispatch(addFriendInvite(data.friend_invite))
           toast(`You received a friend invite from ${data.username}`, {
             description: "Do you want to accept the invite?",
             action: {
@@ -84,7 +85,6 @@ export default function WebSocketConnector({ children }: { children: React.React
               },
             },
           })
-          dispatch(addFriendInvite(data.friend_invite))
         } else if (data.type === "friend_invite_answered") {
           //We wait for the server to respond before removing the friend invite and updating friendsbar
           const friend: User = data.new_friend

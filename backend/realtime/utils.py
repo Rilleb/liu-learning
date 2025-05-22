@@ -83,7 +83,7 @@ async def notify_friend_on_friend_invite(
         {
             "type": "friend_invite_received",
             "from": invite_from_id,
-            "username": invite_from_username,
+            "from_username": invite_from_username,
             "invite_id": invite_id,
         },
     )
@@ -91,11 +91,16 @@ async def notify_friend_on_friend_invite(
 
 async def add_friend_invite(from_friend, to):
     to_friend = await sync_to_async(services.get_user_from_username)(to)
-    # if to_friend and (not services.are_friends(from_friend, to_friend)):
-    if to_friend and (
-        not await sync_to_async(services.are_friends)(from_friend, to_friend)
+    has_pending_invite = await sync_to_async(services.has_pending_invite)(
+        from_friend, to_friend
+    )
+    if (
+        to_friend
+        and not has_pending_invite
+        and (not await sync_to_async(services.are_friends)(from_friend, to_friend))
     ):
         # You shouldn't be able to make an invite to people you are friends with
+        # Or send them multiple invites
         invite = await sync_to_async(services.create_friend_invite)(
             from_friend=from_friend, to=to_friend
         )

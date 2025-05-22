@@ -1,15 +1,80 @@
 'use client'
 
 import { useEffect, useState } from "react"
-import { AccountInfo } from "../data_types/data_types"
+import { AccountInfo, FriendInviteList } from "../data_types/data_types"
 import { useSession } from 'next-auth/react'
 import { Button, Flex, Text, TextField } from '@radix-ui/themes'
 import * as Dialog from '@radix-ui/react-dialog'
+import { Dispatch } from "@reduxjs/toolkit"
+import { useAppDispatch, useAppSelector } from "../store"
+import { useSocket } from "@/app/components/sockets/socketContext";
 
 type Props = {
   accountData: AccountInfo
   accessToken: String
 }
+
+const InvitesComponent = () => {
+  const invites = useAppSelector((state) => state.friends.invites);
+  const { socket, ready } = useSocket();
+
+  const handleAccept = (invite: { from: number; invite_id: number }) => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+    socket.send(JSON.stringify({
+      type: "accept_friend_invite",
+      invite_came_from: invite.from,
+      invite_id: invite.invite_id,
+    }));
+  };
+
+  const handleDecline = (invite: { from: number }) => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) return;
+
+    socket.send(JSON.stringify({
+      type: "decline_friend_invite",
+      invite_came_from: invite.from,
+    }));
+  };
+
+  if (!invites || invites.length === 0) {
+    return (
+      <div className="p-4 bg-[var(--color1)] border border-[var(--color3)] rounded shadow">
+        <p className="text-[var(--foreground2)]">No pending invites.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 bg-[var(--color1)] border border-[var(--color3)] rounded shadow">
+      <h2 className="text-xl font-semibold text-[var(--foreground2)] mb-4">Pending Friend Invites</h2>
+      <ul className="space-y-3">
+        {invites.map((invite, index) => (
+          <li key={index} className="p-3 bg-white border border-[var(--color3)] rounded-md shadow-sm">
+            <p className="text-[var(--foreground)] font-medium">
+              <strong>From:</strong> {invite.from_username}
+            </p>
+            <div className="flex gap-3 mt-3">
+              <button
+                onClick={() => handleAccept(invite)}
+                className="px-4 py-1 rounded text-white bg-[var(--color_green)] hover:bg-[var(--color_green_hover)]"
+              >
+                Accept
+              </button>
+              <button
+                onClick={() => handleDecline(invite)}
+                className="px-4 py-1 rounded text-white bg-[var(--color_red)] hover:opacity-90"
+              >
+                Decline
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
 
 const change_password = async (
   old_password: string,
@@ -23,10 +88,10 @@ const change_password = async (
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/user/change_password`, {
     method: "PUT",
-    headers: { 
-        "Content-Type": "application/json", 
-        'Authorization': `Token ${accessToken}`,
-     },
+    headers: {
+      "Content-Type": "application/json",
+      'Authorization': `Token ${accessToken}`,
+    },
     body: JSON.stringify({ old_password, new_password }),
   })
 
@@ -37,7 +102,7 @@ const change_password = async (
   return { success: true, message: "Password changed successfully." }
 }
 
-const AccountComponent = ({ accountData , accessToken}: Props) => {
+const AccountComponent = ({ accountData, accessToken }: Props) => {
   const [oldPassword, setOldPassword] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -46,7 +111,7 @@ const AccountComponent = ({ accountData , accessToken}: Props) => {
 
   if (!accountData) return <p>...Loading</p>
 
-  const handleSaveClick = async (accessToken:string) => {
+  const handleSaveClick = async (accessToken: string) => {
     setIsLoading(true)
     setFeedbackMessage(null)
     const result = await change_password(oldPassword, newPassword, confirmPassword, accessToken)
@@ -153,15 +218,17 @@ const AccountComponent = ({ accountData , accessToken}: Props) => {
 export default function Home() {
   const { data: session, status } = useSession()
   const [accountData, setAccountData] = useState<AccountInfo>()
+  const [invites, setInvites] = useState<FriendInviteList>([])
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const getData = async () => {
       if (status === "authenticated") {
         const res_account_data = await fetch(
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/account/data?user_id=${session?.user.id}`, {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-          }
+          method: "GET",
+          headers: { "Content-Type": "application/json" }
+        }
         )
 
         if (!res_account_data.ok) {
@@ -174,14 +241,20 @@ export default function Home() {
       }
     }
     getData()
-  }, [status, session])
+  }, [status, session, dispatch])
+
 
   return (
-    <div className="container h-full m-auto grid gap-4 grid-cols-1 lg:grid-cols-1 lg:grid-rows-5 overflow-auto">
-      {/*Account Information*/}
+    <div className="container h-full m-auto grid gap-4 grid-cols-4 lg:grid-cols-4 lg:grid-rows-5 overflow-auto">
       <div className="tile-marker col-span-2 row-span-2 rounded-sm border-[var(--color3)] p-4">
         <AccountComponent accountData={accountData} accessToken={session?.accessToken} />
       </div>
+
+      <div className="tile-marker col-span-2 row-span-2 rounded-sm border-[var(--color3)] p-4 bg-[var(--background)]">
+        <h2 className="text-xl font-bold mb-4 text-[var(--color2)]">Friend Invites</h2>
+        <InvitesComponent />
+      </div>
     </div>
   )
+
 }

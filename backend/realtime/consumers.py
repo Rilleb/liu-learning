@@ -76,9 +76,9 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             await notify_inviter_on_response(
                 invite_from, self.user, True, content.get("game_id")
             )
-        elif type == "game_invite_declined":
-            invite_from = content.get("invite_came_from")
-            await notify_inviter_on_response(invite_from, self.user, False)
+        # elif type == "game_invite_declined":
+        # invite_from = content.get("invite_came_from")
+        # await notify_inviter_on_response(invite_from, self.user, False)
         elif type == "friend_invite":
             to = content.get("to")
             await add_friend_invite(from_friend=self.user, to=to)
@@ -183,9 +183,11 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
         await self.send_json(
             {
                 "type": "friend_invite_received",
-                "from": event["from"],
-                "username": event["username"],
-                "invite_id": event["invite_id"],
+                "friend_invite": {
+                    "from": event["from"],
+                    "from_username": event["from_username"],
+                    "to": self.user.id,
+                },
             }
         )
 

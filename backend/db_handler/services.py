@@ -583,3 +583,7 @@ def get_friend_invites(user):
         }
         for invite in invites
     ]
+
+
+def has_pending_invite(from_friend, to) -> bool:
+    return models.FriendInvites.objects.filter(from_friend=from_friend, to=to).exists()
