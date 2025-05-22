@@ -22,6 +22,7 @@ export function FriendStats({ userData }: Props) {
     const [userSelected, setUserSelected] = useState(false)
     const [dateBasedData, setDateBasedData] = useState<DateBasedStat[]>(date_based)
     const [courseBasedData, setCourseBasedData] = useState<CourseBasedStat[]>(course_based)
+    const [cmpUser, setCmpUser] = useState<string>("")
 
     const token = session?.accessToken ?? "";
     const username = session?.user.username ?? "";
@@ -30,6 +31,7 @@ export function FriendStats({ userData }: Props) {
 
     const onClick = (async (user: User) => {
         setQuery(user.username)
+        setCmpUser(user.username)
         setShowDropdown(false)
         setUserSelected(true)
         setLoading(true)
@@ -55,7 +57,6 @@ export function FriendStats({ userData }: Props) {
             console.error(err)
         }
         setLoading(false)
-
     })
 
 
@@ -158,7 +159,7 @@ export function FriendStats({ userData }: Props) {
                 <div className="bg-white rounded-xl shadow p-4 flex flex-col">
                     <p className="font-semibold mb-2">Attempts by course</p>
                     <div className="flex-grow">
-                        <RadarCourseChart data={courseBasedData} user={username} is_multiple={userSelected} />
+                        <RadarCourseChart data={courseBasedData} user={username} friend={cmpUser} is_multiple={userSelected} />
                     </div>
                 </div>
             </div>
