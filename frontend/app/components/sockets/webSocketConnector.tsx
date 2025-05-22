@@ -2,10 +2,11 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useDispatch } from "react-redux";
-import { setFriendOffline, setFriendOnline, setFriendInvites, addFriendInvite, removeFriendInvite } from "@/app/store/friendSlice";
+import { setFriendOffline, setFriendOnline, setFriendInvites, addFriendInvite, removeFriendInvite, setRefetch } from "@/app/store/friendSlice";
 import { SocketContext } from "@/app/components/sockets/socketContext";
 import { Toaster, toast } from 'sonner';
 import { useRouter } from "next/navigation";
+import { User } from "next-auth";
 
 
 export default function WebSocketConnector({ children }: { children: React.ReactNode }) {
@@ -85,8 +86,12 @@ export default function WebSocketConnector({ children }: { children: React.React
           })
           dispatch(addFriendInvite(data.friend_invite))
         } else if (data.type === "friend_invite_answered") {
-          dispatch(removeFriendInvite(data.to))
-
+          //We wait for the server to respond before removing the friend invite and updating friendsbar
+          const friend: User = data.new_friend
+          dispatch(removeFriendInvite(friend.id))
+          dispatch(setRefetch(true))
+        } else if (data.type === "friend_invite_accepted") {
+          dispatch(setRefetch(true)) //refetch data for friend_bar
         }
       };
 
