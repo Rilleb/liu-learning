@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.db.models.base import CASCADE
 
 # Create your models here.
 
@@ -84,3 +85,13 @@ class Friendship(models.Model):
 
     class Meta:
         unique_together = ("user1", "user2")
+
+
+class FriendInvites(models.Model):
+    to = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="friend_invites_received"
+    )
+    from_friend = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="friend_invites_sent"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)

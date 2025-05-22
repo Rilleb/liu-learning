@@ -516,9 +516,9 @@ class UserCreateView(APIView):
         hashed_password = make_password(password)
 
         # Create user in the database
-        user = User.objects.create(
-            username=username, email=email, password=hashed_password
-        )
+        # user = User.objects.create(
+        # username=username, email=email, password=hashed_password
+        # )
         # Create user in the database
         user = services.create_user(username=username, email=email, password=password)
         if user:
@@ -543,7 +543,7 @@ class CredentialsLoginView(APIView):
             return Response({"error": "Invalid credentials"}, status=400)
 
         # Authenticate user using Django's authenticate method
-        user = authenticate(request, username=user.username, password=password)
+        # user = authenticate(request, username=user.username, password=password)
 
         user = authenticate(username=user.username, password=password)
         if user:
@@ -593,3 +593,69 @@ class Password(APIView):
         else:
             return Response(
                 "Error, could change password", status=status.HTTP_400_BAD_REQUEST)
+            
+
+
+class AddFriendInvite(APIView):
+
+    def post(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        try:
+            data = json.loads(request.body)
+            to_id = data.get("to")
+            from_friend = get_user_from_token(token)
+
+            if not from_friend or not to_id:
+                return Response(
+                    "Missing fields: 'from_friend' and 'to' are required",
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            to_user = User.objects.get(id=to_id)
+            invite = FriendInvites.objects.create(from_friend=from_friend, to=to_user)
+
+            return Response(
+                {"message": "Friend invite created", "invite_id": invite.id},
+                status=status.HTTP_201_CREATED,
+            )
+
+        except User.DoesNotExist:
+            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def get(self, request):
+        token = get_auth_token(request)
+        if not token:
+            return Response("Missing auth header", status=status.HTTP_401_UNAUTHORIZED)
+
+        user_id = request.GET.get("user_id")
+        if not user_id:
+            return Response(
+                "Missing user_id parameter", status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(id=user_id)
+            invites = FriendInvites.objects.filter(to=user)
+
+            results = [
+                {
+                    "id": invite.id,
+                    "from_friend_id": invite.from_friend.id,
+                    "from_friend_username": invite.from_friend.username,
+                    "created_at": invite.created_at.isoformat(),
+                }
+                for invite in invites
+            ]
+
+            return Response(results, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response("User not found", status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+>>>>>>> 30d94b8 (Working on friends invite, socket events should be working, thea will take over and finish this part)
