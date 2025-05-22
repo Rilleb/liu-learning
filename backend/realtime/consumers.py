@@ -17,6 +17,7 @@ from realtime.utils import (
     notify_user_on_invite,
     update_user_progress,
 )
+from db_handler.serializers import UserSerializer
 
 
 class UserConsumer(AsyncJsonWebsocketConsumer):
@@ -47,9 +48,10 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
                 await self.send_json({"status": "authenticated"})
                 await self.send_json(
                     {
-                        "load_friend_invites": await sync_to_async(
-                            services.get_friend_invites
-                        )(self.user)
+                        "type": "load_friend_invites",
+                        "invites": await sync_to_async(services.get_friend_invites)(
+                            self.user
+                        ),
                     }
                 )
             except Token.DoesNotExist:
@@ -91,23 +93,21 @@ class UserConsumer(AsyncJsonWebsocketConsumer):
             if invite.to_id != self.user.id:
                 await self.send_json({"error": "Unauthorized"})
                 return
-
+            serilizer = UserSerializer(self.user)
             await self.channel_layer.group_send(
                 f"user_{invite.from_friend.id}",
-                {
-                    "type": "friend_invite_accepted",
-                    "from_id": self.user.id,
-                    "from_username": self.user.username,
-                },
+                {"type": "friend_invite_accepted", "from": serilizer.data},
             )
 
             await sync_to_async(services.add_friend)(self.user, invite.from_friend)
+            serilizer = UserSerializer(invite.from_friend)
 
             await self.send_json(
                 {
                     "type": "friend_invite_answered",
                     "status": "accepted",
                     "from": invite.from_friend.id,
+                    "new_friend": serilizer.data,
                 }
             )
             await sync_to_async(invite.delete)()

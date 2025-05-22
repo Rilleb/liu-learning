@@ -79,8 +79,8 @@ export type CourseList = Course[]
 export type UserList = User[]
 
 export interface FriendInvite {
-    from: number, 
-    from_username: string, 
+    from: number
+    from_username: string
     to: number
 }
 
@@ -90,4 +90,5 @@ export interface FriendsList {
     online: UserList
     offline: UserList
     invites: FriendInviteList
+    refetch: boolean
 }

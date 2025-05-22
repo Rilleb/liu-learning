@@ -96,6 +96,7 @@ export default function GamePage({ gameStarted, quiz, questions, timelimit, rest
 
   const handleDone = async (passed: boolean) => {
     setShowDoneScreen(true)
+    console.log("Passed?", passed)
     if (!socket) {
       return
     }
@@ -124,8 +125,6 @@ export default function GamePage({ gameStarted, quiz, questions, timelimit, rest
     }
 
   }
-
-  console.log("IsRoomOwner?", isRoomOwner)
 
   return (
     <div className="flex items-center justify-center min-h-screen">

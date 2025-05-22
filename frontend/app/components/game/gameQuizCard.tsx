@@ -167,7 +167,7 @@ export default function GameQuizCard({
   const [showAnswer, setShowAnswer] = useState(false);
   const [startedAt, setStartedAt] = useState(new Date(Date.now()).toISOString());
   const [buttonVisible, setButtonVisible] = useState(true);
-  const [passed, setPassed] = useState(false);
+  const [passed, setPassed] = useState(true);
   const [passedQuiz, setPassedQuiz] = useState(true);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [freeTextAnswer, setFreeTextAnswer] = useState('');

@@ -9,6 +9,7 @@ const initialState: FriendsList = {
     offline: [],
     online: [],
     invites: [],
+    refetch: false,
 }
 
 const friendSlice = createSlice({
@@ -44,7 +45,12 @@ const friendSlice = createSlice({
             state.invites.push(action.payload)
         },
         removeFriendInvite(state, action: PayloadAction<number>) {
-            state.invites = state.invites.filter((f) => f.to != action.payload)
+            state.invites = state.invites.filter(
+                (f) => f && f.to !== action.payload
+            )
+        },
+        setRefetch(state, action: PayloadAction<boolean>) {
+            state.refetch = action.payload
         },
     },
 })
@@ -56,5 +62,6 @@ export const {
     setFriendInvites,
     addFriendInvite,
     removeFriendInvite,
+    setRefetch,
 } = friendSlice.actions
 export default friendSlice.reducer
