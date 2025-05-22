@@ -18,10 +18,10 @@ const QuizComponent = async ({ quizzes }: { quizzes: QuizList }) => {
                         return (
                             <li
                                 key={quiz.id}
-                                className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
+                                className="border-2 border-[var(--color2)] rounded-md p-4"
                             >
                                 <Link href={`/courses/${quiz.course.id}/${quiz.id}`}>
-                                    <p>Quiz: {quiz.name} </p>
+                                    <p className="hover:underline">Quiz: {quiz.name} </p>
                                 </Link>
                             </li>
                         )
@@ -39,7 +39,7 @@ export async function CourseComponent({ courses }: { courses: CourseList }) {
                 {courses && courses.map((course) => (
                     <li
                         key={course.id}
-                        className="border-2 border-[var(--color2)] rounded-md p-4 hover:shadow-md transition-shadow"
+                        className="border-2 border-[var(--color2)] rounded-md p-4"
                     >
                         <Link href={`/courses/${course.id}`}>
                             <div className="space-y-2">

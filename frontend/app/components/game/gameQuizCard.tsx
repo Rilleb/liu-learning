@@ -67,7 +67,7 @@ export function AnswerDiv({
   if (show) {
     return (
       <div>
-        <h2>The correct answer is: {question.answer} </h2>
+        <h2>The correct answer is: {question.correct_answer} </h2>
       </div>
     );
   }
@@ -78,11 +78,11 @@ export function AnswerDiv({
 }
 
 export function MultipleChoice({ question, onSelect }: { question: Question, onSelect: (answer: string) => void }) {
-  const options = [question.answer, question.alternatives.alt1, question.alternatives.alt2, question.alternatives.alt3]; // must have 3 alternatives
+  const options = [question.correct_answer, question.alt_1, question.alt_2, question.alt_3]; // must have 3 alternatives
   const shuffled = [...options].sort(() => Math.random() - 0.5);
   return (
     <div>
-      <h2>{question.question}</h2>
+      <h2>{question.description}</h2>
       {options.map((option, idx) => (
         <label key={idx} className="flex items-center gap-2 mb-1">
           <input
@@ -140,7 +140,7 @@ export function FreeText({
 }) {
   return (
     <div>
-      <h2>{question.question}</h2>
+      <h2>{question.description}</h2>
       <EnhancedTextbox key={question.id} onTextChange={onAnswerChange}></EnhancedTextbox>
     </div>
   );
@@ -212,7 +212,7 @@ export default function GameQuizCard({
   useEffect(() => {
     <CheckMultiple questions={questions} index={index} onSelect={setSelectedAnswer} />
     if (questions[index].is_multiple) {
-      if (selectedAnswer == questions[index].answer) {
+      if (selectedAnswer == questions[index].correct_answer) {
         setPassed(true)
       } else {
         setPassed(false)
@@ -259,7 +259,7 @@ export default function GameQuizCard({
                     await addQuestionAttempt({
                       attempt: quiz_attempt_id,
                       question: questions[index].id,
-                      is_correct: selectedAnswer === questions[index].answer,
+                      is_correct: selectedAnswer === questions[index].correct_answer,
                       is_multiple_choice: questions[index].is_multiple,
                       free_text_answer: "",
                       started_at: startedAt,

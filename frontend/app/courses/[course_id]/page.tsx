@@ -1,9 +1,8 @@
-import { getQuizzesForCourse, get_course_name } from '../../lib/get_data'
 import Link from 'next/link'
 import FriendsBar from '../../components/friend_bar'
 import { getServerSession } from "next-auth"
 import { options } from "../../api/auth/[...nextauth]/options"
-import { UserList, QuizList, Course } from "../../data_types/data_types"
+import { QuizList, Course } from "../../data_types/data_types"
 import FollowButton from '@/app/components/followButton'
 
 
@@ -37,7 +36,6 @@ const QuizComponent = async ({ courseId }: { courseId: number }) => {
             )
         }
         quizzes = await res.json()
-        console.log("Quizes: ", quizzes)
     } catch (e) {
         console.error("Error: ", e)
         return (

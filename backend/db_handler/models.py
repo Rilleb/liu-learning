@@ -70,8 +70,8 @@ class QuizAnswer(models.Model):
     attempt_started_at = models.DateTimeField()
     attempt_ended_at = models.DateTimeField(auto_now_add=True)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    multiple_chooice_answer = models.IntegerField()
-    free_text_answer = models.TextField()
+    multiple_chooice_answer = models.IntegerField(default=0, blank=True)
+    free_text_answer = models.TextField(default="", blank=True)
 
 
 class Friendship(models.Model):

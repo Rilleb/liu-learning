@@ -1,5 +1,5 @@
 
-"use client";
+'use client'
 
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
@@ -30,7 +30,7 @@ export default function RootLayout({
 }) {
     const storeRef = useRef<AppStore | null>(null)
     if (!storeRef.current) {
-        storeRef.current = makeStore()
+        storeRef.current = makeStore();
     }
 
     return (

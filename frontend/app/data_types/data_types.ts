@@ -37,10 +37,12 @@ export interface Quiz {
 
 export interface Question {
     id: number
-    question: string
-    answer: string
+    description: string
     is_multiple: boolean
-    alternatives: any
+    correct_answer: string
+    alt_1: string
+    alt_2: string
+    alt_3: string
 }
 
 export interface QuizAttempt {
@@ -91,4 +93,12 @@ export interface FriendsList {
     offline: UserList
     invites: FriendInviteList
     refetch: boolean
+}
+
+export interface AccountInfo {
+    name: string
+    email: string
+    created: Date
+    course_count: number
+    friend_count: number
 }
