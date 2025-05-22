@@ -339,7 +339,7 @@ class FindUser(APIView):
 class QuestionCount(APIView):
     def get(self, request):
         quizId = request.query_params.get("quiz_id", None)
-        count = services.get_question_count(quizId == quizId)
+        count = services.get_question_count(quizId)
         return Response(count)
 
 
