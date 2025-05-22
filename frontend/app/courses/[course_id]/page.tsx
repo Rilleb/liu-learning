@@ -113,7 +113,7 @@ export default async function Home({ params }: { params: { course_id: number } }
                 <h1> {course.name} : {course.code} </h1>
                 <FollowButton courseId={courseId} accessToken={session.accessToken} />
             </div>
-            <p className="text-gray-600 text-sm">{course.description}</p>
+            <h3>{course.description}</h3>
             {/*Quizzes*/}
             <div className="h-screen tile-marker col-span-2 border-2 !overflow-auto md-col-span-2 rounded-sm border-[var(--color3)] p-4">
                 <h1>Quizzes</h1>
