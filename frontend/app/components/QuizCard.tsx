@@ -4,6 +4,7 @@ import { Question } from "./../data_types/data_types"
 import { useState, useEffect } from "react";
 import EnhancedTextbox from './text_box';
 import { useRouter } from 'next/navigation';
+import { useMemo } from "react";
 
 async function addQuestionAttempt({
   attempt,
@@ -44,7 +45,6 @@ async function addQuestionAttempt({
     }
 
     const data = await res.text();
-    console.log("Question attempt recorded:", data);
   } catch (err) {
     console.error("Error submitting attempt:", err);
   }
@@ -71,18 +71,22 @@ export function AnswerDiv({
   );
 }
 
-export function MultipleChoice({ question, onSelect }: { question: Question, onSelect: (answer: string) => void }) {
-  const options = [question.correct_answer, question.alt_1, question.alt_2, question.alt_3]; // must have 3 alternatives
-  const shuffled = [...options].sort(() => Math.random() - 0.5);
+export function MultipleChoice({ question, onSelect, selectedAnswer }: { question: Question, onSelect: (answer: string) => void, selectedAnswer:string | null }) {
+  const shuffled = useMemo(() => {
+    const options = [question.correct_answer, question.alt_1, question.alt_2, question.alt_3]; // must have 3 alternatives
+    return [...options].sort(() => Math.random() - 0.5);
+  }, [question.id]); 
+
   return (
     <div>
       <h2>{question.description}</h2>
-      {options.map((option, idx) => (
+      {shuffled.map((option, idx) => (
         <label key={idx} className="flex items-center gap-2 mb-1">
           <input
             type="radio"
             name={`question-${question.id}`}
             value={option}
+            checked={selectedAnswer === option}
             onChange={() => onSelect(option)}
           />
           {option}
@@ -95,11 +99,13 @@ export function MultipleChoice({ question, onSelect }: { question: Question, onS
 export function CheckMultiple({
   questions,
   index,
+  selectedAnswer,
   onAnswerChange,
   onSelect,
 }: {
   questions: Question[];
   index: number;
+  selectedAnswer: string | null;
   onAnswerChange?: (text: string) => void;
   onSelect?: (answer: string) => void;
 }) {
@@ -110,7 +116,11 @@ export function CheckMultiple({
   let question: Question = questions[index];
   if (questions[index].is_multiple) {
     if (onSelect) {
-      return MultipleChoice({ question, onSelect })
+      return (  <MultipleChoice
+        question={question}
+        onSelect={onSelect}
+        selectedAnswer={selectedAnswer ?? null}
+      />)
     } else {
       console.error("Missing onSelect for multiple choice question.");
       return <div>Error: No handler for multiple choice.</div>;
@@ -169,9 +179,8 @@ export default function QuizCard({
   const [freeTextAnswer, setFreeTextAnswer] = useState('');
 
   useEffect(() => {
-    if (index == questions.length - 1) {
-      setButtonText("End quiz")
-    }
+    setSelectedAnswer(null)
+    setFreeTextAnswer('')
     if (index >= questions.length) {
       const time = new Date().toISOString()
       router.push(`/courses/${course_id}/${quiz_id}/ended?attempt_id=${quiz_attempt_id}&ended_at=${time}&passed=${passedQuiz}`);
@@ -214,7 +223,7 @@ export default function QuizCard({
       <h1 className="!text-[var(--color3)] !font-normal !text-2xl">{name}</h1>
       {index < questions.length && (
         <>
-          <CheckMultiple questions={questions} index={index} onAnswerChange={setFreeTextAnswer} onSelect={setSelectedAnswer} />
+          <CheckMultiple questions={questions} index={index} onAnswerChange={setFreeTextAnswer} onSelect={setSelectedAnswer} selectedAnswer={selectedAnswer} />
           <AnswerDiv question={questions[index]} show={showAnswer} />
           {buttonVisible && (
             <button
@@ -222,6 +231,10 @@ export default function QuizCard({
               className="text-white bg-[var(--color2)] hover:bg-[var(--color3)] px-4 py-2 transition-all rounded place-self-end"
               onClick={async () => {
                 if (buttonText === "Check answer") {
+                  if (questions[index].is_multiple && selectedAnswer === null) {
+                    alert("Please select an answer before continuing.");
+                    return; 
+                  }
                   isAnswered(true)
                   if (questions[index].is_multiple) {
                     if (selectedAnswer == questions[index].correct_answer) { 
@@ -244,7 +257,11 @@ export default function QuizCard({
                   setIndex(index + 1)
                 }
                 setShowAnswer(!showAnswer)
-                setButtonText(prev => prev === "Check answer" ? "Next Question" : "Check answer")
+                if (index === questions.length - 1 && buttonText === "Check answer") {
+                  setButtonText("End quiz");
+                } else {
+                  setButtonText(prev => prev === "Check answer" ? "Next Question" : "Check answer");
+                }
               }}
             >
               {buttonText}

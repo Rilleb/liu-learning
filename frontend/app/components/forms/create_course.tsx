@@ -97,7 +97,7 @@ export default function CreateCourseForm() {
                     <button
                         type="button"
                         onClick={handleAddChapter}
-                        className="bg-[var(--color2)] text-white px-2 py-1.5 rounded hover:bg-[var(--color3)]"
+                        className="bg-[var(--color2)] text-[var(--background)] px-2 py-1.5 rounded hover:bg-[var(--color3)]"
                     >
                         + Add Chapter
                     </button>
@@ -108,7 +108,7 @@ export default function CreateCourseForm() {
                 {status && <p>{status}</p>}
                 <button
                     type="submit"
-                    className="bg-[var(--color_green)] text-white px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
+                    className="bg-[var(--color_green)] text-[var(--background)] px-4 py-2 rounded hover:bg-[var(--color_green_hover)]"
                 >
                     Create Course
                 </button>
