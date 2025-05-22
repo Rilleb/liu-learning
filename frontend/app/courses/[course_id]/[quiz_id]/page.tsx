@@ -30,7 +30,7 @@ export default async function Home({ params }: { params: { quiz_id: number, cour
         return (
             <div>
                 <p> Error fetching Quiz data </p>
-                <p> Make usre you are logged in </p>
+                <p> Make sure you are logged in </p>
             </div>
         )
     }
