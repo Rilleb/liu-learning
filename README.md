@@ -33,4 +33,10 @@ Our goal is to create an engaging, gamified learning platform where users can tr
 ## Videos
 [Shared folder where all videos should be placed](https://liuonline-my.sharepoint.com/:f:/g/personal/gusca083_student_liu_se/Euvmb9LMRQVCo_nC66BhpaUBa7UWBu0_i2WRECPeUsJULQ?e=1BtRIg)
 
-[Gustav Screen Cast](https://liuonline-my.sharepoint.com/:v:/g/personal/gusca083_student_liu_se/EQ9_UUFWUWxPvfSNlzswcC0BmOe5CCV6vjgK1j6kwDtgmg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=mLuVJd)
+[Group Project Overview](https://liuonline-my.sharepoint.com/personal/gusca083_student_liu_se/_layouts/15/stream.aspx?id=%2Fpersonal%2Fgusca083%5Fstudent%5Fliu%5Fse%2FDocuments%2FVideos%2F2025%2D05%2D23%2000%2D27%2D13%2Emkv&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E8778fecf%2D87a5%2D47f5%2D8897%2D34b556a9dfa1)
+
+[Gustav Screen Cast (gusca083)](https://liuonline-my.sharepoint.com/:v:/g/personal/gusca083_student_liu_se/EQ9_UUFWUWxPvfSNlzswcC0BmOe5CCV6vjgK1j6kwDtgmg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=mLuVJd)
+
+[Rickard Screen Cast (ricel947)](https://liuonline-my.sharepoint.com/personal/gusca083_student_liu_se/_layouts/15/stream.aspx?id=%2Fpersonal%2Fgusca083%5Fstudent%5Fliu%5Fse%2FDocuments%2FVideos%2Fricel946%5Fscreencast%2Emkv&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E0bfd765b%2D9505%2D454a%2Db32f%2D0baf5a3cf9b4)
+
+[Thea Screen Cast (thean981)](https://liuonline-my.sharepoint.com/personal/gusca083_student_liu_se/_layouts/15/stream.aspx?id=%2Fpersonal%2Fgusca083%5Fstudent%5Fliu%5Fse%2FDocuments%2FVideos%2Fthea%5Findividal%5Fcode%5Freview%2Emp4&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E5c45a325%2Dd137%2D4647%2D8036%2D7c0e8bee6bdd)
